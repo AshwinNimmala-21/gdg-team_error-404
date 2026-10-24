@@ -22,7 +22,7 @@ describe("demo samples (saved data, recorded extractions)", () => {
     const r = run("fine-arlington", sampleText("fine-arlington.txt"));
     expect(r.read).toMatchObject({ rent: 2350, bedrooms: 1, zip: "22203", jurisdiction: "VA" });
     expect(r.price.status).toBe("typical");
-    expect(r.price.headline).toBe("7% above HUD's benchmark rent for a 1-bedroom in the Washington metro");
+    expect(r.price.headline).toBe("Within the usual range for a 1-bedroom in ZIP 22203");
     expect(r.scam.status).toBe("none_found");
     expect(r.scam.flagged).toBe(0);
     expect(r.lease.status).toBe("not_provided");

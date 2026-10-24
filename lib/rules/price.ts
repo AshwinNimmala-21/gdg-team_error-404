@@ -1,13 +1,16 @@
+import { CENSUS_BEDROOM_SOURCE, CENSUS_SOURCE } from "@/lib/data/acs";
 import type { Benchmarks } from "@/lib/data/benchmarks";
-import { CENSUS_SOURCE } from "@/lib/data/acs";
 import { HUD_SOURCE } from "@/lib/data/fmr";
 import type { Evidence, PriceCheck } from "@/lib/types";
 
-// Clearlease rules of thumb (not HUD or FTC numbers). HUD's FMR sits near the 40th percentile of
-// local gross rent (rent + utilities), so ordinary listings land near or above it.
-export const BELOW_RATIO = 0.85;
-export const ABOVE_RATIO = 1.3;
-export const FAR_BELOW_RATIO = 0.75;
+// The "usual range" for a unit runs from the lower to the higher of two local references:
+// the Census median for the same bedroom count in the ZIP, and HUD's Fair Market Rent.
+// HUD's ZIP-level figures in pricey ZIPs sit at HUD's ceiling, while Census medians include
+// long-time tenants, so using both edges keeps either source from deciding alone.
+// Cut-offs are Clearlease rules of thumb, not HUD or FTC numbers.
+export const BELOW_RATIO = 0.85; // under 85% of the low edge → below market
+export const ABOVE_RATIO = 1.25; // over 125% of the high edge → above market
+export const FAR_BELOW_RATIO = 0.75; // 25%+ under the low edge → FTC "a lot cheaper" scam sign
 
 export interface PriceInput {
   rent: number | null;
@@ -32,58 +35,71 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
   if (input.rentEvidence) evidence.push(input.rentEvidence);
   if (input.bedroomsEvidence) evidence.push(input.bedroomsEvidence);
 
-  const areaName = b.fmrArea?.shortName ?? null;
+  const saved = (live: boolean) => (live ? "" : " (saved figure)");
+  const refs: { amount: number; name: string }[] = [];
+  if (b.censusBedroom && bedrooms !== null) {
+    refs.push({ amount: b.censusBedroom.amount, name: `Census median for a ${bedLabel(bedrooms)} in ${b.censusBedroom.geography}` });
+    evidence.push({
+      label: `Census median rent for a ${bedLabel(bedrooms)}`,
+      value: `${money(b.censusBedroom.amount)} a month in ${b.censusBedroom.geography}, ${b.censusBedroom.vintage}${saved(b.censusBedroom.live)}`,
+      counted: true,
+      source: CENSUS_BEDROOM_SOURCE,
+    });
+  }
   if (b.fmr && b.fmrArea && bedrooms !== null) {
     const where = b.fmr.level === "zip" ? `ZIP ${zip}` : b.fmrArea.shortName;
+    refs.push({ amount: b.fmr.amount, name: `HUD ${b.fmr.year} benchmark, ${where}` });
     evidence.push({
       label: "HUD benchmark rent (Fair Market Rent)",
-      value: `${money(b.fmr.amount)} a month for a ${bedLabel(bedrooms)}, ${where}, ${b.fmr.year}${b.fmr.live ? "" : " (saved figure)"}`,
+      value: `${money(b.fmr.amount)} a month for a ${bedLabel(bedrooms)}, ${where}, ${b.fmr.year}${saved(b.fmr.live)}`,
       counted: true,
       source: HUD_SOURCE,
     });
   }
   if (b.census) {
     evidence.push({
-      label: "Census median rent, all unit sizes",
-      value: `${b.census.topCoded ? "At least " : ""}${money(b.census.amount)} a month in ${b.census.geography}, ${b.census.vintage}${b.census.live ? "" : " (saved figure)"}`,
+      label: "Census median rent, all unit sizes (context)",
+      value: `${b.census.topCoded ? "At least " : ""}${money(b.census.amount)} a month in ${b.census.geography}, ${b.census.vintage}${saved(b.census.live)}`,
       counted: true,
       source: CENSUS_SOURCE,
     });
   }
 
-  const base = {
-    rent,
-    bedrooms,
-    zip,
-    areaName,
-    benchmark: b.fmr,
-    census: b.census,
-    evidence,
-    missing,
-  };
+  const base = { rent, bedrooms, zip, areaName: b.fmrArea?.shortName ?? null, benchmark: b.fmr, census: b.census, evidence, missing };
 
-  if (rent === null || bedrooms === null || !b.fmr || !b.fmrArea || rent <= 0) {
-    return { ...base, status: "unknown", ratio: null, farBelow: false, ...unknownCopy(missing) };
+  if (rent === null || bedrooms === null || refs.length === 0 || rent <= 0) {
+    return { ...base, status: "unknown", ratio: null, range: null, farBelow: false, ...unknownCopy(missing) };
   }
 
-  const ratio = rent / b.fmr.amount;
-  const pct = Math.round(Math.abs(ratio - 1) * 100);
-  const what = `HUD's benchmark rent for a ${bedLabel(bedrooms)} in the ${b.fmr.level === "zip" ? `${zip} ZIP code` : b.fmrArea.shortName}`;
-  const status: PriceCheck["status"] = ratio < BELOW_RATIO ? "below" : ratio > ABOVE_RATIO ? "above" : "typical";
+  const lowRef = refs.reduce((a, r) => (r.amount < a.amount ? r : a));
+  const highRef = refs.reduce((a, r) => (r.amount > a.amount ? r : a));
+  const ratio = rent / lowRef.amount;
+  const status: PriceCheck["status"] = ratio < BELOW_RATIO ? "below" : rent / highRef.amount > ABOVE_RATIO ? "above" : "typical";
   const farBelow = ratio <= FAR_BELOW_RATIO;
+  const unit = `a ${bedLabel(bedrooms)} in ${zip ? `ZIP ${zip}` : "this area"}`;
+
+  const rangeLine =
+    lowRef === highRef
+      ? `Local benchmark: ${money(lowRef.amount)} (${lowRef.name}).`
+      : `Usual range: ${money(lowRef.amount)} (${lowRef.name}) to ${money(highRef.amount)} (${highRef.name}).`;
 
   const headline =
-    pct < 2 ? `About the same as ${what}` : `${pct}% ${ratio < 1 ? "below" : "above"} ${what}`;
-  const detail =
+    status === "below"
+      ? `${Math.round((1 - ratio) * 100)}% below the usual range for ${unit}`
+      : status === "above"
+        ? `${Math.round((rent / highRef.amount - 1) * 100)}% above the usual range for ${unit}`
+        : `Within the usual range for ${unit}`;
+  const detail = `${rangeLine} ${
     status === "below"
       ? farBelow
-        ? "Rent this far under the local benchmark is a common scam sign, according to the FTC. Our cut-off (25% under) is a Clearlease rule of thumb, not an FTC number."
-        : "Cheaper than most places like it. That can be a real deal, but confirm the unit exists and see it before you pay anything."
+        ? "Rent this far under local rents is a common scam sign, according to the FTC. Our cut-off (25% under) is a Clearlease rule of thumb, not an FTC number."
+        : "Cheaper than most places like it. That can be a real deal, but see the unit before you pay anything."
       : status === "above"
-        ? "Well above the local benchmark. Ask what's included (utilities, parking, amenities) and compare a few similar listings nearby."
-        : "In the normal range. HUD sets this benchmark near the 40th percentile of local rents including utilities, so most real listings land near or above it.";
+        ? "Ask what's included (utilities, parking, amenities) and compare a few similar listings nearby."
+        : "Both figures include utilities, so a listing without utilities can sit a bit lower and still be normal."
+  }`;
 
-  return { ...base, status, ratio, farBelow, headline, detail };
+  return { ...base, status, ratio, range: { low: lowRef.amount, high: highRef.amount }, farBelow, headline, detail };
 }
 
 function unknownCopy(missing: PriceCheck["missing"]): { headline: string; detail: string } {
@@ -94,7 +110,7 @@ function unknownCopy(missing: PriceCheck["missing"]): { headline: string; detail
     };
   }
   const need = missing.map((m) => (m === "rent" ? "the monthly rent" : m === "bedrooms" ? "the number of bedrooms" : "the ZIP code"));
-  const list = need.length > 1 ? `${need.slice(0, -1).join(", ")} and ${need.at(-1)}` : need[0] ?? "the rent details";
+  const list = need.length > 1 ? `${need.slice(0, -1).join(", ")} and ${need.at(-1)}` : (need[0] ?? "the rent details");
   return {
     headline: `Add ${list} to check the price`,
     detail: "We couldn't read it from what you shared. Use Edit above to fill it in.",

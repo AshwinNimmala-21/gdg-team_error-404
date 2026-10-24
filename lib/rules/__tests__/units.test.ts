@@ -49,16 +49,18 @@ describe("zip areas", () => {
 });
 
 describe("price bands", () => {
-  const b = savedBenchmarks("22201", 1); // FMR 1BR = $2,204
+  const b = savedBenchmarks("22201", 1); // range: HUD metro FMR $2,204 to Census 1BR median $2,389
   const price = (rent: number) => computePrice({ rent, bedrooms: 1, zip: "22201" }, b);
   it("classifies against HUD FMR", () => {
     expect(price(2204).status).toBe("typical");
-    expect(price(2204).headline).toMatch(/^About the same/);
+    expect(price(2204).headline).toBe("Within the usual range for a 1-bedroom in ZIP 22201");
+    expect(price(2204).range).toEqual({ low: 2204, high: 2389 });
     expect(price(1880).status).toBe("typical"); // 0.853
     expect(price(1850).status).toBe("below"); // 0.839
     expect(price(1850).farBelow).toBe(false);
     expect(price(1653).farBelow).toBe(true); // 0.75
-    expect(price(2900).status).toBe("above"); // 1.316
+    expect(price(2900).status).toBe("typical"); // 1.21 of the high edge
+    expect(price(3000).status).toBe("above"); // 1.256
   });
   it("explains what's missing", () => {
     expect(computePrice({ rent: null, bedrooms: 1, zip: "22201" }, b).headline).toBe("Add the monthly rent to check the price");

@@ -68,17 +68,26 @@ export async function liveFmr(opts: { zip: string; countyFips: string | null; me
   };
 }
 
-/** Census ACS 5-year median gross rent for a ZCTA. Requires CENSUS_KEY (keyless calls are refused since 2026). */
-export async function liveCensusMedian(zip: string): Promise<{ value: number; topCoded: boolean } | null> {
+/** Census ACS 5-year median gross rent for a ZCTA, overall (B25064) and by bedrooms (B25031). Requires CENSUS_KEY. */
+export async function liveCensus(zip: string): Promise<{ all: { value: number; topCoded: boolean } | null; byBedrooms: (number | null)[] } | null> {
   const key = process.env.CENSUS_KEY?.trim();
   if (!key) return null;
   return cached(`acs:${zip}`, async () => {
+    const vars = ["B25064_001E", "B25031_002E", "B25031_003E", "B25031_004E", "B25031_005E", "B25031_006E"];
     const url =
-      "https://api.census.gov/data/2024/acs/acs5?get=NAME,B25064_001E" +
+      `https://api.census.gov/data/2024/acs/acs5?get=${vars.join(",")}` +
       `&for=zip%20code%20tabulation%20area:${zip}&key=${encodeURIComponent(key)}`;
     const json = await getJson(url);
     if (!Array.isArray(json) || json.length < 2 || !Array.isArray(json[0])) return null;
-    const col = (json[0] as unknown[]).indexOf("B25064_001E");
-    return col >= 0 ? parseAcsValue((json[1] as unknown[])[col]) : null;
+    const header = json[0] as unknown[];
+    const row = json[1] as unknown[];
+    const get = (v: string) => (header.indexOf(v) >= 0 ? parseAcsValue(row[header.indexOf(v)]) : null);
+    return {
+      all: get("B25064_001E"),
+      byBedrooms: vars.slice(1).map((v) => {
+        const p = get(v);
+        return p && !p.topCoded ? p.value : null;
+      }),
+    };
   });
 }

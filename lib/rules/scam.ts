@@ -67,7 +67,7 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
     else dropped.push({ ...ev, label: `${label} (not counted: we couldn't find this quote in what you shared)` });
   };
 
-  if (price.farBelow && price.rent !== null && price.benchmark) {
+  if (price.farBelow && price.rent !== null && price.range) {
     flags.push({
       id: "priceFarBelow",
       label: "Rent is far below similar rentals",
@@ -76,7 +76,7 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
       evidence: [
         {
           label: "FTC: “If the rent is a lot cheaper than most rents in the area, it could be a sign of a scam.”",
-          value: `${money(price.rent)} is ${Math.round((1 - (price.ratio ?? 1)) * 100)}% under HUD's ${money(price.benchmark.amount)} benchmark. Clearlease flags 25% or more.`,
+          value: `${money(price.rent)} is ${Math.round((1 - (price.ratio ?? 1)) * 100)}% under the low end of the usual local range (${money(price.range.low)}). Clearlease flags 25% or more.`,
           counted: true,
           source: FTC,
         },

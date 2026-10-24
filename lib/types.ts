@@ -49,6 +49,7 @@ export interface PriceCheck {
   benchmark: { amount: number; level: "zip" | "county" | "metro"; year: string; live: boolean } | null;
   census: { amount: number; geography: string; vintage: string; live: boolean; topCoded: boolean } | null;
   ratio: number | null;
+  range: { low: number; high: number } | null;
   farBelow: boolean;
   missing: ("rent" | "bedrooms" | "zip" | "area")[];
   evidence: Evidence[];

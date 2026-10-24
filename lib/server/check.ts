@@ -1,0 +1,132 @@
+import { z } from "zod";
+import { ExtractionError, extractWithGemma, modelId } from "@/lib/ai/gemma";
+import { keywordExtract, SAMPLE_EXTRACTIONS } from "@/lib/ai/mock";
+import { ExtractionSchema, type Extraction } from "@/lib/ai/schema";
+import { resolveBenchmarks } from "@/lib/data/benchmarks";
+import { resolveFacts, runRules } from "@/lib/rules/check";
+import { makeCorpus } from "@/lib/rules/quotes";
+import { SAMPLE_IDS, type CheckErrorCode, type CheckResult } from "@/lib/types";
+
+export const MAX_TEXT = 12_000;
+export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+
+const zip = z.string().regex(/^\d{5}$/);
+
+export const CheckRequestSchema = z.object({
+  text: z.string().max(MAX_TEXT).optional(),
+  image: z
+    .object({
+      mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+      data: z.string().regex(/^[A-Za-z0-9+/]+={0,2}$/),
+    })
+    .optional(),
+  zip: zip.optional().or(z.literal("")),
+  overrides: z
+    .object({
+      rent: z.number().positive().max(100_000).optional(),
+      bedrooms: z.number().int().min(0).max(10).optional(),
+      zip: zip.optional(),
+    })
+    .optional(),
+  extraction: z.unknown().optional(),
+  sampleId: z.enum(SAMPLE_IDS).optional(),
+});
+
+export class CheckFailure extends Error {
+  constructor(
+    public code: CheckErrorCode,
+    message: string,
+    public status: number,
+  ) {
+    super(message);
+  }
+}
+
+export const isMockMode = () => process.env.MOCK_AI === "1" || !process.env.GEMINI_API_KEY?.trim();
+
+export async function runCheck(body: unknown): Promise<CheckResult> {
+  const started = Date.now();
+  const parsed = CheckRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    const tooLong = parsed.error.issues.some((i) => i.code === "too_big");
+    throw tooLong
+      ? new CheckFailure("too_large", `Text is limited to ${MAX_TEXT.toLocaleString()} characters. Paste the most important part.`, 413)
+      : new CheckFailure("bad_input", "Something in the request wasn't valid. Reload the page and try again.", 400);
+  }
+  const req = parsed.data;
+  const text = req.text ?? "";
+  if (req.image && Math.floor((req.image.data.length * 3) / 4) > MAX_IMAGE_BYTES)
+    throw new CheckFailure("too_large", "That image is over 8 MB. Try a screenshot or a smaller photo.", 413);
+  if (!text.trim() && !req.image && !req.extraction)
+    throw new CheckFailure("bad_input", "Paste a listing or add a photo first.", 400);
+
+  const notes: string[] = [];
+  let extraction: Extraction;
+  let mode: CheckResult["meta"]["mode"];
+  let usage: CheckResult["meta"]["usage"] = null;
+  let imageRead = false;
+  const mock = isMockMode();
+  const model = mock ? "demo mode (no model call)" : modelId();
+
+  if (req.extraction !== undefined) {
+    // Rescore: the user edited rent / bedrooms / ZIP. No model call.
+    const x = ExtractionSchema.safeParse(req.extraction);
+    if (!x.success) throw new CheckFailure("bad_input", "Couldn't update the check. Run it again.", 400);
+    extraction = x.data;
+    mode = "rules-only";
+  } else if (mock) {
+    mode = "mock";
+    if (req.sampleId) {
+      extraction = SAMPLE_EXTRACTIONS[req.sampleId];
+      imageRead = req.sampleId === "lease-photo";
+    } else {
+      extraction = keywordExtract(text);
+      if (req.image) notes.push("Demo mode can't read photos. Paste the text, or run Clearlease with a Gemini API key.");
+    }
+  } else {
+    try {
+      const r = await extractWithGemma({ text, image: req.image });
+      extraction = r.extraction;
+      usage = r.usage;
+      imageRead = Boolean(req.image);
+      mode = "live";
+    } catch (err) {
+      if (err instanceof ExtractionError) {
+        if (err.code === "model_busy") throw new CheckFailure("model_busy", "Gemma is busy right now. Wait a few seconds and try again.", 503);
+        if (err.code === "invalid_output")
+          throw new CheckFailure(
+            "invalid_output",
+            "We couldn't read this reliably, so we're not showing a guess. Try pasting the text instead of a photo, or try again.",
+            502,
+          );
+      }
+      throw new CheckFailure("model_failed", "We couldn't reach the AI model. Try again, or try one of the samples.", 502);
+    }
+  }
+
+  const corpus = makeCorpus(text, extraction.imageTranscript);
+  const facts = resolveFacts(extraction, corpus, req.overrides, req.zip || undefined);
+  const benchmarks = await resolveBenchmarks(facts.zip, facts.bedrooms);
+  const result = runRules({ extraction, text, facts, benchmarks });
+  const dataLive = Boolean(benchmarks.fmr?.live || benchmarks.census?.live);
+
+  return {
+    read: result.read,
+    price: result.price,
+    scam: result.scam,
+    lease: result.lease,
+    questions: result.questions,
+    aiInstructions: result.aiInstructions,
+    help: result.help,
+    meta: {
+      model,
+      mode,
+      dataLive,
+      latencyMs: Date.now() - started,
+      usage,
+      imageRead,
+      notes: [...notes, ...result.notes],
+    },
+    extraction,
+  };
+}

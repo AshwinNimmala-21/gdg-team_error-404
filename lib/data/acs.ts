@@ -43,3 +43,14 @@ export function parseAcsValue(v: unknown): { value: number; topCoded: boolean } 
   if (!Number.isFinite(n) || n <= 0) return null;
   return { value: n, topCoded: n >= 3501 };
 }
+
+// ACS B25031 median gross rent by bedrooms (index 0 = studio … 4 = 4BR), same vintage. null = top-coded
+// ("$3,500+") or unavailable. Fetched 2026-10-24 (docs/research/census-acs.md); live lookups fill other ZIPs.
+export const ACS_MEDIAN_BY_BEDROOMS_ZCTA: Record<string, (number | null)[]> = {
+  "22201": [2116, 2389, 3022, 3443, null],
+};
+
+export const CENSUS_BEDROOM_SOURCE = {
+  name: `Census ${ACS_VINTAGE}, median gross rent by bedrooms (B25031)`,
+  url: "https://api.census.gov/data/2024/acs/acs5/groups/B25031.html",
+};
