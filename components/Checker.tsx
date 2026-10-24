@@ -97,9 +97,12 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
     setLastHashes(contactHashes);
     setStatus({ kind: "loading" });
     setElapsed(0);
-    setAnnounce(img ? "Reading your photo with Gemma. This takes about 10 seconds." : "Checking your listing. This takes about 10 seconds.");
-    resultsRef.current?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     const sid = opts && "sampleId" in opts ? (opts.sampleId ?? undefined) : sampleId;
+    const what = sid === "lease-photo" ? "lease photo" : "photo";
+    setAnnounce(img ? `Reading your ${what} with Gemma. This takes about 30 seconds.` : "Checking your listing. This takes about 10 seconds.");
+    // Photos are slow: tell screen-reader users it's still working.
+    const slow = img ? setTimeout(() => setAnnounce(`Still reading your ${what}. A full page takes about 30 seconds.`), 20_000) : undefined;
+    resultsRef.current?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     const r = await send({
       text: safeText,
       image: img ? { mimeType: img.mimeType, data: img.data } : undefined,
@@ -107,6 +110,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
       sampleId: sid,
       contactHashes,
     });
+    clearTimeout(slow);
     setRunning(null);
     if (r) {
       setResult(r);
@@ -307,7 +311,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
         <div aria-live="polite" role="status" className="sr-only">
           {announce}
         </div>
-        {status.kind === "loading" && <Loading elapsed={elapsed} photo={Boolean(image)} />}
+        {status.kind === "loading" && <Loading elapsed={elapsed} photo={Boolean(image)} lease={running === "lease-photo"} />}
         {status.kind === "error" && (
           <div role="alert" className="rounded-xs border-2 border-stop bg-sheet p-5">
             <p className="text-lg font-bold text-stop">We couldn&apos;t finish this check</p>
@@ -389,13 +393,23 @@ function GhostSlots({ pulsing }: { pulsing: boolean }) {
   );
 }
 
-function Loading({ elapsed, photo }: { elapsed: number; photo: boolean }) {
+/** Honest wait: photos take about 30 s, text about 10 s. The message changes as time passes. */
+function Loading({ elapsed, photo, lease }: { elapsed: number; photo: boolean; lease: boolean }) {
+  const stage =
+    elapsed >= 45 || (!photo && elapsed >= 20)
+      ? "Taking longer than usual. If the model doesn't answer, we retry automatically."
+      : photo && elapsed >= 20
+        ? "Still reading. A full page takes about 30 seconds."
+        : photo
+          ? "This takes about 30 seconds. Gemma reads every line, then we check it against HUD, Census, FTC and state rules."
+          : "Gemma pulls out the facts, then we check them against HUD, Census, FTC and state rules.";
   return (
     <div className="rounded-xs border border-rule bg-sheet px-4 pt-5 pb-6 sm:px-8 sm:pt-7" aria-busy="true">
-      <p className="text-[22px] font-extrabold tracking-tight sm:text-[26px]">{photo ? "Reading your photo…" : "Reading your listing…"}</p>
+      <p className="text-[22px] font-extrabold tracking-tight sm:text-[26px]">
+        {photo ? `Reading your ${lease ? "lease photo" : "photo"}…` : "Reading your listing…"}
+      </p>
       <p className="mt-1 text-[15px] text-ink-soft">
-        Gemma pulls out the facts, then we check them against HUD, Census, FTC and state rules.{" "}
-        {elapsed > 0 && <span className="tabular-nums">{elapsed}&nbsp;s</span>}
+        {stage} {elapsed > 0 && <span className="tabular-nums">{elapsed}&nbsp;s</span>}
       </p>
       <GhostSlots pulsing />
     </div>
