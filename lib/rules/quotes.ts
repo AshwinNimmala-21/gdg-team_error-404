@@ -1,0 +1,70 @@
+// Grounding check: a quote from the model only counts if it actually appears in what the user gave us.
+
+export interface Corpus {
+  text: string;
+  image: string;
+}
+
+export function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[‘’‚‛′`]/g, "'")
+    .replace(/[“”„‟″]/g, '"')
+    .replace(/[‐-―−]/g, "-")
+    .replace(/…/g, "...")
+    .replace(/[^\p{L}\p{N}$%@.'"\-/]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function makeCorpus(text: string | undefined, imageTranscript: string | null | undefined): Corpus {
+  return { text: normalize(text ?? ""), image: normalize(imageTranscript ?? "") };
+}
+
+/**
+ * Where the quote was found, or null. Models sometimes trim or add an ellipsis, so we also accept
+ * a quote whose pieces (split on "...") each appear in order.
+ */
+export function findQuote(quote: string | null | undefined, corpus: Corpus): "text" | "image" | null {
+  if (!quote) return null;
+  const q = normalize(quote).replace(/^\.+|\.+$/g, "").trim();
+  if (q.length < 3) return null;
+  for (const where of ["text", "image"] as const) {
+    const hay = corpus[where];
+    if (!hay) continue;
+    if (hay.includes(q)) return where;
+    const parts = q.split("...").map((p) => p.trim()).filter((p) => p.length >= 3);
+    if (parts.length > 1) {
+      let from = 0;
+      let ok = true;
+      for (const p of parts) {
+        const i = hay.indexOf(p, from);
+        if (i < 0) {
+          ok = false;
+          break;
+        }
+        from = i + p.length;
+      }
+      if (ok) return where;
+    }
+  }
+  return null;
+}
+
+/** True when the digits of `n` (e.g. 1650, "1,650", "$1.650") appear in the quote. */
+export function numberInQuote(n: number | null, quote: string | null): boolean {
+  if (n === null || !quote) return false;
+  const digits = quote.replace(/(\d)[,.](?=\d{3}\b)/g, "$1");
+  return new RegExp(`(^|[^\\d])${String(n).replace(".", "\\.")}([^\\d]|$)`).test(digits);
+}
+
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six"];
+
+/** Bedrooms can be written "1BR", "one-bedroom" or "studio". */
+export function bedroomsInQuote(n: number | null, quote: string | null): boolean {
+  if (n === null || !quote) return false;
+  const q = quote.toLowerCase();
+  if (n === 0 && /studio|efficiency/.test(q)) return true;
+  return numberInQuote(n, quote) || (NUMBER_WORDS[n] !== undefined && new RegExp(`\\b${NUMBER_WORDS[n]}\\b`).test(q));
+}
