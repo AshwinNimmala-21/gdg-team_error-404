@@ -139,7 +139,8 @@ export interface CheckResult {
   help: HelpLink[];
   meta: {
     model: string;
-    mode: "live" | "mock" | "rules-only";
+    /** "saved": the live call failed on a built-in sample, so its recorded answer is shown (labelled in the UI). */
+    mode: "live" | "mock" | "rules-only" | "saved";
     dataLive: boolean;
     latencyMs: number;
     usage: { promptTokens: number; outputTokens: number } | null;

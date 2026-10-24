@@ -95,6 +95,18 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
 
         <ModeLine r={r} />
 
+        {r.meta.mode === "saved" && (
+          <div role="note" className="mt-5 flex gap-3 rounded-xs border-l-4 border-warn bg-warn-tint/60 py-3 pr-3 pl-3.5 text-[15px]">
+            <ToneIcon tone="warn" className="mt-0.5 shrink-0 text-warn" />
+            <div className="min-w-0">
+              <p className="font-bold">Showing a saved result: the AI model didn&apos;t respond.</p>
+              <p className="mt-1 text-ink-soft">
+                This is the pre-recorded answer for this sample, in Gemma&apos;s format. Checks of your own listings always use the live model.
+              </p>
+            </div>
+          </div>
+        )}
+
         {r.aiInstructions.detected && (
           <div role="note" className="mt-5 flex gap-3 rounded-xs border-l-4 border-stop bg-stop-tint/60 py-3 pr-3 pl-3.5 text-[15px]">
             <ToneIcon tone="stop" className="mt-0.5 shrink-0 text-stop" />

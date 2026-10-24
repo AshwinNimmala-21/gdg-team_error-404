@@ -25,6 +25,7 @@ for (const c of cases) {
   const problems = [];
   if (!res.ok) problems.push(`HTTP ${res.status} ${j?.error?.code}`);
   else {
+    if (j.meta.mode === "saved") problems.push("saved result: the live model didn't respond");
     if (!c.price.includes(j.price.status)) problems.push(`price ${j.price.status}`);
     if (j.scam.status !== c.scam) problems.push(`scam ${j.scam.status}`);
     if (j.lease.status !== c.lease) problems.push(`lease ${j.lease.status}`);

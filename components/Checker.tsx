@@ -112,7 +112,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
       setResult(r);
       setStatus({ kind: "done" });
       setAnnounce(
-        `Report ready. Price check: ${priceVerdict(r.price).word}. Scam risk: ${scamVerdict(r.scam).word}. Lease clauses: ${leaseVerdict(r.lease).word}.`,
+        `${r.meta.mode === "saved" ? "Showing a saved result: the AI model didn't respond. " : ""}Report ready. Price check: ${priceVerdict(r.price).word}. Scam risk: ${scamVerdict(r.scam).word}. Lease clauses: ${leaseVerdict(r.lease).word}.`,
       );
     }
   }

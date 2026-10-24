@@ -7,7 +7,7 @@ import { resolveFacts, runRules } from "@/lib/rules/check";
 import { findQuote, makeCorpus } from "@/lib/rules/quotes";
 import { HASH_RE } from "@/lib/community";
 import { communityKeys, readCounts, signIds } from "./community";
-import { SAMPLE_IDS, type CheckErrorCode, type CheckResult } from "@/lib/types";
+import { SAMPLE_IDS, type CheckErrorCode, type CheckResult, type SampleId } from "@/lib/types";
 
 export const MAX_TEXT = 12_000;
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -46,6 +46,31 @@ export class CheckFailure extends Error {
 }
 
 export const isMockMode = () => process.env.MOCK_AI === "1" || !process.env.GEMINI_API_KEY?.trim();
+
+/** True only when the request is still the built-in sample: every quote in its saved answer is in the text. */
+export function isUnchangedSample(id: SampleId, text: string, hasImage: boolean): boolean {
+  if (id === "lease-photo") return hasImage && !text.trim();
+  if (hasImage) return false;
+  const saved = SAMPLE_EXTRACTIONS[id];
+  const quotes = [...Object.values(saved.listing), ...Object.values(saved.signals), saved.aiInstructions]
+    .map((f) => f.quote)
+    .filter((q): q is string => Boolean(q));
+  const corpus = makeCorpus(text, null);
+  return quotes.length > 0 && quotes.every((q) => findQuote(q, corpus) === "text");
+}
+
+function modelFailure(err: unknown): CheckFailure {
+  if (err instanceof ExtractionError) {
+    if (err.code === "model_busy") return new CheckFailure("model_busy", "Gemma is busy right now. Wait a few seconds and try again.", 503);
+    if (err.code === "invalid_output")
+      return new CheckFailure(
+        "invalid_output",
+        "We couldn't read this reliably, so we're not showing a guess. Try pasting the text instead of a photo, or try again.",
+        502,
+      );
+  }
+  return new CheckFailure("model_failed", "We couldn't reach the AI model. Try again, or try one of the samples.", 502);
+}
 
 export async function runCheck(body: unknown): Promise<CheckResult> {
   const started = Date.now();
@@ -94,16 +119,11 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
       imageRead = Boolean(req.image);
       mode = "live";
     } catch (err) {
-      if (err instanceof ExtractionError) {
-        if (err.code === "model_busy") throw new CheckFailure("model_busy", "Gemma is busy right now. Wait a few seconds and try again.", 503);
-        if (err.code === "invalid_output")
-          throw new CheckFailure(
-            "invalid_output",
-            "We couldn't read this reliably, so we're not showing a guess. Try pasting the text instead of a photo, or try again.",
-            502,
-          );
-      }
-      throw new CheckFailure("model_failed", "We couldn't reach the AI model. Try again, or try one of the samples.", 502);
+      // Retries are spent. A built-in sample gets its saved answer, labelled in the UI; user input never does.
+      if (!req.sampleId || !isUnchangedSample(req.sampleId, text, Boolean(req.image))) throw modelFailure(err);
+      extraction = SAMPLE_EXTRACTIONS[req.sampleId];
+      imageRead = req.sampleId === "lease-photo";
+      mode = "saved";
     }
   }
 
