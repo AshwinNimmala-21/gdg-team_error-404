@@ -109,6 +109,12 @@ Made by Claude under the "no STOPs until MVP" instruction. Each one is a recomme
   - Flags need a 30-minute signed token from /api/check.
   - Address ids come only from a fresh model read whose value appears in the input (from the security review).
 - A26 **UX round 1 verdict words:** "Suspiciously cheap", "Below usual range", "Above usual range", and "Fix before signing" for the lease. The critic found "Below market" read as a bargain. This overrides the R1.1 wording.
+- A28 **Design pass 2** (see `docs/design-principles.md`; before/after shots in `docs/screenshots/design-pass/`):
+  - The three verdicts became one stamped verdict board at the top of the report: the single bold element, also the section navigation.
+  - Sections use quiet tone tags; lease clauses are grouped by action.
+  - Removed: numbered gutters, numbered samples, mono data labels.
+  - On mobile, the call to action reaches the first screen.
+  - Behavior and accessibility unchanged. Verified: 4/4 e2e, 29 tests, 0px overflow, tab order through the stamps, reduced motion turns the animation off.
 - A27 Gemma API errors are logged as status codes only, never content. The step-down ladder absorbs the intermittent 400 on the strict level.
 
 ## 1. User and core flow

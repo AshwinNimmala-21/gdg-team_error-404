@@ -198,9 +198,9 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
             }}
             aria-invalid={formError?.field === "text" || undefined}
             aria-describedby={formError?.field === "text" ? ids.err : undefined}
-            rows={7}
+            rows={5}
             maxLength={12000}
-            className="mt-2 block w-full resize-y rounded-xs border border-ink-soft bg-sheet p-3 text-[16px] leading-relaxed placeholder:text-ink-soft"
+            className="mt-2 block min-h-32 w-full resize-y rounded-xs border border-ink-soft bg-sheet p-3 text-[16px] leading-relaxed placeholder:text-ink-soft sm:min-h-44"
             placeholder="1BR in Clarendon, $1,650/month. Owner overseas…"
           />
 
@@ -262,7 +262,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
               onChange={(e) => setZip(e.target.value.replace(/\D/g, ""))}
               aria-invalid={formError?.field === "zip" || undefined}
               aria-describedby={formError?.field === "zip" ? ids.err : undefined}
-              className="mt-2 block w-32 rounded-xs border border-ink-soft bg-sheet px-3 py-2 font-mono text-[16px]"
+              className="mt-2 block w-32 rounded-xs border border-ink-soft bg-sheet px-3 py-2 text-[16px] tabular-nums"
             />
           </div>
 
@@ -338,29 +338,24 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
 
 function SampleList({ headingId, onRun, running, busy }: { headingId: string; onRun: (id: SampleId) => void; running: SampleId | null; busy: boolean }) {
   return (
-    <section aria-labelledby={headingId} className="mt-6 scroll-mt-4 border-t border-rule pt-5 lg:mt-0 lg:border-t-0 lg:pt-0">
+    <section aria-labelledby={headingId} className="mt-7 scroll-mt-4 lg:mt-0">
       <h2 id={headingId} className="text-[15px] font-bold">
         Try a fictional sample
       </h2>
-      <ul className="mt-2 divide-y divide-rule border-y border-rule">
-        {SAMPLES.map((s, i) => {
+      <ul className="mt-2 border-t border-rule">
+        {SAMPLES.map((s) => {
           const active = running === s.id;
           return (
-            <li key={s.id}>
+            <li key={s.id} className="border-b border-rule">
               <button
                 type="button"
                 aria-disabled={busy || undefined}
                 aria-current={active || undefined}
                 onClick={() => onRun(s.id)}
-                className={`grid min-h-14 w-full grid-cols-[1.75rem_1fr] items-center gap-2 px-1 py-2.5 text-left hover:bg-sheet ${busy && !active ? "cursor-wait" : ""} ${active ? "bg-sheet" : ""}`}
+                className={`block min-h-14 w-full px-1 py-2.5 text-left hover:bg-sheet ${busy && !active ? "cursor-wait" : ""} ${active ? "bg-sheet" : ""}`}
               >
-                <span aria-hidden className="font-mono text-ink-soft">
-                  {i + 1}
-                </span>
-                <span>
-                  <span className="block font-semibold text-pen">{s.title}</span>
-                  <span className="block text-[14px] text-ink-soft">{active ? "Checking…" : s.note}</span>
-                </span>
+                <span className="block font-semibold text-pen underline-offset-2 hover:underline">{s.title}</span>
+                <span className="block text-[14px] text-ink-soft">{active ? "Checking…" : s.note}</span>
               </button>
             </li>
           );
@@ -370,55 +365,50 @@ function SampleList({ headingId, onRun, running, busy }: { headingId: string; on
   );
 }
 
+const CHECKS = [
+  ["Price check", "Rent against Census and HUD figures for the same size unit in that ZIP code."],
+  ["Scam risk", "The FTC's rental-scam warning signs, with the exact words quoted."],
+  ["Lease clauses", "Clauses that may conflict with DC, Maryland or Virginia rules."],
+] as const;
+
+/** Unstamped slots: a preview of the verdict board (dashed, waiting for ink). */
+function GhostSlots({ pulsing }: { pulsing: boolean }) {
+  return (
+    <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+      {CHECKS.map(([t, d]) => (
+        <li key={t} className="rounded-[3px] border-2 border-dashed border-rule px-4 pt-2.5 pb-3">
+          <p className="text-[13px] leading-none font-semibold text-ink-soft">{t}</p>
+          {pulsing ? (
+            <div className="skeleton mt-2.5 h-5 w-3/4 rounded-xs bg-paper" />
+          ) : (
+            <p className="mt-1.5 text-[14px] leading-snug text-ink-soft">{d}</p>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function Loading({ elapsed, photo }: { elapsed: number; photo: boolean }) {
   return (
-    <div className="rounded-xs border border-rule bg-sheet" aria-busy="true">
-      <div className="px-4 pt-5 pb-4 sm:px-8">
-        <p className="text-xl font-extrabold">{photo ? "Reading your photo…" : "Reading your listing…"}</p>
-        <p className="mt-1 text-[15px] text-ink-soft">
-          Gemma pulls out the facts, then we check them against HUD, Census, FTC and state rules. {elapsed > 0 && <span className="font-mono">{elapsed} s</span>}
-        </p>
-      </div>
-      {["Price check", "Scam risk", "Lease clauses"].map((t, i) => (
-        <div key={t} className="grid grid-cols-[2rem_1fr] gap-x-3 border-t border-rule px-4 py-6 sm:grid-cols-[3rem_1fr] sm:px-8">
-          <span aria-hidden className="font-mono text-2xl text-rule sm:text-3xl">
-            {i + 1}
-          </span>
-          <div>
-            <p className="font-bold text-ink-soft">{t}</p>
-            <div className="skeleton mt-3 h-4 w-3/4 rounded-xs bg-paper" />
-            <div className="skeleton mt-2 h-4 w-1/2 rounded-xs bg-paper" />
-          </div>
-        </div>
-      ))}
+    <div className="rounded-xs border border-rule bg-sheet px-4 pt-5 pb-6 sm:px-8 sm:pt-7" aria-busy="true">
+      <p className="text-[22px] font-extrabold tracking-tight sm:text-[26px]">{photo ? "Reading your photo…" : "Reading your listing…"}</p>
+      <p className="mt-1 text-[15px] text-ink-soft">
+        Gemma pulls out the facts, then we check them against HUD, Census, FTC and state rules.{" "}
+        {elapsed > 0 && <span className="tabular-nums">{elapsed}&nbsp;s</span>}
+      </p>
+      <GhostSlots pulsing />
     </div>
   );
 }
 
 function EmptyReport({ samples }: { samples: React.ReactNode }) {
-  const rows = [
-    ["Price check", "Compares the rent with Census and HUD rents for the same size unit in that ZIP code."],
-    ["Scam risk", "Looks for the FTC's rental-scam warning signs and quotes the exact words."],
-    ["Lease clauses", "Reads a lease photo and flags clauses that may conflict with DC, Maryland or Virginia rules."],
-  ];
   return (
-    <div className="rounded-xs border-2 border-dashed border-rule p-5 sm:p-8">
-      <p className="text-xl font-extrabold">Your pre-sign report will appear here</p>
-      <p className="mt-1 text-[15px] text-ink-soft">Three checks, each with the evidence behind it, plus the questions to ask before you pay.</p>
-      <ol className="mt-5 space-y-4">
-        {rows.map(([t, d], i) => (
-          <li key={t} className="grid grid-cols-[2rem_1fr] gap-x-3">
-            <span aria-hidden className="font-mono text-2xl leading-none text-ink-soft">
-              {i + 1}
-            </span>
-            <div>
-              <p className="font-bold">{t}</p>
-              <p className="text-[15px] text-ink-soft">{d}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-      <div className="mt-6 hidden border-t border-rule pt-5 lg:block">{samples}</div>
+    <div className="rounded-xs border border-rule bg-sheet/60 px-4 pt-5 pb-6 sm:px-8 sm:pt-7">
+      <p className="text-[22px] font-extrabold tracking-tight sm:text-[26px]">Your pre-sign report will appear here</p>
+      <p className="mt-1 text-[15px] text-ink-soft">Three verdicts, the evidence behind each one, and the questions to ask before you pay.</p>
+      <GhostSlots pulsing={false} />
+      <div className="mt-7 hidden lg:block">{samples}</div>
     </div>
   );
 }

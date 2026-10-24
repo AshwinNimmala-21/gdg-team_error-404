@@ -56,20 +56,59 @@ details[open] > summary .caret {
   transform: rotate(90deg);
 }
 
-/* The verdict stamp lands once. This is the only motion in the app. */
-@keyframes stamp-land {
-  from {
-    opacity: 0;
-    transform: rotate(-2deg) scale(1.14);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(-2deg) scale(1);
-  }
-}
+/*
+ * The verdict board's stamps: the one bold element. A double ring (outer 3px, inner 1px) drawn on
+ * pseudo-elements so the rough-ink SVG filter roughens only the rings, never the text.
+ * They land one after another; this is the only non-user-triggered motion in the app.
+ */
 .stamp {
-  transform: rotate(-2deg);
-  animation: stamp-land 170ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  position: relative;
+  isolation: isolate;
+  border-radius: 3px;
+  transform: rotate(var(--tilt, -2deg));
+  animation: stamp-press 260ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+.stamp::before,
+.stamp::after {
+  content: "";
+  position: absolute;
+  border-radius: 3px;
+  border: 3px solid currentColor;
+  inset: 0;
+  filter: url(#ink-edge);
+  pointer-events: none;
+}
+.stamp::after {
+  border-width: 1.25px;
+  inset: 4px;
+}
+/* "Not checked yet" is an empty stamp outline: dashed and clean, no ink. */
+.stamp--nil::before,
+.stamp--nil::after {
+  border-style: dashed;
+  filter: none;
+}
+.stamp--nil::after {
+  display: none;
+}
+.stamp:focus-visible {
+  outline-offset: 5px;
+}
+@keyframes stamp-press {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--tilt, -2deg)) scale(1.16);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(var(--tilt, -2deg)) scale(0.97);
+    box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 12%, transparent);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(var(--tilt, -2deg)) scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
 
 @keyframes pulse-soft {

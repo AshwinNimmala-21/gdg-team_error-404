@@ -23,11 +23,11 @@ export default function Home() {
         </p>
       </header>
       <main id="main">
-        <div className="mx-auto max-w-[1240px] px-4 pt-8 pb-8 lg:px-8 lg:pt-12">
-          <h1 className="max-w-[18ch] text-[32px] leading-[1.1] font-extrabold tracking-tight sm:text-[44px]">
+        <div className="mx-auto max-w-[1240px] px-4 pt-6 pb-6 lg:px-8 lg:pt-12 lg:pb-9">
+          <h1 className="max-w-[18ch] text-[30px] leading-[1.08] font-extrabold tracking-[-0.02em] sm:text-[46px]">
             Check a rental before you send money.
           </h1>
-          <p className="mt-3 max-w-[60ch] text-[17px] leading-relaxed text-ink-soft">
+          <p className="mt-3 max-w-[56ch] text-[16px] leading-relaxed text-ink-soft sm:text-[17px]">
             Paste a listing or add a lease photo. We check the price, the scam warning signs and the lease clauses, and quote the words behind each one.
           </p>
         </div>

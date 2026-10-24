@@ -102,3 +102,23 @@ Desktop (1280): two columns. The left column (400px) is the sticky intake form a
 - Gradient hero / fade-up on everything: rejected. The only motion is the stamp landing (scale 1.12 → 1 over 160ms, staggered), and it's off under `prefers-reduced-motion`.
 - "A · B · C" meta strings: rejected. The facts bar is a labelled definition list.
 - ALL-CAPS eyebrows: rejected. Section labels are numbered, in sentence case.
+
+## Design pass 2 (Sat Oct 24, evening)
+
+**Problems in v1:**
+- The bold moment was split across a small text strip at the top and a stamp inside each section, about 850px down on a phone.
+- Template tells crept in: big mono gutter numerals (1/2/3), numbered samples that aren't a sequence, mono for data labels in the facts bar, and hairline rules between everything.
+- The lease section repeated a red badge on every clause.
+
+**v2 plan:**
+- **One verdict board, the single bold element.** The top of the report becomes an inspection slip with three inked stamps: Price, Scam risk, Lease. Each stamp is large (24 → 30px, weight 900) with a double-ring border like a real rubber stamp. The ink edge is roughened with an SVG turbulence filter on the *border only*, so the text stays crisp. Each stamp sits at its own slight angle (−2.5°, 1.5°, −1°), as if stamped by hand. They land one after another (scale 1.16 → 1 with a brief ink "press" shadow). Each stamp links to its section. On a phone they stack and are the first thing the report shows.
+- **Sections go quiet.** Each section has a title and a small tone tag (icon + word in the tone color, no border). The big numerals and per-section stamps are gone.
+- **Lease clauses are grouped by what to do:** "Fix before signing", "Ask about", "Looks standard". Each group has a count, so the badge doesn't repeat on every clause. Grouping is information, not decoration.
+- **Mono only for evidence:** words quoted from the renter's input, plus the model ID. Figures use Public Sans with tabular numbers.
+- **Fewer rules:** spacing separates items; rules separate only the three sections and the questions.
+- **Samples:** no numbers (they're a choice, not a sequence). The empty state lists the three checks as plain text, not a numbered list.
+- **Mobile:** the textarea is 5 rows below `sm`, so "Check this listing" stays near the first screen. The report header is compact.
+
+**Review: did v2 drift into a default?**
+- "Rotated rubber stamp" could become a gimmick if it's used everywhere. That's why it appears in exactly one place, carries real information (all three verdicts), and works as navigation.
+- The double ring and rough ink edge are specific to this subject (a leasing office's approval stamp, an inspector's mark). They aren't a generic badge.

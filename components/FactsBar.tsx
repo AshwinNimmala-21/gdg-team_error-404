@@ -44,7 +44,7 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
   const item = (label: string, value: string | null) => (
     <div className="flex items-baseline gap-1.5">
       <dt className="text-[13px] text-ink-soft">{label}</dt>
-      <dd className={`font-mono text-[15px] ${value ? "font-medium" : "text-ink-soft"}`}>{value ?? "not found"}</dd>
+      <dd className={`text-[16px] tabular-nums ${value ? "font-semibold" : "text-ink-soft"}`}>{value ?? "not found"}</dd>
     </div>
   );
 
@@ -69,7 +69,7 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
       </div>
     );
 
-  const field = "mt-1 block w-full rounded-xs border border-ink-soft bg-sheet px-2.5 py-2 font-mono text-[16px]";
+  const field = "mt-1 block w-full rounded-xs border border-ink-soft bg-sheet px-2.5 py-2 text-[16px] tabular-nums";
   return (
     <form
       onSubmit={save}
