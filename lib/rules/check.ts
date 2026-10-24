@@ -63,7 +63,7 @@ export function runRules(args: {
   text: string;
   facts: ResolvedFacts;
   benchmarks: Benchmarks;
-}): Omit<CheckResult, "meta" | "extraction"> & { notes: string[] } {
+}): Omit<CheckResult, "meta" | "extraction" | "community"> & { notes: string[] } {
   const { extraction: x, text, facts, benchmarks } = args;
   const corpus = makeCorpus(text, x.imageTranscript);
   const jurisdiction = facts.zip ? (lookupZip(facts.zip)?.state ?? stateForZip(facts.zip)) : null;

@@ -65,7 +65,7 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
     });
   }
 
-  const base = { rent, bedrooms, zip, areaName: b.fmrArea?.shortName ?? null, benchmark: b.fmr, census: b.census, evidence, missing };
+  const base = { rent, bedrooms, zip, areaName: b.area?.place ?? null, benchmark: b.fmr, census: b.census, evidence, missing };
 
   if (rent === null || bedrooms === null || refs.length === 0 || rent <= 0) {
     return { ...base, status: "unknown", ratio: null, range: null, farBelow: false, ...unknownCopy(missing) };

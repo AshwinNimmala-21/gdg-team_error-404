@@ -4,6 +4,7 @@ import { forwardRef, type ReactNode } from "react";
 import { leaseVerdict, priceVerdict, scamVerdict, type Verdict } from "@/lib/client/verdicts";
 import type { CheckResult, ClauseFinding, Overrides } from "@/lib/types";
 import { EvidenceDrawer, Quote } from "./Evidence";
+import { Community } from "./Community";
 import { FactsBar } from "./FactsBar";
 import { ToneIcon } from "./Icons";
 import { Stamp } from "./Stamp";
@@ -105,6 +106,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
             ))}
           </ul>
         )}
+        {r.community && <Community data={r.community} />}
         <EvidenceDrawer
           label="Show sources"
           items={[

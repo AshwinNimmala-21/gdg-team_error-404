@@ -20,6 +20,8 @@ export interface CheckRequest {
   overrides?: Overrides;
   extraction?: Extraction;
   sampleId?: SampleId;
+  /** SHA-256 of normalized phone numbers / emails, computed in the browser before redaction. */
+  contactHashes?: string[];
 }
 
 export interface SourceRef {
@@ -132,6 +134,8 @@ export interface CheckResult {
   lease: LeaseCheck;
   questions: Question[];
   aiInstructions: { detected: boolean; quote: string | null };
+  /** Anonymous community flags (null when the counter is off or Firestore didn't answer). */
+  community: { ids: string[]; address: number; contact: number; firstSeen: string | null } | null;
   help: HelpLink[];
   meta: {
     model: string;

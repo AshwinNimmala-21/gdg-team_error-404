@@ -2,13 +2,15 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SAMPLE_EXTRACTIONS } from "@/lib/ai/mock";
+import { redact } from "@/lib/client/redact";
 import { ExtractionSchema } from "@/lib/ai/schema";
 import { savedBenchmarks } from "@/lib/data/benchmarks";
 import type { SampleId } from "@/lib/types";
 import { resolveFacts, runRules } from "../check";
 import { makeCorpus } from "../quotes";
 
-const sampleText = (f: string) => readFileSync(path.join(process.cwd(), "public/samples", f), "utf8");
+// Mirrors the browser: text is redacted before it is sent.
+const sampleText = (f: string) => redact(readFileSync(path.join(process.cwd(), "public/samples", f), "utf8")).text;
 
 function run(id: SampleId, text: string) {
   const extraction = ExtractionSchema.parse(SAMPLE_EXTRACTIONS[id]);

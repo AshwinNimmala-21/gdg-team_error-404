@@ -80,6 +80,9 @@ export const ExtractionSchema = z.object({
       quote,
     }),
     zip: z.object({ value: zip, quote }),
+    address: z
+      .object({ value: z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim().slice(0, 200) : null), z.string().nullable()), quote })
+      .default({ value: null, quote: null }),
     deposit: z.object({ amount: looseNumber, quote }),
     applicationFee: z.object({ amount: looseNumber, quote }),
   }),
@@ -148,6 +151,11 @@ export const EXTRACTION_JSON_SCHEMA = {
           properties: { value: nullable("string", "5-digit ZIP code of the rental as stated."), quote: quoteJson },
           required: ["value", "quote"],
         },
+        address: {
+          type: "object",
+          properties: { value: nullable("string", "Street address of the rental as stated (number and street, city), or null."), quote: quoteJson },
+          required: ["value", "quote"],
+        },
         deposit: {
           type: "object",
           properties: { amount: nullable("number", "Security deposit in US dollars as stated."), quote: quoteJson },
@@ -159,7 +167,7 @@ export const EXTRACTION_JSON_SCHEMA = {
           required: ["amount", "quote"],
         },
       },
-      required: ["rent", "bedrooms", "zip", "deposit", "applicationFee"],
+      required: ["rent", "bedrooms", "zip", "address", "deposit", "applicationFee"],
     },
     signals: {
       type: "object",

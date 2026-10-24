@@ -4,7 +4,9 @@ import { keywordExtract, SAMPLE_EXTRACTIONS } from "@/lib/ai/mock";
 import { ExtractionSchema, type Extraction } from "@/lib/ai/schema";
 import { resolveBenchmarks } from "@/lib/data/benchmarks";
 import { resolveFacts, runRules } from "@/lib/rules/check";
-import { makeCorpus } from "@/lib/rules/quotes";
+import { findQuote, makeCorpus } from "@/lib/rules/quotes";
+import { HASH_RE } from "@/lib/community";
+import { communityKeys, readCounts } from "./community";
 import { SAMPLE_IDS, type CheckErrorCode, type CheckResult } from "@/lib/types";
 
 export const MAX_TEXT = 12_000;
@@ -30,6 +32,7 @@ export const CheckRequestSchema = z.object({
     .optional(),
   extraction: z.unknown().optional(),
   sampleId: z.enum(SAMPLE_IDS).optional(),
+  contactHashes: z.array(z.string().regex(HASH_RE)).max(5).optional(),
 });
 
 export class CheckFailure extends Error {
@@ -106,7 +109,9 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
 
   const corpus = makeCorpus(text, extraction.imageTranscript);
   const facts = resolveFacts(extraction, corpus, req.overrides, req.zip || undefined);
-  const benchmarks = await resolveBenchmarks(facts.zip, facts.bedrooms);
+  const address = findQuote(extraction.listing.address.quote, corpus) ? extraction.listing.address.value : null;
+  const keys = await communityKeys(address, facts.zip, req.contactHashes ?? []);
+  const [benchmarks, counts] = await Promise.all([resolveBenchmarks(facts.zip, facts.bedrooms), readCounts(keys)]);
   const result = runRules({ extraction, text, facts, benchmarks });
   const dataLive = Boolean(benchmarks.fmr?.live || benchmarks.census?.live);
 
@@ -117,6 +122,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
     lease: result.lease,
     questions: result.questions,
     aiInstructions: result.aiInstructions,
+    community: counts ? { ids: keys.map((k) => k.id), ...counts } : null,
     help: result.help,
     meta: {
       model,

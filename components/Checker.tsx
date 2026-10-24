@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ImageError, prepareImage, type PreparedImage } from "@/lib/client/image";
 import { redact } from "@/lib/client/redact";
+import { normalizeContact, sha256Hex } from "@/lib/community";
 import { leaseVerdict, priceVerdict, scamVerdict } from "@/lib/client/verdicts";
 import type { CheckError, CheckRequest, CheckResult, Overrides, SampleId } from "@/lib/types";
 import { CameraIcon } from "./Icons";
@@ -27,6 +28,7 @@ export function Checker() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [rescoring, setRescoring] = useState(false);
   const [lastText, setLastText] = useState("");
+  const [lastHashes, setLastHashes] = useState<string[]>([]);
   const [announce, setAnnounce] = useState("");
   const [elapsed, setElapsed] = useState(0);
   const [formError, setFormError] = useState<string | null>(null);
@@ -77,8 +79,13 @@ export function Checker() {
       return;
     }
     setFormError(null);
-    const { text: safeText } = redact(rawText);
+    const { text: safeText, contacts } = redact(rawText);
+    // Contacts never leave the device: only their SHA-256 goes to the server, for the community counter.
+    const contactHashes = await Promise.all(
+      [...new Set(contacts.map(normalizeContact).filter((x): x is string => Boolean(x)))].slice(0, 5).map(sha256Hex),
+    );
     setLastText(safeText);
+    setLastHashes(contactHashes);
     setStatus({ kind: "loading" });
     setElapsed(0);
     setAnnounce(img ? "Reading your photo with Gemma. This takes about 10 seconds." : "Checking your listing. This takes about 10 seconds.");
@@ -88,6 +95,7 @@ export function Checker() {
       image: img ? { mimeType: img.mimeType, data: img.data } : undefined,
       zip: z || undefined,
       sampleId: opts?.sampleId ?? sampleId,
+      contactHashes,
     });
     if (r) {
       setResult(r);
@@ -101,7 +109,7 @@ export function Checker() {
   async function rescore(overrides: Overrides) {
     if (!result) return;
     setRescoring(true);
-    const r = await send({ text: lastText, extraction: result.extraction, overrides });
+    const r = await send({ text: lastText, extraction: result.extraction, overrides, contactHashes: lastHashes });
     setRescoring(false);
     if (r) {
       setResult(r);
@@ -246,15 +254,19 @@ export function Checker() {
           </button>
           <details className="mt-3 text-[14px]" id={ids.privacy}>
             <summary className="min-h-11 py-2 text-ink-soft">
-              <span className="text-ink">We don&apos;t save anything.</span>{" "}
+              <span className="text-ink">We don&apos;t save your text or photos.</span>{" "}
               <span className="font-semibold text-pen underline underline-offset-2">What we send</span>
             </summary>
             <div className="space-y-2 pb-2 text-ink-soft">
-              <p>No account, no database, no logs of your text. Your photo is resized on your device and dropped after the check.</p>
+              <p>No account and no logs of your text. Your photo is resized on your device (which also strips location data) and dropped after the check.</p>
               <p>
                 Before sending, we remove phone numbers, emails and long ID or account numbers from your text. To read it, we send the text and photo
                 to Google&apos;s Gemma 4 model through the free Gemini API, where Google may review inputs to improve its products. Cover names,
                 signatures and account numbers in photos first.
+              </p>
+              <p>
+                If you flag a listing as a scam, we store only a one-way fingerprint of its street address or contact and a count, so others can see
+                how many people flagged it. Never the text itself.
               </p>
             </div>
           </details>
