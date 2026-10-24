@@ -29,7 +29,7 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
 - Next.js 16 App Router + TypeScript + Tailwind v4, Node 24 locally (20+ OK). `@google/genai` (Gemini API), `zod`, `vitest`.
 - Data: HUD FMR API (`/hudapi/public/fmr/data/{FIPS}99999`, Bearer `HUD_TOKEN`), Census ACS5 `B25064_001E` by ZCTA (`CENSUS_KEY`). Static fallback JSON for ~15 DMV counties + Montgomery County VA; every external call degrades to it with a visible "demo data" badge. Mock AI via `MOCK_AI=1`.
 - Hosting: Cloud Run `us-east4`, `gcloud run deploy clearlease --source .`, secrets from Secret Manager (`--set-secrets`). `output: "standalone"` + multi-stage Dockerfile. Runbook in `docs/DEPLOY.md` (PowerShell-friendly). Humans run gcloud.
-- Env names: `GEMINI_API_KEY`, `HUD_TOKEN`, `CENSUS_KEY`, `GEMMA_MODEL`, `MOCK_AI`, `FRED_API_KEY` (unused). **Never read, print or commit `.env.local`.**
+- Env names: `GEMINI_API_KEY`, `HUD_TOKEN`, `CENSUS_KEY`, `GEMMA_MODEL`, `MOCK_AI`, `FRED_API_KEY` (unused). **Keys live in `.env` (template: `.env.example`). Never read, print or commit `.env*` files other than the template.**
 
 ## Engineering rules
 1. Model and data calls server-side only (route handlers); keys only from `process.env`.

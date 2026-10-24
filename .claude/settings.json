@@ -1,1 +1,1 @@
-{"permissions":{"deny":["Read(.env*)"],"ask":["Bash(git push *)","Bash(rm *)","Bash(npm audit fix *)","Bash(gcloud *)","Bash(vercel *)"]}}
+{"permissions":{"deny":["Read(.env*)","Edit(.env*)","Write(.env*)","Bash(cat .env*)","Bash(head .env*)","Bash(tail .env*)","Bash(less .env*)","Bash(more .env*)","Bash(grep * .env*)","Bash(type .env*)","PowerShell(Get-Content .env*)","PowerShell(cat .env*)","PowerShell(type .env*)"],"ask":["Bash(git push *)","Bash(rm *)","Bash(npm audit fix *)","Bash(gcloud *)","Bash(vercel *)"]}}
