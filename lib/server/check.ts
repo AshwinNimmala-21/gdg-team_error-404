@@ -6,7 +6,7 @@ import { resolveBenchmarks } from "@/lib/data/benchmarks";
 import { resolveFacts, runRules } from "@/lib/rules/check";
 import { findQuote, makeCorpus } from "@/lib/rules/quotes";
 import { HASH_RE } from "@/lib/community";
-import { communityKeys, readCounts } from "./community";
+import { communityKeys, readCounts, signIds } from "./community";
 import { SAMPLE_IDS, type CheckErrorCode, type CheckResult } from "@/lib/types";
 
 export const MAX_TEXT = 12_000;
@@ -109,7 +109,9 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
 
   const corpus = makeCorpus(text, extraction.imageTranscript);
   const facts = resolveFacts(extraction, corpus, req.overrides, req.zip || undefined);
-  const address = findQuote(extraction.listing.address.quote, corpus) ? extraction.listing.address.value : null;
+  // Address fingerprints only from a fresh model read whose address text is itself in the input (never from a rescore).
+  const addr = extraction.listing.address;
+  const address = mode !== "rules-only" && findQuote(addr.quote, corpus) && findQuote(addr.value, corpus) ? addr.value : null;
   const keys = await communityKeys(address, facts.zip, req.contactHashes ?? []);
   const [benchmarks, counts] = await Promise.all([resolveBenchmarks(facts.zip, facts.bedrooms), readCounts(keys)]);
   const result = runRules({ extraction, text, facts, benchmarks });
@@ -122,7 +124,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
     lease: result.lease,
     questions: result.questions,
     aiInstructions: result.aiInstructions,
-    community: counts ? { ids: keys.map((k) => k.id), ...counts } : null,
+    community: counts ? { ids: keys.map((k) => k.id), token: signIds(keys.map((k) => k.id)), ...counts } : null,
     help: result.help,
     meta: {
       model,

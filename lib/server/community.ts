@@ -1,9 +1,9 @@
-import { createHmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Firestore } from "@google-cloud/firestore";
 import { HASH_RE, normalizeAddress, sha256Hex } from "@/lib/community";
 
 // Anonymous community flag counter in Firestore. Each document id is HMAC-SHA256(COMMUNITY_SALT,
-// sha256(normalized address or contact)); fields are only { kind, count, firstSeen }. No raw text,
+// sha256(normalized address or contact)); fields are only { count, firstSeen }. No raw text,
 // images or IPs. Off unless COMMUNITY_SALT is set; any Firestore error or timeout is skipped silently.
 
 const COLLECTION = "community_flags";
@@ -89,4 +89,21 @@ export async function addFlag(ids: string[]): Promise<boolean> {
     }),
   );
   return done === true;
+}
+
+const TOKEN_TTL_MS = 30 * 60 * 1000;
+
+/** Short-lived proof that these ids came from a real /api/check response (stops arbitrary-id flagging). */
+export function signIds(ids: string[], now = Date.now()): string {
+  const salt = process.env.COMMUNITY_SALT?.trim() ?? "";
+  const mac = createHmac("sha256", salt).update(`${[...ids].sort().join(",")}|${now}`).digest("hex");
+  return `${now}.${mac}`;
+}
+
+export function verifyIds(ids: string[], token: string, now = Date.now()): boolean {
+  const [ts, mac] = token.split(".");
+  const issued = Number(ts);
+  if (!Number.isFinite(issued) || now - issued > TOKEN_TTL_MS || issued > now + 60_000 || !mac) return false;
+  const expected = signIds(ids, issued).split(".")[1];
+  return expected.length === mac.length && timingSafeEqual(Buffer.from(expected), Buffer.from(mac));
 }

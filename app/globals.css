@@ -15,8 +15,8 @@
   --color-warn-tint: #faeedc;
   --color-stop: #ae2318;
   --color-stop-tint: #fbe8e5;
-  --color-none: #4a5664;
-  --color-none-tint: #eef1f4;
+  --color-nil: #4a5664;
+  --color-nil-tint: #eef1f4;
 
   --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "Cascadia Mono", monospace;

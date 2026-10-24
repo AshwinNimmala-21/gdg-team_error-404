@@ -26,7 +26,7 @@ export function Community({ data }: { data: NonNullable<CheckResult["community"]
   async function flag() {
     setState("sending");
     try {
-      const res = await fetch("/api/flag", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: data.ids }) });
+      const res = await fetch("/api/flag", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: data.ids, token: data.token }) });
       if (!res.ok) throw new Error();
       try {
         localStorage.setItem(STORE_KEY, JSON.stringify([...new Set([...readFlagged(), ...data.ids])].slice(-200)));

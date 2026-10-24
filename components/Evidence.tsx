@@ -16,7 +16,7 @@ export function EvidenceItem({ e }: { e: Evidence }) {
   return (
     <li className="py-2.5">
       <p className={`text-[15px] font-semibold ${e.counted ? "text-ink" : "text-ink-soft"}`}>{e.label}</p>
-      {e.value && <p className="font-mono text-[13.5px] text-ink">{e.value}</p>}
+      {e.value && <p className="text-[15px] text-ink">{e.value}</p>}
       {e.quote && <Quote text={e.quote} from={e.quoteFrom} />}
       {e.source && (
         <p className="mt-1 text-[13px]">

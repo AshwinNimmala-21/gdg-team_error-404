@@ -9,7 +9,7 @@ import { FactsBar } from "./FactsBar";
 import { ToneIcon } from "./Icons";
 import { Stamp } from "./Stamp";
 
-const TONE_TEXT = { ok: "text-ok", warn: "text-warn", stop: "text-stop", none: "text-none" } as const;
+const TONE_TEXT = { ok: "text-ok", warn: "text-warn", stop: "text-stop", nil: "text-nil" } as const;
 
 const SEVERITY: Record<ClauseFinding["severity"], Verdict> = {
   conflict: { word: "Fix before signing", tone: "stop" },
@@ -19,13 +19,13 @@ const SEVERITY: Record<ClauseFinding["severity"], Verdict> = {
 
 function Section({ n, title, verdict, delay, children }: { n: number; title: string; verdict: Verdict; delay: number; children: ReactNode }) {
   return (
-    <section aria-labelledby={`s${n}`} className="grid grid-cols-[2rem_1fr] gap-x-3 border-t border-rule px-4 py-6 sm:grid-cols-[3rem_1fr] sm:px-8">
+    <section id={`s${n}`} aria-labelledby={`s${n}-h`} className="scroll-mt-4 grid grid-cols-[2rem_1fr] gap-x-3 border-t border-rule px-4 py-6 sm:grid-cols-[3rem_1fr] sm:px-8">
       <span aria-hidden className="pt-0.5 font-mono text-2xl leading-none text-ink-soft sm:text-3xl">
         {n}
       </span>
       <div className="min-w-0">
-        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
-          <h3 id={`s${n}`} className="pt-0.5 text-[19px] leading-tight font-bold">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-4">
+          <h3 id={`s${n}-h`} className="pt-0.5 text-[19px] leading-tight font-bold">
             {title}
             <span className="sr-only">: {verdict.word}</span>
           </h3>
@@ -56,12 +56,13 @@ interface Props {
 export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ result: r, onRescore, rescoring, onAddLease }, headingRef) {
   const counted = r.lease.findings;
   return (
-    <article aria-labelledby="report-title" className="rounded-xs border border-rule bg-sheet">
+    <article aria-labelledby="report-title" aria-busy={rescoring || undefined} className={`rounded-xs border border-rule bg-sheet transition-opacity motion-reduce:transition-none ${rescoring ? "opacity-60" : ""}`}>
       <header className="px-4 pt-5 pb-4 sm:px-8 sm:pt-7">
         <h2 id="report-title" ref={headingRef} tabIndex={-1} className="text-2xl font-extrabold tracking-tight focus:outline-none sm:text-[28px]">
           Your pre-sign report
         </h2>
         <ModeLine r={r} />
+        <VerdictStrip r={r} />
         {r.aiInstructions.detected && (
           <div role="note" className="mt-4 flex gap-3 rounded-xs border-2 border-stop bg-stop-tint p-3 text-[15px]">
             <ToneIcon tone="stop" className="mt-0.5 shrink-0 text-stop" />
@@ -100,7 +101,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
                     <span className="sr-only">{f.weight === 2 ? " (strong warning sign)" : " (warning sign)"}</span>
                   </p>
                   {f.evidence[0]?.quote && <Quote text={f.evidence[0].quote} from={f.evidence[0].quoteFrom} />}
-                  {!f.evidence[0]?.quote && f.evidence[0]?.value && <p className="mt-1 font-mono text-[13.5px]">{f.evidence[0].value}</p>}
+                  {!f.evidence[0]?.quote && f.evidence[0]?.value && <p className="mt-1 text-[15px] text-ink-soft">{f.id === "priceFarBelow" ? "See the price check above." : f.evidence[0].value}</p>}
                 </div>
               </li>
             ))}
@@ -136,7 +137,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="font-bold">{f.title}</p>
                   <span className={`inline-flex items-center gap-1 text-[14px] font-semibold ${f.evidence[0].counted ? TONE_TEXT[SEVERITY[f.severity].tone] : "text-ink-soft"}`}>
-                    <ToneIcon tone={f.evidence[0].counted ? SEVERITY[f.severity].tone : "none"} className="h-4 w-4" />
+                    <ToneIcon tone={f.evidence[0].counted ? SEVERITY[f.severity].tone : "nil"} className="h-4 w-4" />
                     {f.evidence[0].counted ? SEVERITY[f.severity].word : "Not counted"}
                   </span>
                 </div>
@@ -192,6 +193,27 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
     </article>
   );
 });
+
+/** All three verdicts at a glance (on a phone the stamps are a scroll apart). */
+function VerdictStrip({ r }: { r: CheckResult }) {
+  const rows = [
+    ["Price", priceVerdict(r.price)],
+    ["Scam risk", scamVerdict(r.scam)],
+    ["Lease", leaseVerdict(r.lease)],
+  ] as const;
+  return (
+    <ol aria-label="Summary" className="mt-4 grid gap-1.5 sm:grid-cols-3 sm:gap-3">
+      {rows.map(([label, v], i) => (
+        <li key={label}>
+          <a href={`#s${i + 1}`} className={`inline-flex min-h-8 items-center gap-1.5 text-[15px] font-semibold hover:underline ${TONE_TEXT[v.tone]}`}>
+            <ToneIcon tone={v.tone} className="h-4 w-4 shrink-0" />
+            <span className="text-ink-soft">{label}:</span> {v.word}
+          </a>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 function ModeLine({ r }: { r: CheckResult }) {
   const secs = (r.meta.latencyMs / 1000).toFixed(1);

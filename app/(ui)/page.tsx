@@ -8,7 +8,10 @@ export default function Home() {
       </a>
       <header className="mx-auto flex max-w-[1240px] items-baseline justify-between gap-4 px-4 pt-5 lg:px-8">
         <p className="text-xl font-extrabold tracking-tight">Clearlease</p>
-        <p className="text-right text-[14px] text-ink-soft">For renters in DC, Maryland and Virginia</p>
+        <p className="text-right text-[14px] text-ink-soft">
+          <span className="sm:hidden">DC, MD and VA renters</span>
+          <span className="hidden sm:inline">For renters in DC, Maryland and Virginia</span>
+        </p>
       </header>
       <main id="main">
         <div className="mx-auto max-w-[1240px] px-4 pt-8 pb-8 lg:px-8 lg:pt-12">
@@ -16,8 +19,7 @@ export default function Home() {
             Check a rental before you send money.
           </h1>
           <p className="mt-3 max-w-[60ch] text-[17px] leading-relaxed text-ink-soft">
-            Paste a listing or add a photo of a lease. In about 10 seconds you get a price check against HUD data, the FTC&apos;s scam warning
-            signs, and the lease clauses to question, each with the exact words that triggered it.
+            Paste a listing or add a lease photo. We check the price, the scam warning signs and the lease clauses, and quote the words behind each one.
           </p>
         </div>
         <Checker />

@@ -110,7 +110,7 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   const score = flags.reduce((s, f) => s + f.weight, 0);
   const status: ScamCheck["status"] = score === 0 ? "none_found" : score >= LIKELY_AT ? "likely" : "some";
   const n = flags.length;
-  const headline = status === "none_found" ? `No red flags found in ${CHECK_COUNT} checks` : `${n} of ${CHECK_COUNT} checks flagged`;
+  const headline = status === "none_found" ? `We checked ${CHECK_COUNT} warning signs and found none` : `${n} of ${CHECK_COUNT} checks flagged`;
   const detail =
     status === "none_found"
       ? "That isn't a guarantee. See the place in person (or on a live video tour) and sign a lease before you pay anything."

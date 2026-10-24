@@ -3,8 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ImageError, prepareImage, type PreparedImage } from "@/lib/client/image";
 import { redact } from "@/lib/client/redact";
-import { normalizeContact, sha256Hex } from "@/lib/community";
 import { leaseVerdict, priceVerdict, scamVerdict } from "@/lib/client/verdicts";
+import { normalizeContact, sha256Hex } from "@/lib/community";
 import type { CheckError, CheckRequest, CheckResult, Overrides, SampleId } from "@/lib/types";
 import { CameraIcon } from "./Icons";
 import { Report } from "./Report";
@@ -24,6 +24,7 @@ export function Checker() {
   const [image, setImage] = useState<PreparedImage | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [sampleId, setSampleId] = useState<SampleId | undefined>();
+  const [running, setRunning] = useState<SampleId | null>(null);
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [result, setResult] = useState<CheckResult | null>(null);
   const [rescoring, setRescoring] = useState(false);
@@ -31,11 +32,15 @@ export function Checker() {
   const [lastHashes, setLastHashes] = useState<string[]>([]);
   const [announce, setAnnounce] = useState("");
   const [elapsed, setElapsed] = useState(0);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<{ field: "text" | "zip"; message: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const textRef = useRef<HTMLTextAreaElement>(null);
+  const zipRef = useRef<HTMLInputElement>(null);
   const reportRef = useRef<HTMLHeadingElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const addingLease = useRef(false);
   const ids = { text: useId(), zip: useId(), file: useId(), privacy: useId(), err: useId() };
+  const loading = status.kind === "loading";
 
   useEffect(() => {
     if (status.kind !== "loading") return;
@@ -66,16 +71,19 @@ export function Checker() {
     }
   }
 
-  async function check(opts?: { text?: string; image?: PreparedImage | null; sampleId?: SampleId; zip?: string }) {
+  async function check(opts?: { text?: string; image?: PreparedImage | null; sampleId?: SampleId | null; zip?: string }) {
+    if (loading) return;
     const rawText = opts?.text ?? text;
     const img = opts && "image" in opts ? opts.image : image;
     const z = (opts?.zip ?? zip).trim();
     if (!rawText.trim() && !img) {
-      setFormError("Paste a listing or add a photo first, or try a sample below.");
+      setFormError({ field: "text", message: "Paste a listing or add a photo first, or try a sample below." });
+      textRef.current?.focus();
       return;
     }
     if (z && !/^\d{5}$/.test(z)) {
-      setFormError("ZIP codes have 5 digits. Leave it blank and we'll read it from the listing.");
+      setFormError({ field: "zip", message: "ZIP codes have 5 digits. Leave it blank and we'll read it from the listing." });
+      zipRef.current?.focus();
       return;
     }
     setFormError(null);
@@ -90,13 +98,15 @@ export function Checker() {
     setElapsed(0);
     setAnnounce(img ? "Reading your photo with Gemma. This takes about 10 seconds." : "Checking your listing. This takes about 10 seconds.");
     resultsRef.current?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    const sid = opts && "sampleId" in opts ? (opts.sampleId ?? undefined) : sampleId;
     const r = await send({
       text: safeText,
       image: img ? { mimeType: img.mimeType, data: img.data } : undefined,
       zip: z || undefined,
-      sampleId: opts?.sampleId ?? sampleId,
+      sampleId: sid,
       contactHashes,
     });
+    setRunning(null);
     if (r) {
       setResult(r);
       setStatus({ kind: "done" });
@@ -119,19 +129,25 @@ export function Checker() {
   }
 
   async function onFile(file: File | undefined) {
+    const fromReport = addingLease.current;
+    addingLease.current = false;
     if (!file) return;
     setImageError(null);
     try {
       const img = await prepareImage(file);
       setImage(img);
       setSampleId(undefined);
+      // "Add a photo of the lease" in the report re-runs the check with the listing text plus the photo.
+      if (fromReport) await check({ image: img, sampleId: null });
     } catch (e) {
       setImageError(e instanceof ImageError ? e.message : "We couldn't use that image. Try a screenshot.");
     }
   }
 
   async function runSample(id: SampleId) {
+    if (loading) return;
     const s = SAMPLES.find((x) => x.id === id)!;
+    setRunning(id);
     setSampleId(id);
     setZip("");
     setImageError(null);
@@ -149,17 +165,22 @@ export function Checker() {
     }
   }
 
-  const loading = status.kind === "loading";
+  const samples = (headingId: string) => <SampleList headingId={headingId} onRun={runSample} running={running} busy={loading} />;
 
   return (
     <div ref={(el) => el?.setAttribute("data-ready", "")} className="mx-auto grid max-w-[1240px] gap-6 px-4 pb-16 lg:grid-cols-[400px_1fr] lg:gap-10 lg:px-8">
       <div className="lg:sticky lg:top-6 lg:self-start">
+        <p className="mb-3 text-[15px] lg:hidden">
+          No listing handy?{" "}
+          <a href="#samples-h" className="font-semibold text-pen underline underline-offset-2">
+            Try a sample
+          </a>
+        </p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             check();
           }}
-          aria-describedby={formError ? ids.err : undefined}
           noValidate
         >
           <label htmlFor={ids.text} className="block text-[15px] font-bold">
@@ -167,15 +188,18 @@ export function Checker() {
           </label>
           <p className="text-[14px] text-ink-soft">Paste the ad, the landlord&apos;s message, or lease clauses.</p>
           <textarea
+            ref={textRef}
             id={ids.text}
             value={text}
             onChange={(e) => {
               setText(e.target.value);
               setSampleId(undefined);
             }}
+            aria-invalid={formError?.field === "text" || undefined}
+            aria-describedby={formError?.field === "text" ? ids.err : undefined}
             rows={7}
             maxLength={12000}
-            className="mt-2 block w-full resize-y rounded-xs border border-ink-soft bg-sheet p-3 text-[16px] leading-relaxed placeholder:text-ink-soft/80"
+            className="mt-2 block w-full resize-y rounded-xs border border-ink-soft bg-sheet p-3 text-[16px] leading-relaxed placeholder:text-ink-soft"
             placeholder="1BR in Clarendon, $1,650/month. Owner overseas…"
           />
 
@@ -228,36 +252,38 @@ export function Checker() {
               ZIP code <span className="font-normal text-ink-soft">(optional, we&apos;ll read it from the listing)</span>
             </label>
             <input
+              ref={zipRef}
               id={ids.zip}
               inputMode="numeric"
               autoComplete="postal-code"
               maxLength={5}
               value={zip}
               onChange={(e) => setZip(e.target.value.replace(/\D/g, ""))}
+              aria-invalid={formError?.field === "zip" || undefined}
+              aria-describedby={formError?.field === "zip" ? ids.err : undefined}
               className="mt-2 block w-32 rounded-xs border border-ink-soft bg-sheet px-3 py-2 font-mono text-[16px]"
             />
           </div>
 
           {formError && (
             <p id={ids.err} role="alert" className="mt-4 text-[15px] font-semibold text-stop">
-              {formError}
+              {formError.message}
             </p>
           )}
 
           <button
             type="submit"
-            disabled={loading}
-            aria-describedby={ids.privacy}
-            className="mt-5 min-h-12 w-full rounded-xs bg-pen px-5 text-[17px] font-bold text-white hover:bg-pen-dark disabled:cursor-wait disabled:opacity-70"
+            aria-disabled={loading || undefined}
+            className="mt-5 min-h-12 w-full rounded-xs bg-pen px-5 text-[17px] font-bold text-white hover:bg-pen-dark aria-disabled:cursor-wait aria-disabled:bg-pen-dark"
           >
             {loading ? "Checking…" : "Check this listing"}
           </button>
-          <details className="mt-3 text-[14px]" id={ids.privacy}>
+          <details className="mt-3 text-[14px]">
             <summary className="min-h-11 py-2 text-ink-soft">
               <span className="text-ink">We don&apos;t save your text or photos.</span>{" "}
               <span className="font-semibold text-pen underline underline-offset-2">What we send</span>
             </summary>
-            <div className="space-y-2 pb-2 text-ink-soft">
+            <div className="space-y-2 pb-2 text-ink-soft" id={ids.privacy}>
               <p>No account and no logs of your text. Your photo is resized on your device (which also strips location data) and dropped after the check.</p>
               <p>
                 Before sending, we remove phone numbers, emails and long ID or account numbers from your text. To read it, we send the text and photo
@@ -272,31 +298,8 @@ export function Checker() {
           </details>
         </form>
 
-        <section aria-labelledby="samples-h" className="mt-6 border-t border-rule pt-5">
-          <h2 id="samples-h" className="text-[15px] font-bold">
-            Or try a fictional sample
-          </h2>
-          <ul className="mt-2 divide-y divide-rule border-y border-rule">
-            {SAMPLES.map((s, i) => (
-              <li key={s.id}>
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => runSample(s.id)}
-                  className="grid min-h-14 w-full grid-cols-[1.75rem_1fr] items-center gap-2 px-1 py-2.5 text-left hover:bg-sheet disabled:opacity-60"
-                >
-                  <span aria-hidden className="font-mono text-ink-soft">
-                    {i + 1}
-                  </span>
-                  <span>
-                    <span className="block font-semibold text-pen">{s.title}</span>
-                    <span className="block text-[14px] text-ink-soft">{s.note}</span>
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {/* On desktop the samples sit in the empty report until the first check. */}
+        <div className={status.kind === "idle" ? "lg:hidden" : ""}>{samples("samples-h")}</div>
       </div>
 
       <div ref={resultsRef} className="min-w-0 scroll-mt-4">
@@ -314,11 +317,54 @@ export function Checker() {
           </div>
         )}
         {status.kind === "done" && result && (
-          <Report ref={reportRef} result={result} onRescore={rescore} rescoring={rescoring} onAddLease={() => fileRef.current?.click()} />
+          <Report
+            ref={reportRef}
+            result={result}
+            onRescore={rescore}
+            rescoring={rescoring}
+            onAddLease={() => {
+              addingLease.current = true;
+              fileRef.current?.click();
+            }}
+          />
         )}
-        {status.kind === "idle" && <EmptyReport />}
+        {status.kind === "idle" && <EmptyReport samples={samples("samples-h-empty")} />}
       </div>
     </div>
+  );
+}
+
+function SampleList({ headingId, onRun, running, busy }: { headingId: string; onRun: (id: SampleId) => void; running: SampleId | null; busy: boolean }) {
+  return (
+    <section aria-labelledby={headingId} className="mt-6 scroll-mt-4 border-t border-rule pt-5 lg:mt-0 lg:border-t-0 lg:pt-0">
+      <h2 id={headingId} className="text-[15px] font-bold">
+        Try a fictional sample
+      </h2>
+      <ul className="mt-2 divide-y divide-rule border-y border-rule">
+        {SAMPLES.map((s, i) => {
+          const active = running === s.id;
+          return (
+            <li key={s.id}>
+              <button
+                type="button"
+                aria-disabled={busy || undefined}
+                aria-current={active || undefined}
+                onClick={() => onRun(s.id)}
+                className={`grid min-h-14 w-full grid-cols-[1.75rem_1fr] items-center gap-2 px-1 py-2.5 text-left hover:bg-sheet ${busy && !active ? "cursor-wait" : ""} ${active ? "bg-sheet" : ""}`}
+              >
+                <span aria-hidden className="font-mono text-ink-soft">
+                  {i + 1}
+                </span>
+                <span>
+                  <span className="block font-semibold text-pen">{s.title}</span>
+                  <span className="block text-[14px] text-ink-soft">{active ? "Checking…" : s.note}</span>
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
@@ -347,9 +393,9 @@ function Loading({ elapsed, photo }: { elapsed: number; photo: boolean }) {
   );
 }
 
-function EmptyReport() {
+function EmptyReport({ samples }: { samples: React.ReactNode }) {
   const rows = [
-    ["Price check", "Compares the rent with HUD's benchmark rent and Census medians for that ZIP code."],
+    ["Price check", "Compares the rent with Census and HUD rents for the same size unit in that ZIP code."],
     ["Scam risk", "Looks for the FTC's rental-scam warning signs and quotes the exact words."],
     ["Lease clauses", "Reads a lease photo and flags clauses that may conflict with DC, Maryland or Virginia rules."],
   ];
@@ -370,6 +416,7 @@ function EmptyReport() {
           </li>
         ))}
       </ol>
+      <div className="mt-6 hidden border-t border-rule pt-5 lg:block">{samples}</div>
     </div>
   );
 }

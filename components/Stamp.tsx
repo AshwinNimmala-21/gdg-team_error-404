@@ -5,7 +5,7 @@ const TONE: Record<Tone, string> = {
   ok: "text-ok bg-ok-tint border-ok",
   warn: "text-warn bg-warn-tint border-warn",
   stop: "text-stop bg-stop-tint border-stop",
-  none: "text-none bg-none-tint border-none border-dashed",
+  nil: "text-nil bg-nil-tint border-nil border-dashed",
 };
 
 /** The inspector's stamp: icon + word + color, never color alone. */

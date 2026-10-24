@@ -135,7 +135,7 @@ export interface CheckResult {
   questions: Question[];
   aiInstructions: { detected: boolean; quote: string | null };
   /** Anonymous community flags (null when the counter is off or Firestore didn't answer). */
-  community: { ids: string[]; address: number; contact: number; firstSeen: string | null } | null;
+  community: { ids: string[]; token: string; address: number; contact: number; firstSeen: string | null } | null;
   help: HelpLink[];
   meta: {
     model: string;
