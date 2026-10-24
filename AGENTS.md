@@ -5,7 +5,8 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
 ## Facts
 - Theme: AI for Housing, DMV (DC/MD/VA). Validate a real problem; small-and-working beats big-and-broken.
 - Submission window **Sun Oct 25 11:00–12:30 PM, hard**. Closing 2:00 PM. Demo video **2 min**. README is scored heavily.
-- Tracks: all teams are in GDG Best Overall. Exactly ONE MLH track. Primary: **Gemma 4**; fallback **UI/UX** (decided Sun 9:30 AM). We also meet Open-Source requirements. NOT entering Google Cloud (we still host on Cloud Run).
+- Tracks: all teams are in GDG Best Overall. Exactly ONE MLH track. We build to qualify for **all four** (Gemma 4, Open-Source AI, UI/UX, Google Cloud) and pick one Sun 9:30 AM. Readiness table: PLAN.md §4b.
+- **Hosting: Google Cloud only** (Cloud Run + Secret Manager + Firestore + Maps). No Vercel.
 - GDG rubric (100): Problem & impact 25 (definition 10, measurable impact 10, stakeholder empathy 5) · Tech & AI 25 (AI necessity 15, architecture 10) · Responsible AI 25 (safety & grounding 10, privacy 8, inclusive design/WCAG 7) · Feasibility 25 (nonprofit deployment 10, inference cost 8, documentation 7).
 - Judges: they care HOW the model is used. **Exact model ID must be in the README** or they assume we didn't use it. Show the integration in the demo. UI/UX = polished AND effortless, not the "AI look".
 - Submit to both MLH OrganizerHQ (public repo + LICENSE, 2-min video, one track) and codingjam.dev (VT chapter). Everything built this weekend; Claude Code use disclosed.
@@ -13,7 +14,9 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
 ## Decisions (settled — do not re-ask)
 - Product: **Clearlease**, a pre-sign check for DMV renters (students, new grads relocating, first-time renters). Demo story: VT grad with a new Arlington job comparing listings from 300 miles away.
 - Inputs: pasted text + uploaded image (screenshot / lease photo) + ZIP. PDF only if a Phase 4 round earns it.
-- Output: three verdict cards (Price check, Scam risk, Lease clauses) + evidence drawer + "questions to ask before you sign". No map, search, history, chat box, login, or DB.
+- Output: three verdict cards (Price check, Scam risk, Lease clauses) + evidence drawer + "questions to ask before you sign". No search, history, chat box or login. Optional extras:
+  - a ZIP-area map (Maps key read at runtime)
+  - an anonymous Firestore flag counter that stores only keyed hashes, a count and a first-seen date
 - Model: `gemma-4-26b-a4b-it` default (env `GEMMA_MODEL`); benchmark `gemma-4-31b-it` once on the lease sample; switch only on evidence (record in PLAN.md).
 - Jurisdiction rule sheets: VA + DC first, MD if time.
 - Verdict words:
@@ -29,7 +32,8 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
 - Next.js 16 App Router + TypeScript + Tailwind v4, Node 24 locally (20+ OK). `@google/genai` (Gemini API), `zod`, `vitest`.
 - Data: HUD FMR API (`/hudapi/public/fmr/data/{FIPS}99999`, Bearer `HUD_TOKEN`), Census ACS5 `B25064_001E` by ZCTA (`CENSUS_KEY`). Static fallback JSON for ~15 DMV counties + Montgomery County VA; every external call degrades to it with a visible "demo data" badge. Mock AI via `MOCK_AI=1`.
 - Hosting: Cloud Run `us-east4`, `gcloud run deploy clearlease --source .`, secrets from Secret Manager (`--set-secrets`). `output: "standalone"` + multi-stage Dockerfile. Runbook in `docs/DEPLOY.md` (PowerShell-friendly). Humans run gcloud.
-- Env names: `GEMINI_API_KEY`, `HUD_TOKEN`, `CENSUS_KEY`, `GEMMA_MODEL`, `MOCK_AI`, `FRED_API_KEY` (unused). **Keys live in `.env` (template: `.env.example`). Never read, print or commit `.env*` files other than the template.**
+- Env names: `GEMINI_API_KEY`, `HUD_TOKEN`, `CENSUS_KEY`, `COMMUNITY_SALT` (enables the Firestore counter), `GEMMA_MODEL`, `MOCK_AI`, `RATE_LIMIT_PER_MIN`, `FIRESTORE_DATABASE_ID` (optional), `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and `NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID` (read at request time, never at build), `FRED_API_KEY` (unused).
+- Never let `.env` into a build. Next.js copies it into `.next/standalone`. `.dockerignore` and `.gcloudignore` exclude it. **Keys live in `.env` (template: `.env.example`). Never read, print or commit `.env*` files other than the template.**
 
 ## Engineering rules
 1. Model and data calls server-side only (route handlers); keys only from `process.env`.

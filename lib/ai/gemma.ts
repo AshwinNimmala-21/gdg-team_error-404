@@ -94,6 +94,8 @@ export async function extractWithGemma(input: {
       };
     } catch (err) {
       if (err instanceof ApiError) {
+        // Status code and model only: never the prompt or the response.
+        console.error(`gemma error: model=${model} level=${level} status=${err.status}`);
         if (err.status === 429) throw new ExtractionError("model_busy", "Gemma is busy right now.");
         if (err.status === 400 && level < 2) continue; // step down: drop schema / thinking config
         throw new ExtractionError("model_failed", `Gemma request failed (${err.status}).`);

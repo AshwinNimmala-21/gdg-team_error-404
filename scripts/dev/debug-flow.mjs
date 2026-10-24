@@ -1,0 +1,12 @@
+import { chromium } from "playwright-core";
+const sample = process.argv[2] ?? "Facebook deal";
+const browser = await chromium.launch({ channel: "chrome" });
+const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+page.on("response", async (r) => { if (r.url().endsWith("/api/check")) { const j = await r.json().catch(() => null); console.log("api", r.status(), j?.error ?? j?.meta?.mode, j?.meta?.latencyMs); } });
+await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
+await page.locator("[data-ready]").waitFor();
+const t = Date.now();
+await Promise.all([page.waitForResponse((r) => r.url().endsWith("/api/check"), { timeout: 90_000 }), page.getByRole("button", { name: new RegExp(sample) }).first().click()]);
+await page.waitForTimeout(1500);
+console.log("after", Date.now() - t, "ms; headings:", (await page.getByRole("heading").allInnerTexts()).slice(0, 4), "alerts:", await page.getByRole("alert").allInnerTexts());
+await browser.close();

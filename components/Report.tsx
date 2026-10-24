@@ -225,7 +225,7 @@ function ModeLine({ r }: { r: CheckResult }) {
     <div className="mt-2 flex flex-wrap gap-2 text-[13px]">
       {r.meta.mode === "live" && (
         <span className="rounded-xs border border-rule px-2 py-0.5 text-ink-soft">
-          Read by Gemma 4 (<code className="font-mono">{r.meta.model}</code>) in {secs} s
+          Read by Gemma 4 (<code className="font-mono">{r.meta.model}</code>) in {secs}&nbsp;s
         </span>
       )}
       {r.meta.mode === "mock" && (
