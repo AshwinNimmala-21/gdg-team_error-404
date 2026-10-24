@@ -16,6 +16,14 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
 - Output: three verdict cards (Price check, Scam risk, Lease clauses) + evidence drawer + "questions to ask before you sign". No map, search, history, chat box, login, or DB.
 - Model: `gemma-4-26b-a4b-it` default (env `GEMMA_MODEL`); benchmark `gemma-4-31b-it` once on the lease sample; switch only on evidence (record in PLAN.md).
 - Jurisdiction rule sheets: VA + DC first, MD if time.
+- Verdict words:
+  - Price: Below market / Typical / Above market
+  - Scam: No red flags found / Some red flags / Likely scam ("N of 9 checks flagged"; never "safe")
+  - Lease: Looks standard / Ask about N clauses / Clauses to fix before signing
+  - Each verdict = icon + word + color.
+- Evidence in native `<details>`. "We read: … [Edit]" reruns the rules only. One `POST /api/check`. Full list in PLAN.md "Decisions".
+- Ownership after the MVP: Yoshwan = `app/api` + `lib`, Ashwin = `app/(ui)` + `components`.
+- Price benchmark = HUD FMR (FY2027) for the bedroom count. The model never computes prices or legality. Quotes are verified against the input before a flag counts.
 
 ## Stack (do not substitute)
 - Next.js 16 App Router + TypeScript + Tailwind v4, Node 24 locally (20+ OK). `@google/genai` (Gemini API), `zod`, `vitest`.
