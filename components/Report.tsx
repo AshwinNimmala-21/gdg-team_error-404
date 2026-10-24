@@ -226,7 +226,7 @@ function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
           <section key={g.severity} aria-label={`${g.title}: ${items.length}`}>
             <h4 className={`flex items-center gap-1.5 border-b-2 border-current pb-1.5 text-[16px] font-bold ${TONE_TEXT[g.tone]}`}>
               <ToneIcon tone={g.tone} className="h-[18px] w-[18px] shrink-0" />
-              {g.title} <span className="font-semibold opacity-80">({items.length})</span>
+              {g.title} <span className="font-semibold">({items.length})</span>
             </h4>
             <ul className="mt-1 space-y-6 pt-3">
               {items.map((f, i) => (
@@ -240,7 +240,7 @@ function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
         <section aria-label={`Not counted: ${uncounted.length}`}>
           <h4 className="flex items-center gap-1.5 border-b-2 border-current pb-1.5 text-[16px] font-bold text-nil">
             <ToneIcon tone="nil" className="h-[18px] w-[18px] shrink-0" />
-            Not counted <span className="font-semibold opacity-80">({uncounted.length})</span>
+            Not counted <span className="font-semibold">({uncounted.length})</span>
           </h4>
           <ul className="mt-1 space-y-6 pt-3">
             {uncounted.map((f, i) => (

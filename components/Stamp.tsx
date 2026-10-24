@@ -20,7 +20,7 @@ export function Stamp({ verdict, label, href, tilt, delay }: { verdict: Verdict;
       className={`stamp group inline-flex max-w-full flex-col items-start px-4 pt-2.5 pb-3 no-underline sm:px-5 ${TONE[verdict.tone]}`}
       style={{ "--tilt": `${tilt}deg`, animationDelay: `${delay}ms` } as React.CSSProperties}
     >
-      <span className="text-[13px] leading-none font-semibold opacity-90">
+      <span className="text-[13px] leading-none font-semibold">
         {label}
         <span className="sr-only">: </span>
       </span>

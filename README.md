@@ -100,7 +100,7 @@ Hosting is one Cloud Run service that scales to zero, plus Firestore and Secret 
 ## Accessibility and design
 
 - Built mobile-first for a renter standing outside the building. Tested at 320, 375 and 1280 px with no horizontal scroll, and photo upload works from the camera roll.
-- Verdicts are never color-only: icon + word + color. Contrast is 5.7:1 or higher on every pair; values are in [`docs/design-principles.md`](docs/design-principles.md).
+- Verdicts are never color-only: icon + word + color. Contrast is 5.9:1 or higher on every text pair (measured; the lowest is green text on its tint), with no opacity tricks on text. Color values are in [`docs/design-principles.md`](docs/design-principles.md).
 - Keyboard: visible focus ring, logical tab order, native `<details>` for evidence, Escape closes the editor, and focus moves to the report when it's ready.
 - Screen readers: `aria-live` announcements, field-level errors (`aria-invalid`), a skip link, and a summary of all three verdicts.
 - `prefers-reduced-motion` turns off the only animation (the stamp landing).

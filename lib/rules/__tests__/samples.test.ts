@@ -54,7 +54,24 @@ describe("demo samples (saved data, recorded extractions)", () => {
     expect(bySeverity("standard")).toEqual(["late_fee", "security_deposit"]);
     expect(r.lease.findings.every((f) => f.evidence[0].quoteFrom === "image")).toBe(true);
     expect(r.price.status).toBe("typical");
-    expect(r.scam.status).toBe("none_found");
+    // A lease alone has no listing to scam-check: "not run", never a green "no red flags".
+    expect(r.scam.status).toBe("not_run");
+    expect(r.scam.flagged).toBe(0);
+  });
+
+  it("a lease that does contain a scam sign still flags it", () => {
+    const x = ExtractionSchema.parse({
+      ...SAMPLE_EXTRACTIONS["lease-photo"],
+      signals: {
+        ...SAMPLE_EXTRACTIONS["lease-photo"].signals,
+        riskyPayment: { present: true, quote: "Monthly rent: $2,200", methods: ["wire"] },
+      },
+    });
+    const corpus = makeCorpus("", x.imageTranscript);
+    const facts = resolveFacts(x, corpus);
+    const r = runRules({ extraction: x, text: "", facts, benchmarks: savedBenchmarks(facts.zip, facts.bedrooms) });
+    expect(r.scam.status).not.toBe("not_run");
+    expect(r.scam.flagged).toBe(1);
   });
 
   it("(d) injection: instructions detected and ignored; never 'no red flags'", () => {

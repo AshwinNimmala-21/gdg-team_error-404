@@ -20,6 +20,7 @@ export function priceVerdict(p: PriceCheck): Verdict {
 }
 
 export function scamVerdict(s: ScamCheck): Verdict {
+  if (s.status === "not_run") return { word: "Not run", tone: "nil" };
   if (s.status === "likely") return { word: "Likely scam", tone: "stop" };
   if (s.status === "some") return { word: "Some red flags", tone: "warn" };
   return { word: "No red flags found", tone: "ok" };

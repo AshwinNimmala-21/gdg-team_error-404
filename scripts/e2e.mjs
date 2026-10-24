@@ -12,7 +12,7 @@ const redact = (t) =>
 const cases = [
   { id: "fine-arlington", file: "fine-arlington.txt", price: ["typical"], scam: "none_found", lease: "not_provided" },
   { id: "scam-facebook", file: "scam-facebook.txt", price: ["below"], scam: "likely", lease: "not_provided", flags: 7 },
-  { id: "lease-photo", image: "lease-page.jpg", price: ["typical"], scam: "none_found", lease: "fix" },
+  { id: "lease-photo", image: "lease-page.jpg", price: ["typical"], scam: "not_run", lease: "fix" },
   { id: "injection", file: "injection.txt", price: ["below"], scam: "likely", lease: "not_provided", ai: true },
 ];
 

@@ -108,6 +108,19 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   }
 
   const score = flags.reduce((s, f) => s + f.weight, 0);
+  // Scam signs live in listings and landlord messages. With neither (e.g. a lease alone), a clean result
+  // would read as approval, so say the check didn't run. Anything that did fire is still shown.
+  if (score === 0 && !x.inputKinds.some((k) => k === "listing" || k === "message"))
+    return {
+      status: "not_run",
+      headline: "We didn't run the scam check",
+      detail:
+        "Scam warning signs show up in rental listings and landlord messages, and we didn't find one here. Paste the listing or the landlord's messages to check them.",
+      flagged: 0,
+      checked: CHECK_COUNT,
+      flags,
+      dropped,
+    };
   const status: ScamCheck["status"] = score === 0 ? "none_found" : score >= LIKELY_AT ? "likely" : "some";
   const n = flags.length;
   const headline = status === "none_found" ? `We checked ${CHECK_COUNT} warning signs and found none` : `${n} of ${CHECK_COUNT} checks flagged`;

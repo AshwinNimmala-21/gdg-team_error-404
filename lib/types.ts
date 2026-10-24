@@ -77,7 +77,8 @@ export interface ScamFlag {
 }
 
 export interface ScamCheck {
-  status: "none_found" | "some" | "likely";
+  /** "not_run": no listing or landlord message to check (e.g. a lease alone) and nothing flagged. */
+  status: "not_run" | "none_found" | "some" | "likely";
   headline: string;
   detail: string;
   flagged: number;
