@@ -5,7 +5,8 @@ Last updated: Sat Oct 24 2026, Phase 1.
 ## Status
 - [x] Phase 0: safety rails (`.claude/settings.json`, `.gitignore`), validation questions in `docs/validation.md`
 - [x] Phase 1: clean slate, Next.js 16.4.3 scaffold (`npm run build` passes), `@google/genai` 2.31, `zod` 4, `vitest` 5, LICENSE, memory files, agents and skills
-- [ ] Phase 1: researcher output in `docs/research/` (running in background)
+- [ ] Phase 1: researcher output in `docs/research/`: `hud-fmr.md` done; census-acs, ftc-red-flags, tenant-law-dc-md-va and help-links re-dispatched after a network failure
+  - HUD finding: the current FMR year is **FY2027**, not FY2026. FMR is about the 40th percentile of gross rent, so the UI calls it "HUD's benchmark for a modest unit", not "average rent". ZIP-level SAFMRs for our sample ZIPs must come from a live API call against `METRO47900M47900`, saved as fixture data.
 - [ ] Phase 1: grill round 1 → answers recorded below
 - [ ] Phase 2: MVP plan (flow, Gemma per step, types, samples, Mermaid, judge's predicted score)
 - [ ] Phase 3: MVP sprint → live on Cloud Run by ~4 PM Sat
