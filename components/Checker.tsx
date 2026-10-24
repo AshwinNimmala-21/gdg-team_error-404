@@ -144,7 +144,7 @@ export function Checker() {
   const loading = status.kind === "loading";
 
   return (
-    <div className="mx-auto grid max-w-[1240px] gap-6 px-4 pb-16 lg:grid-cols-[400px_1fr] lg:gap-10 lg:px-8">
+    <div ref={(el) => el?.setAttribute("data-ready", "")} className="mx-auto grid max-w-[1240px] gap-6 px-4 pb-16 lg:grid-cols-[400px_1fr] lg:gap-10 lg:px-8">
       <div className="lg:sticky lg:top-6 lg:self-start">
         <form
           onSubmit={(e) => {

@@ -1,5 +1,6 @@
 // In-memory sliding window per client key. Good enough for one Cloud Run instance; it resets on
-// restart and isn't shared across instances, which is fine for a cost guard on a free tool.
+// restart and isn't shared across instances. Cloud Run's max-instances setting (docs/DEPLOY.md)
+// caps the worst case.
 
 const WINDOW_MS = 60_000;
 const hits = new Map<string, number[]>();
@@ -16,7 +17,16 @@ export function rateLimit(key: string, limit = 10, now = Date.now()): { ok: bool
   return { ok: true, retryAfterS: 0 };
 }
 
-/** Cloud Run puts the client IP first in X-Forwarded-For. Used only as an in-memory key, never stored. */
+/**
+ * Client key for rate limiting. Clients can put anything at the front of X-Forwarded-For, so we use
+ * the rightmost entry, which Google's front end appends on Cloud Run. Used only in memory, never stored.
+ */
 export function clientKey(headers: Headers): string {
-  return headers.get("x-forwarded-for")?.split(",")[0]?.trim() || headers.get("x-real-ip") || "local";
+  const xff = headers.get("x-forwarded-for");
+  const last = xff
+    ?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .at(-1);
+  return last || headers.get("x-real-ip") || "local";
 }
