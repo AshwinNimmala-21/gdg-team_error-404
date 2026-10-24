@@ -25,10 +25,28 @@ const SIGNAL_RULES: Record<Exclude<SignalId, "riskyPayment">, { label: string; w
 
 // The FTC sign is an owner who is away and can't meet you. Moving for work, on its own, is ordinary.
 const RELOCATING = /\b(relocat\w*|moving|transferr\w*|new job)\b/i;
-const AWAY = /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|can'?t meet|unable to meet|not (in|around))\b/i;
+const AWAY =
+  /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|far away|(another|a different) (city|state|country)|(relocated|moved) to|(can'?t|cannot|unable to|not able to|won'?t be able to) (meet|show|be (there|here|around))|not (in|around)|(mail|send|ship|drop)\w* (you )?(the )?keys?)\b/i;
 
-export function isOnlyRelocating(quote: string | null): boolean {
-  return Boolean(quote && RELOCATING.test(quote) && !AWAY.test(quote));
+/** The sentence around a quote in the user's text (or the photo transcript), or null if it can't be found. */
+function sentenceAround(quote: string, sources: string[]): string | null {
+  const q = quote.replace(/\s+/g, " ").trim().toLowerCase();
+  for (const src of sources) {
+    const s = src.replace(/\s+/g, " ");
+    const i = s.toLowerCase().indexOf(q);
+    if (i < 0) continue;
+    const start = Math.max(...[".", "!", "?"].map((c) => s.lastIndexOf(c, i - 1))) + 1;
+    const ends = [".", "!", "?"].map((c) => s.indexOf(c, i + q.length - 1)).filter((n) => n >= 0);
+    return s.slice(start, ends.length ? Math.min(...ends) + 1 : s.length);
+  }
+  return null;
+}
+
+/** True when the whole sentence only says the owner is moving, with nothing about being away or unavailable. */
+export function isOnlyRelocating(quote: string | null, sources: string[]): boolean {
+  if (!quote || !RELOCATING.test(quote)) return false;
+  const sentence = sentenceAround(quote, sources);
+  return sentence !== null && !AWAY.test(sentence); // fail closed: an unlocatable quote still counts
 }
 
 const FTC_METHODS = new Set(["wire", "gift_card", "crypto"]);
@@ -104,7 +122,7 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   for (const [id, rule] of Object.entries(SIGNAL_RULES) as [keyof typeof SIGNAL_RULES, (typeof SIGNAL_RULES)[keyof typeof SIGNAL_RULES]][]) {
     const s = x.signals[id];
     if (!s.present) continue;
-    if (id === "landlordAway" && isOnlyRelocating(s.quote)) {
+    if (id === "landlordAway" && isOnlyRelocating(s.quote, [rawText, x.imageTranscript ?? ""])) {
       dropped.push({
         ...quoted(s.quote, corpus, rule.label, rule.source),
         counted: false,
