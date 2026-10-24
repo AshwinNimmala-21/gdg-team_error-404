@@ -1,0 +1,14 @@
+# Files gcloud must NOT upload for `gcloud run deploy --source .` (secrets stay local).
+.gcloudignore
+.git
+.gitignore
+.env
+.env.*
+!.env.local.example
+node_modules
+.next
+.claude
+.idea
+docs/screenshots
+scripts/dev
+*.log

@@ -4,8 +4,10 @@ import { forwardRef, type ReactNode } from "react";
 import { leaseVerdict, priceVerdict, scamVerdict, type Verdict } from "@/lib/client/verdicts";
 import type { CheckResult, ClauseFinding, Overrides } from "@/lib/types";
 import { EvidenceDrawer, Quote } from "./Evidence";
+import type { MapsConfig } from "@/lib/server/maps-config";
 import { Community } from "./Community";
 import { FactsBar } from "./FactsBar";
+import { ListingMap } from "./ListingMap";
 import { ToneIcon } from "./Icons";
 import { Stamp } from "./Stamp";
 
@@ -51,9 +53,10 @@ interface Props {
   onRescore: (o: Overrides) => void;
   rescoring: boolean;
   onAddLease: () => void;
+  maps: MapsConfig | null;
 }
 
-export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ result: r, onRescore, rescoring, onAddLease }, headingRef) {
+export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ result: r, onRescore, rescoring, onAddLease, maps }, headingRef) {
   const counted = r.lease.findings;
   return (
     <article aria-labelledby="report-title" aria-busy={rescoring || undefined} className={`rounded-xs border border-rule bg-sheet transition-opacity motion-reduce:transition-none ${rescoring ? "opacity-60" : ""}`}>
@@ -85,6 +88,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
 
       <Section n={1} title="Price check" verdict={priceVerdict(r.price)} delay={0}>
         <Lead headline={r.price.headline} detail={r.price.detail} />
+        {maps && r.read.zip && <ListingMap config={maps} zip={r.read.zip} place={r.read.areaName} />}
         <EvidenceDrawer items={r.price.evidence} />
       </Section>
 

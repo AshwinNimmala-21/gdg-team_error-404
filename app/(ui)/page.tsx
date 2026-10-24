@@ -1,4 +1,13 @@
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { Checker } from "@/components/Checker";
+import { readMapsConfig } from "@/lib/server/maps-config";
+
+// The page shell is prerendered. Runtime settings (the Maps key) are read per request and streamed in.
+async function CheckerWithRuntimeConfig() {
+  await connection();
+  return <Checker maps={readMapsConfig()} />;
+}
 
 export default function Home() {
   return (
@@ -22,7 +31,9 @@ export default function Home() {
             Paste a listing or add a lease photo. We check the price, the scam warning signs and the lease clauses, and quote the words behind each one.
           </p>
         </div>
-        <Checker />
+        <Suspense fallback={<Checker maps={null} />}>
+          <CheckerWithRuntimeConfig />
+        </Suspense>
       </main>
     </>
   );

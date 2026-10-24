@@ -6,6 +6,7 @@ import { redact } from "@/lib/client/redact";
 import { leaseVerdict, priceVerdict, scamVerdict } from "@/lib/client/verdicts";
 import { normalizeContact, sha256Hex } from "@/lib/community";
 import type { CheckError, CheckRequest, CheckResult, Overrides, SampleId } from "@/lib/types";
+import type { MapsConfig } from "@/lib/server/maps-config";
 import { CameraIcon } from "./Icons";
 import { Report } from "./Report";
 
@@ -18,7 +19,7 @@ const SAMPLES: { id: SampleId; title: string; note: string; file: string }[] = [
 
 type Status = { kind: "idle" } | { kind: "loading" } | { kind: "error"; message: string } | { kind: "done" };
 
-export function Checker() {
+export function Checker({ maps }: { maps: MapsConfig | null }) {
   const [text, setText] = useState("");
   const [zip, setZip] = useState("");
   const [image, setImage] = useState<PreparedImage | null>(null);
@@ -322,6 +323,7 @@ export function Checker() {
             result={result}
             onRescore={rescore}
             rescoring={rescoring}
+            maps={maps}
             onAddLease={() => {
               addingLease.current = true;
               fileRef.current?.click();

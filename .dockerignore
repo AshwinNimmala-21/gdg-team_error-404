@@ -1,0 +1,14 @@
+# Never send secrets into the build: Next.js copies .env files into the standalone server.
+.env
+.env.*
+!.env.local.example
+node_modules
+.next
+.git
+.idea
+.vscode
+.claude
+docs
+scripts/dev
+coverage
+*.log
