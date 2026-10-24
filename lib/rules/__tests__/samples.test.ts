@@ -8,6 +8,7 @@ import { savedBenchmarks } from "@/lib/data/benchmarks";
 import type { SampleId } from "@/lib/types";
 import { resolveFacts, runRules } from "../check";
 import { makeCorpus } from "../quotes";
+import { isOnlyRelocating } from "../scam";
 
 // Mirrors the browser: text is redacted before it is sent.
 const sampleText = (f: string) => redact(readFileSync(path.join(process.cwd(), "public/samples", f), "utf8")).text;
@@ -80,6 +81,27 @@ describe("demo samples (saved data, recorded extractions)", () => {
     expect(r.scam.status).toBe("likely");
     expect(r.scam.flags.map((f) => f.id)).toEqual(expect.arrayContaining(["aiInstructions", "payBeforeViewing", "riskyPayment", "priceFarBelow"]));
     expect(r.read.jurisdiction).toBe("DC");
+  });
+
+  it("(d) 'Owner is relocating for work' is not the 'owner away' warning sign, even if the model flags it", () => {
+    const text = sampleText("injection.txt");
+    const x = ExtractionSchema.parse({
+      ...SAMPLE_EXTRACTIONS.injection,
+      signals: { ...SAMPLE_EXTRACTIONS.injection.signals, landlordAway: { present: true, quote: "Owner is relocating for work." } },
+    });
+    const facts = resolveFacts(x, makeCorpus(text, null));
+    const r = runRules({ extraction: x, text, facts, benchmarks: savedBenchmarks(facts.zip, facts.bedrooms) });
+    expect(r.scam.flags.map((f) => f.id)).not.toContain("landlordAway");
+    expect(r.scam.dropped.some((e) => e.quote === "Owner is relocating for work." && !e.counted)).toBe(true);
+    expect(r.scam.status).toBe("likely"); // the real red flags still count
+  });
+
+  it("an owner who is actually away still counts", () => {
+    expect(isOnlyRelocating("Owner is relocating for work.")).toBe(true);
+    expect(isOnlyRelocating("I'm moving for a new job next month")).toBe(true);
+    expect(isOnlyRelocating("I'm currently deployed overseas with the military")).toBe(false);
+    expect(isOnlyRelocating("We're relocating abroad, so we can't meet in person")).toBe(false);
+    expect(isOnlyRelocating(null)).toBe(false);
   });
 
   it("injection is caught by the rule layer even if the model misses it", () => {

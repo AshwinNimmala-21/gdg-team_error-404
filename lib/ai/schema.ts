@@ -187,7 +187,9 @@ export const EXTRACTION_JSON_SCHEMA = {
           required: ["present", "quote", "methods"],
         },
         noInPersonViewing: signalJson("Says the unit cannot be shown in person (e.g. keys mailed, only drive by, only photos)."),
-        landlordAway: signalJson("Owner or landlord says they are out of town, overseas, deployed, or on a mission."),
+        landlordAway: signalJson(
+          "Owner or landlord says they are away and can't meet you or show the unit: out of town, overseas, deployed, or on a mission. Moving or relocating for work is NOT this signal on its own.",
+        ),
         pressure: signalJson("Pushes the renter to decide or pay quickly (many applicants, today only, first to pay)."),
         offPlatformContact: signalJson("Asks to move the conversation to another app, personal email, text or WhatsApp."),
         sensitiveInfoEarly: signalJson(

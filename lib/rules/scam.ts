@@ -23,6 +23,14 @@ const SIGNAL_RULES: Record<Exclude<SignalId, "riskyPayment">, { label: string; w
   offPlatformContact: { label: "Moves the conversation off the listing site", weight: 1 },
 };
 
+// The FTC sign is an owner who is away and can't meet you. Moving for work, on its own, is ordinary.
+const RELOCATING = /\b(relocat\w*|moving|transferr\w*|new job)\b/i;
+const AWAY = /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|can'?t meet|unable to meet|not (in|around))\b/i;
+
+export function isOnlyRelocating(quote: string | null): boolean {
+  return Boolean(quote && RELOCATING.test(quote) && !AWAY.test(quote));
+}
+
 const FTC_METHODS = new Set(["wire", "gift_card", "crypto"]);
 const APP_METHODS = new Set(["payment_app", "cashiers_check", "cash", "money_order"]);
 
@@ -95,7 +103,16 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
 
   for (const [id, rule] of Object.entries(SIGNAL_RULES) as [keyof typeof SIGNAL_RULES, (typeof SIGNAL_RULES)[keyof typeof SIGNAL_RULES]][]) {
     const s = x.signals[id];
-    if (s.present) add(id, rule.label, rule.weight, quoted(s.quote, corpus, rule.label, rule.source), !rule.source);
+    if (!s.present) continue;
+    if (id === "landlordAway" && isOnlyRelocating(s.quote)) {
+      dropped.push({
+        ...quoted(s.quote, corpus, rule.label, rule.source),
+        counted: false,
+        label: `${rule.label} (not counted: moving for work isn't the warning sign; the FTC sign is an owner who can't meet you or show the place)`,
+      });
+      continue;
+    }
+    add(id, rule.label, rule.weight, quoted(s.quote, corpus, rule.label, rule.source), !rule.source);
   }
 
   const modelSaw = x.aiInstructions.present ? quoted(x.aiInstructions.quote, corpus, "Instructions aimed at AI tools") : null;
