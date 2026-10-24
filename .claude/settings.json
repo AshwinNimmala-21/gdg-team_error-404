@@ -1,1 +1,1 @@
-{"permissions":{"deny":["Read(.env*)"]}}
+{"permissions":{"deny":["Read(.env*)"],"ask":["Bash(git push *)","Bash(rm *)","Bash(npm audit fix *)","Bash(gcloud *)","Bash(vercel *)"]}}

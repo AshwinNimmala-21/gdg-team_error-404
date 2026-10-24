@@ -44,3 +44,7 @@ next-env.d.ts
 
 # IDE
 .idea/
+
+# local secrets (explicit)
+.env.local
+.env*.local
