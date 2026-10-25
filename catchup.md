@@ -213,6 +213,8 @@ Written by three parallel subagents (docs only), reviewed and committed by Ashwi
 14. The map has `role="img"` on `dev`. Yoshwan's `inert`/`aria-hidden` fix (`e8a0352`) is on `main` only and comes in with the next `git pull origin main`.
 15. Hosting: Cloud Run (`Dockerfile`, standalone output). `.env` is excluded from the image; Maps config is read per request.
 
+**Git note (Yoshwan):** use `git pull --rebase=merges --autostash origin dev`. A plain `--rebase` tries to linearize the `main` → `dev` merge commit and stops on a conflict (happened at 4:21 AM; aborted cleanly, nothing lost).
+
 **Baseline, Sun 4:03–4:11 AM, fresh production build on :3000, live Gemma** (every later gate is compared to this):
 - `npm test` 92/92, lint clean, `npm run build` OK.
 - e2e EN **5/5 live**; e2e ES **6/6**, 0 English sentences.
@@ -226,9 +228,9 @@ Written by three parallel subagents (docs only), reviewed and committed by Ashwi
 | D2 CONTRIBUTING / CODE_OF_CONDUCT / THIRD_PARTY_NOTICES | **Done** | `9d22833` |
 | D3 code tour | **Done** | `9d22833` (refresh line numbers before the video) |
 | C small polish | **Done** (Yoshwan, 4:21 AM) | "Read by Gemma 4" line links to and focuses "What Gemma read" (live mode only; verified in Task A's live gate). "Copy these questions" with a polite landlord message, aria-live, and a selectable fallback when the clipboard is blocked. Tagline "Virginia, DC and Maryland" (ES too). Census API notice verbatim (census.gov ToS, "Attribution"), with a Spanish translation beside it in ES. Also fixed the baseline axe failure (toggle label-in-name; 8+8 → 0+0) and English clause explanations in the Spanish saved/demo lease answer. e2e-es skip list updated for the inert map. Gate (demo mode): 93 tests, lint, build, e2e EN 5/5, ES 6/6, axe 0 EN+ES. |
-| A real-world inputs | Not started | |
+| A real-world inputs | **Done** (Yoshwan, 4:57 AM, `a5d46c5`) | Questions get a "what we can check" panel (`components/QuestionHelp.tsx`, `inputType`) with any FTC signs they describe; accent-insensitive quote checks; "1.6k" and no-break-space rent formats; Spanish/Spanglish vocabulary in the prompt. `scripts/eval/messy.jsonl` (20 items) live before → after: questions handled 0/5 → 4/5; scam 100%/100%/0 false alarms and rent 11/11 unchanged. Gate: e2e EN 5/5 + ES 6/6 live, axe 0 EN+ES (plus the question panel). |
 | B dark theme | Not started | |
-| D4 self-hosted model (Ollama) | Not started | Ollama is not installed on Ashwin's Mac; `ollama.com/library/gemma4` lists `gemma4:26b` (16–19 GB) and smaller e2b/e4b/12b tags |
+| D4 self-hosted model (Ollama) | **Done** (Yoshwan, 5:06 AM) | `GEMMA_PROVIDER=ollama` + `GEMMA_BASE_URL` (`lib/ai/ollama.ts`, OpenAI-compatible endpoint, same retry ladder). Gemini default unchanged (tests + e2e EN 5/5, ES 6/6 live). Tested on Yoshwan's laptop (RTX 4050, Ollama 0.40.11, `OLLAMA_CONTEXT_LENGTH=16384`): e2b-it-qat 1/5 strict, e4b-it-qat 3/5 strict, photo works on both, 26B not tested. README "Self-host Gemma 4" has the table. |
 | Finish 1–4 | Not started | |
 
 ## 15. Remaining instructions (verbatim)

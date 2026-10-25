@@ -6,7 +6,7 @@ State when written (Sun Oct 25, 03:30 AM):
 - App deployed on Cloud Run: `https://clearlease-477820387862.us-east4.run.app` ([`catchup.md:19`](../catchup.md)). Repo is public, LICENSE is Apache-2.0.
 - **No demo video recorded.** `docs/video-script.md` and `docs/submissions.md` are stubs.
 - **`docs/validation.md` has no student answers** (`docs/validation.md:67`, "None recorded yet").
-- **Self-hosted Gemma (task D4, Ollama) is not implemented.** The README says so: "untested, not wired in" ([`README.md:204`](../README.md)). `grep` finds no `GEMMA_PROVIDER` or Ollama code in `lib/` or `app/`.
+- **Update 05:06: self-hosted Gemma (D4) is implemented and tested.** `GEMMA_PROVIDER=ollama` runs the same pipeline on a local Gemma 4 (`lib/ai/ollama.ts`, tests in `lib/ai/__tests__/ollama.test.ts`). On this laptop, `gemma4:e2b-it-qat` passed 1 of 5 strict sample checks and `gemma4:e4b-it-qat` passed 3 of 5. Both read the lease photo, and every answer was schema-valid. `gemma4:26b` was not tested (too big for this laptop). See README "Self-host Gemma 4".
 - Tonight's queue (C, A, B, D4, Finish) has not started ([`catchup.md:197-208`](../catchup.md)).
 
 ## Summary
@@ -14,7 +14,7 @@ State when written (Sun Oct 25, 03:30 AM):
 | Track | Score /10 | One-line reason |
 |---|---|---|
 | Best Use of Gemma 4 | **7** | Core, multimodal, model ID everywhere, measured. Loses points for no video and live flakiness. |
-| Best Open-Source AI | **5** (7 if D4 works) | Licenses and docs are good. The open-weights angle is a claim, not a code path, and this is the judges' own example idea. |
+| Best Open-Source AI | **6** (was 5; D4 works but small local models over-flag) | Licenses and docs are good. The open-weights angle is a claim, not a code path, and this is the judges' own example idea. |
 | Best UI/UX | **7** | Deliberate design, 0 axe violations, manual 12/12. No video, no real-user evidence, 30 s photo wait. |
 | Best Use of Google Cloud | **5** | Real deploy on Cloud Run with Secret Manager and Firestore, but a plain stack and thin on the autoscaling and security story. |
 
@@ -50,7 +50,7 @@ State when written (Sun Oct 25, 03:30 AM):
 
 ---
 
-## 2. Best Open-Source AI: 5/10 as of now
+## 2. Best Open-Source AI: 6/10 after D4 (5/10 before)
 
 **Criteria scored against** ([`docs/brief/event-notes.md:26`](brief/event-notes.md)):
 > "any open model, including Gemma. **Licenses must be in place in the repo.** Example idea they gave: **AI scam detector for leasing.** Spend less time choosing a model; they care how you use it and what you build. **README is very important** — easier to understand = easier to score."
@@ -72,6 +72,8 @@ State when written (Sun Oct 25, 03:30 AM):
 **Likely competition.** **This is the judges' own example idea ("AI scam detector for leasing").** Expect several lookalike teams, and some will be fully local (Ollama or llama.cpp) with a "runs offline" demo. A team that really runs an open model locally beats us on the criterion as stated.
 
 **If D4 works: +2 (to 7).** Reason: a verified `GEMMA_PROVIDER=ollama` path means the open weights run the same pipeline end to end, turning the self-host story from a claim into a demonstrable fact, and it strengthens the privacy argument (no tenant document leaves the machine). It does not reach 8 because a small local Gemma 4 may be slower, miss flags, or fail the photo path, and the lookalike teams stay the same. If D4 only half works (text yes, photo no), +1 and say so.
+
+**D4 result (05:06): +1, not +2.** It works end to end: text and photo, schema-valid, on two local Gemma 4 sizes, with the measured results in the README. But the small models a laptop can run over-flag (e2b: 1 of 5 strict passes, it invents lease clauses; e4b: 3 of 5), and the 26B model we'd recommend wasn't tested. A judge can run it; they'll also see it's weaker locally.
 
 **What it still needs by 11:00 AM**
 - *Code:* D4 (Gemini stays default; unchanged behaviour verified by tests and the 5/5 e2e), run the 5 samples through Ollama and record the real result (including failures) in the README.
@@ -146,10 +148,12 @@ State when written (Sun Oct 25, 03:30 AM):
 All of this is also available to the GDG overall prize regardless of the MLH choice.
 
 **Switch condition.**
-- **To Open-Source AI** only if D4 is verified end to end (all 5 samples on a local Gemma 4 through Ollama, schema-valid, photo included, results recorded in the README) **and** the Gemma field looks crowded at the 9:30 AM check.
+- **To Open-Source AI** only if D4 is verified end to end (all 5 samples on a local Gemma 4 through Ollama, schema-valid, photo included, results recorded in the README) **and** the Gemma field looks crowded at the 9:30 AM check. **05:06 status:** all 5 samples did run through local Gemma 4, photo included and schema-valid, but only 3 of 5 passed our strict verdict check (e4b), so this condition is **not met** on quality.
 - **To UI/UX** if the deployed site still shows a saved-result fallback or an error in 1 or more of 10 consecutive live sample runs. The Gemma track needs the model to visibly work on camera, while UI/UX can lean on the design, the accessibility results and the usability timings.
 - Otherwise stay on Gemma 4. Decide by 9:30 AM so the video can name the track.
 
 ## Update log
 
 - **03:30 initial**: written before D4 and council round 1.
+
+- **05:06 after D4**: Open-Source 5 → 6. D4 implemented and tested (e2b 1/5, e4b 3/5 strict, 26B untested). The recommendation is unchanged: Gemma 4.

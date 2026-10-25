@@ -89,6 +89,8 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [ ] HANDED OVER to Yoshwan's laptop (Sun ~3:00 AM): Task C (+ Census API notice), Task A, Task B, D4, Finish. Instructions verbatim in catchup.md §15; status table in §14.
 
 ### Morning questions
+- (Yoshwan's session, 5:06 AM) `.env.example` should list `GEMMA_PROVIDER` and `GEMMA_BASE_URL` (both optional; for self-hosting). Claude isn't allowed to read or edit `.env*` files, so a human needs to add those two names to the template.
+- (Census notice) Done in Task C: verbatim in the report footer, with a Spanish translation in ES mode.
 - Add the Census API notice ("This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.") to the report footer? Suggested in Task C.
 - MLH track: score Gemma 4, Open-Source AI, Google Cloud, UI/UX in the morning (lean Gemma 4).
 

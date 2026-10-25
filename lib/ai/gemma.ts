@@ -6,11 +6,16 @@ import {
   type GenerateContentResponse,
   type Part,
 } from "@google/genai";
+import { DEFAULT_OLLAMA_MODEL, DEFAULT_OLLAMA_URL, ollamaGenerate } from "./ollama";
 import { buildUserPrompt, SYSTEM_PROMPT } from "./prompt";
 import { EXTRACTION_JSON_SCHEMA, ExtractionSchema, type Extraction } from "./schema";
 
 export const DEFAULT_MODEL = "gemma-4-26b-a4b-it";
-export const modelId = () => process.env.GEMMA_MODEL?.trim() || DEFAULT_MODEL;
+
+/** GEMMA_PROVIDER=ollama runs Gemma 4 on your own machine (Ollama); anything else uses the Gemini API, the default. */
+export type Provider = "gemini" | "ollama";
+export const providerFromEnv = (): Provider => (process.env.GEMMA_PROVIDER?.trim().toLowerCase() === "ollama" ? "ollama" : "gemini");
+export const modelId = () => process.env.GEMMA_MODEL?.trim() || (providerFromEnv() === "ollama" ? DEFAULT_OLLAMA_MODEL : DEFAULT_MODEL);
 
 // Each attempt gets its own timeout (a lease photo takes ~34 s, text ~12 s). The overall deadline
 // keeps a request with retries under Cloud Run's --timeout 120 (docs/DEPLOY.md).
@@ -145,21 +150,31 @@ export async function extractWithGemma(input: {
   image?: { mimeType: string; data: string };
   lang?: "en" | "es";
 }): Promise<GemmaResult> {
+  const model = modelId();
+  const log = (msg: string) => console.error(`gemma error: model=${model} ${msg}`);
+  const promptFor = (level: Level) => buildUserPrompt(input.text, Boolean(input.image), input.lang) + (level === 0 ? "" : SCHEMA_IN_PROMPT);
+
+  if (providerFromEnv() === "ollama") {
+    // Self-hosted: no API key, and a local machine is slower than the hosted API, so attempts get more time.
+    const generate = ollamaGenerate({
+      baseUrl: process.env.GEMMA_BASE_URL?.trim() || DEFAULT_OLLAMA_URL,
+      model,
+      input: { system: SYSTEM_PROMPT, prompt: promptFor, image: input.image },
+    });
+    const r = await generateWithRetries(generate, { attemptMs: input.image ? 240_000 : 120_000, deadlineMs: 300_000, log });
+    return { ...r, model };
+  }
+
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new ExtractionError("model_failed", "No Gemini API key is configured.");
   const ai = new GoogleGenAI({ apiKey });
-  const model = modelId();
 
   const generate: Generate = (level, signal) => {
-    const prompt = buildUserPrompt(input.text, Boolean(input.image), input.lang) + (level === 0 ? "" : SCHEMA_IN_PROMPT);
     const parts: Part[] = [];
     if (input.image) parts.push({ inlineData: { mimeType: input.image.mimeType, data: input.image.data } });
-    parts.push({ text: prompt });
+    parts.push({ text: promptFor(level) });
     return ai.models.generateContent({ model, contents: [{ role: "user", parts }], config: configFor(level, signal) });
   };
-  const r = await generateWithRetries(generate, {
-    attemptMs: input.image ? ATTEMPT_MS.image : ATTEMPT_MS.text,
-    log: (msg) => console.error(`gemma error: model=${model} ${msg}`),
-  });
+  const r = await generateWithRetries(generate, { attemptMs: input.image ? ATTEMPT_MS.image : ATTEMPT_MS.text, log });
   return { ...r, model };
 }

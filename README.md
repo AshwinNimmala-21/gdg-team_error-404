@@ -11,7 +11,7 @@
 - **Multimodal:** lease photos and chat screenshots are read directly (image input), with a transcript we use to verify every quote.
 - **Visible in the product:** each report has a "What Gemma read" section showing the extracted facts and highlighting the exact words in your text or photo. The header shows the model ID and latency.
 - **Measured:** on a hard eval set we wrote as a stress test (paraphrased payment requests, misspellings, Spanish, anti-scam disclaimers, screenshots), Clearlease caught 15 of 15 scams with 0 false alarms, while a keyword scanner caught 2 and raised 6 false alarms. On ordinary listings a keyword scan does about as well, and we say so ([`docs/evaluation.md`](docs/evaluation.md)).
-- **Open weights:** the same model can run on a nonprofit's own hardware (see "Self-host Gemma", untested).
+- **Open weights:** the same pipeline runs on a nonprofit's own hardware with `GEMMA_PROVIDER=ollama` (see "Self-host Gemma 4": tested with the small e2b/e4b models on a laptop; they over-flag, so use `gemma4:26b`).
 
 ![Clearlease report for a Facebook-style scam listing: suspiciously cheap, likely scam](docs/screenshots/desktop-scam.png)
 
@@ -175,6 +175,7 @@ Only **one key is required**: `GEMINI_API_KEY` (free from [aistudio.google.com/a
 | `CENSUS_KEY` | No | Saved Census ACS 2020–24 medians, labelled the same way |
 | `COMMUNITY_SALT` (+ Firestore) | No | The anonymous "flag this listing" counter is simply off |
 | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | No | No area map. The key is a browser key restricted by referrer: ours only allows `http://localhost:3000` and our Cloud Run URL. On any other port or domain the report shows "The map couldn't load for this ZIP code" and everything else still works. Self-hosters need their own key with their own referrers. |
+| `GEMMA_PROVIDER`, `GEMMA_BASE_URL` | No | The Gemini API is used. Set `GEMMA_PROVIDER=ollama` to run Gemma 4 on your own machine (no `GEMINI_API_KEY` needed); `GEMMA_BASE_URL` defaults to `http://localhost:11434/v1`. See "Self-host Gemma 4". |
 
 Checked on Oct 25: a production build with only `GEMINI_API_KEY` set (the other four blanked) passed all 5 samples live (`node scripts/e2e.mjs`), showed saved figures, no counter and no map.
 
@@ -201,11 +202,27 @@ PROJECT=your-project-id ./scripts/deploy.sh             # asks for GEMINI_API_KE
 - Settings: `us-east4`, 512 MiB, 1 CPU, `--timeout 120`, at most 3 instances (scales to zero), `RATE_LIMIT_PER_MIN=30`.
 - The script's dry run is tested. The real run follows the same commands as [`docs/DEPLOY.md`](docs/DEPLOY.md), the PowerShell runbook we used for the live deploy.
 
-### Self-host Gemma (Ollama): untested, not wired in
-**We have not built or tested this.** Clearlease calls Gemma 4 through the Gemini API only. It's here because the model's open weights are what make self-hosting possible for a nonprofit that can't send tenant documents to a cloud API:
-- Ollama publishes Gemma 4, including `gemma4:26b` (about 16–19 GB, text and image input), per [ollama.com/library/gemma4](https://ollama.com/library/gemma4). After `ollama pull gemma4:26b`, it runs on a machine with enough GPU or unified memory.
-- To use it, `lib/ai/gemma.ts` would need a small adapter that sends the same system prompt, the delimited user input, the image and the JSON schema to Ollama's local API instead of `@google/genai`, then parses the reply with the same Zod schema. Everything after extraction (quote verification, rules, data) would stay the same.
-- What we haven't checked: whether Ollama's JSON output matches our schema as reliably as the Gemini API, how fast photo reading is on typical hardware, and memory use.
+### Self-host Gemma 4 (Ollama): works, smaller models are less accurate
+A nonprofit that can't send tenant documents to a cloud API can run Gemma 4's open weights on its own machine. The same prompt, schema, quote verification and rules run; only the transport changes (`lib/ai/ollama.ts`, Ollama's OpenAI-compatible endpoint). The Gemini API stays the default, and its behaviour is unchanged (covered by tests).
+
+```bash
+ollama pull gemma4:26b                     # the model we host; 16–19 GB
+OLLAMA_CONTEXT_LENGTH=16384 ollama serve   # the default 4K context is too small for a lease photo
+GEMMA_PROVIDER=ollama GEMMA_MODEL=gemma4:26b npm run dev   # GEMMA_BASE_URL defaults to http://localhost:11434/v1
+```
+
+**Tested Sun Oct 25, 5 AM, on one laptop** (RTX 4050 laptop GPU, 32 GB RAM, Windows, Ollama 0.40.11), with our 5 samples (`node scripts/e2e.mjs`, strict: price, scam tier, lease verdict, flag count and injection must all match):
+
+| Local model | Where it ran | Samples passing | Text check | Lease photo | What went wrong |
+|---|---|---|---|---|---|
+| `gemma4:e2b-it-qat` (4.3 GB) | 100% GPU | 1 of 5 | 13–16 s | 27 s | Invented "lease clauses" from plain listings (quotes were real, so they counted); flagged 9 of 9 on the Facebook deal (expected 7); one false "Some red flags" on the normal listing |
+| `gemma4:e4b-it-qat` (6.1 GB) | 50% CPU / 50% GPU | 3 of 5 | 17–23 s | 42 s | 8 of 9 on the Facebook deal (expected 7); one false "Some red flags" on the normal listing that didn't repeat on a re-run |
+| `gemma4:26b` (what we host) | not tested | — | — | — | Needs about 16–19 GB of GPU or unified memory, more than this laptop has free |
+
+- Both local models read the lease photo and returned "Fix before signing" with 2 conflicts; the hosted model finds 3.
+- Locally, the strict JSON-schema request worked first time on every call, so each check is one model call.
+- Our honest reading: the small models run on a laptop at hosted-like speed, but they over-flag and the smallest invents clauses. A nonprofit should run `gemma4:26b` on a machine with enough memory and re-run `scripts/eval` before relying on it.
+- We haven't run the full evaluation on a local model.
 
 ## APIs and data
 

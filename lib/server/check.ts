@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ExtractionError, extractWithGemma, modelId } from "@/lib/ai/gemma";
+import { ExtractionError, extractWithGemma, modelId, providerFromEnv } from "@/lib/ai/gemma";
 import { keywordExtract } from "@/lib/ai/mock";
 import { sampleExtraction } from "@/lib/ai/mock-es";
 import { ExtractionSchema, type Extraction } from "@/lib/ai/schema";
@@ -47,7 +47,9 @@ export class CheckFailure extends Error {
   }
 }
 
-export const isMockMode = () => process.env.MOCK_AI === "1" || !process.env.GEMINI_API_KEY?.trim();
+// Demo mode: asked for, or the hosted path has no key. A self-hosted model (GEMMA_PROVIDER=ollama) needs no key.
+export const isMockMode = () =>
+  process.env.MOCK_AI === "1" || (providerFromEnv() === "gemini" && !process.env.GEMINI_API_KEY?.trim());
 
 /** True only when the request is still the built-in sample: every quote in its saved answer is in the text. */
 export function isUnchangedSample(id: SampleId, text: string, hasImage: boolean, lang?: "en" | "es"): boolean {
