@@ -18,7 +18,7 @@ Biggest gaps, all human:
 - No video.
 - The live URL may run old code.
 
-Details: `docs/council/rounds.md`.
+Details: `docs/process/council/rounds.md`.
 
 ## Gates at the last code commit
 - `npm test` **126 passed**, lint clean, `npm run build` OK.
@@ -46,18 +46,18 @@ Details: `docs/council/rounds.md`.
 
 | Commit | What |
 |---|---|
-| `4698968` | `docs/video-script.md` (2:00 shot list, narration, 30 s fallback), `docs/submissions.md` (MLH Gemma 4 + codingjam), `docs/track-decision.md` |
+| `4698968` | `docs/video-script.md` (2:00 shot list, narration, 30 s fallback), `docs/submissions.md` (MLH Gemma 4 + codingjam), `docs/process/track-decision.md` |
 | `67b026a` | Merged `main` (map `inert`, soak record) |
 | `9588eaf` | Task C: "Read by Gemma 4" links to "What Gemma read"; "Copy these questions"; tagline "Virginia, DC and Maryland"; **Census API notice** (verbatim, ES translation beside it); EN/ES toggle accessible name fixed |
 | `a5d46c5` | Task A: question state, accent-insensitive quotes, "1.6k" rents, Spanish/Spanglish prompt vocabulary, `scripts/eval/messy.jsonl` |
 | `34ac35e` | D4: `GEMMA_PROVIDER=ollama` self-hosting, tested; README table |
 | `8977afc` | Council: clause numbers grounded, Likely-scam → full report, one 429 retry, **one Gemma call per check** (the strict schema mode got 400 on 46/46 calls, so the hosted path starts at JSON mode); docs claims corrected |
-| `e6d5122` | Council top 3: the FTC payment flag needs the method in its quote; narrower injection regex; honest lease verdicts; README "Not just another scam keyword list" + "Impact we can measure so far"; `docs/council/rounds.md` |
+| `e6d5122` | Council top 3: the FTC payment flag needs the method in its quote; narrower injection regex; honest lease verdicts; README "Not just another scam keyword list" + "Impact we can measure so far"; `docs/process/council/rounds.md` |
 | `f364f1c` | Task B: dark theme ("carbon paper at night"), follows the system + Light/Dark toggle; dark map; token table |
 
 ## Track recommendation
 **Gemma 4.**
-- It's core and multimodal, the model ID is everywhere, and it's measured against a keyword baseline (`docs/track-decision.md`).
+- It's core and multimodal, the model ID is everywhere, and it's measured against a keyword baseline (`docs/process/track-decision.md`).
 - Open-Source AI is 6–7: self-hosting works, but the small local models over-flag and 26B is untested, and the judges' own example idea was a leasing scam detector.
 
 ## Cut, and why

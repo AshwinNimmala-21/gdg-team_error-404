@@ -31,7 +31,7 @@ Raw transcripts were auto-generated and garbled ("Gemaphore" = Gemma 4, "MLA/MOH
 2. Technical innovation & AI architecture — AI is a big chunk; must be genuinely integrated.
 3. Responsible AI, ethics & accessibility — AI bounded to its intended job.
 4. Feasibility, scalability & sustainability — not expected to be production-ready; idea + implementation + whether it's actually feasible.
-(Point breakdown is in `partner-brief.md` / `KICKOFF_PROMPT.md` section 0.)
+(Point breakdown is in `partner-brief.md` / `docs/process/KICKOFF_PROMPT.md` section 0.)
 
 ## Demo + submission
 - **Demo video: 2 minutes.** Use it to clearly explain what you built and how the AI works.

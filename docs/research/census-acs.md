@@ -296,7 +296,7 @@ export const ACS_MEDIAN_GROSS_RENT_BY_ZCTA: Record<string, { median: number; moe
 };
 ```
 
-Sanity cross-check: the DC county value of $1,954 is plausibly below the brief's DC *metro* figure of $2,027 (`docs/brief/research-facts.md`, USAFacts, secondary). They're different geographies, so this isn't a contradiction.
+Sanity cross-check: the DC county value of $1,954 is plausibly below the brief's DC *metro* figure of $2,027 (`docs/process/brief/research-facts.md`, USAFacts, secondary). They're different geographies, so this isn't a contradiction.
 
 ## Sources
 

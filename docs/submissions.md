@@ -2,13 +2,13 @@
 
 Fill every `[[...]]` placeholder before submitting. Each field is in its own fenced block so it copies cleanly. Character counts are in the headings (counted by script; re-count if you edit a block).
 
-- Live URL: <https://clearlease-477820387862.us-east4.run.app> <!-- source: catchup.md section 1, README.md line 5 -->
+- Live URL: <https://clearlease-477820387862.us-east4.run.app> <!-- source: docs/process/catchup.md section 1, README.md line 5 -->
 - Repo: <https://github.com/AshwinNimmala-21/gdg-team_error-404> <!-- source: git remote -v -->
 - Video: `[[VIDEO URL]]`
-- Submit window: Sun Oct 25, 11:00 AM to 12:30 PM hard deadline (docs/brief/event-notes.md). Aim for 11:00 to 11:30.
-- Chosen MLH track: **Gemma 4** (catchup.md section 16 says "lean: Gemma 4"; the final pick is made Sun 9:30 AM, so confirm with the team).
+- Submit window: Sun Oct 25, 11:00 AM to 12:30 PM hard deadline (docs/process/brief/event-notes.md). Aim for 11:00 to 11:30.
+- Chosen MLH track: **Gemma 4** (docs/process/catchup.md section 16 says "lean: Gemma 4"; the final pick is made Sun 9:30 AM, so confirm with the team).
 
-Fact sources for the numbers below: README.md "Evaluation" and "Problem" sections, docs/evaluation.md "Before and after" table, catchup.md sections 2, 7 and 12. Nothing here is new data.
+Fact sources for the numbers below: README.md "Evaluation" and "Problem" sections, docs/evaluation.md "Before and after" table, docs/process/catchup.md sections 2, 7 and 12. Nothing here is new data.
 
 ---
 
@@ -105,8 +105,8 @@ The core description is identical for every track. Change only these items. Re-c
 
 - **Open-Source AI** (swap `Best Use of Gemma 4` for `Best Open-Source AI Project`):
   - Description: shorten "HOW GEMMA 4 IS USED" to two sentences and move the last sentence of "ACCESSIBILITY, SPANISH AND PRIVACY" (open weights, Apache 2.0) to the top as: "Clearlease is Apache-2.0 licensed and runs on Gemma 4, an open-weights model (Apache 2.0)."
-  - Add to "How we built it": "Repo has LICENSE (Apache 2.0), CONTRIBUTING.md, CODE_OF_CONDUCT.md (Contributor Covenant 3.0), THIRD_PARTY_NOTICES.md and a reproducible demo mode that needs no keys." <!-- source: catchup.md section 13, README "Minimum setup" -->
-  - Keep "we have not built or tested self-hosting" unless the D4 Ollama path (catchup.md section 14, not started) was actually completed and tested; if it was, replace that sentence with the measured result only.
+  - Add to "How we built it": "Repo has LICENSE (Apache 2.0), CONTRIBUTING.md, CODE_OF_CONDUCT.md (Contributor Covenant 3.0), THIRD_PARTY_NOTICES.md and a reproducible demo mode that needs no keys." <!-- source: docs/process/catchup.md section 13, README "Minimum setup" -->
+  - Keep "we have not built or tested self-hosting" unless the D4 Ollama path (docs/process/catchup.md section 14, not started) was actually completed and tested; if it was, replace that sentence with the measured result only.
   - Video: show the license files and the README setup.
 - **UI/UX** (swap for `Best UI/UX`):
   - Lead the description with "WHAT IT DOES" and the accessibility paragraph; cut "HOW IT IS BOUNDED" to one sentence.
@@ -182,7 +182,7 @@ Theme fit: AI for Housing, DMV (DC / Maryland / Virginia)
 Do these in order. Submit between 11:00 and 11:30 AM Sunday. The 12:30 PM deadline is hard (late means not judged); do not leave it to 12:15.
 
 - [ ] Track decision made (Sun 9:30 AM freeze). Exactly ONE MLH track on OrganizerHQ; if it is not Gemma 4, apply the swap notes above.
-- [ ] `dev` merged into `main` and pushed, so the submitted repo shows the final work (catchup.md section 10 item 5).
+- [ ] `dev` merged into `main` and pushed, so the submitted repo shows the final work (docs/process/catchup.md section 10 item 5).
 - [ ] Repo is **public**: open <https://github.com/AshwinNimmala-21/gdg-team_error-404> in a private/incognito window.
 - [ ] `LICENSE` present at the repo root (it is: Apache 2.0) and shows in the GitHub sidebar.
 - [ ] README states the exact model ID `gemma-4-26b-a4b-it` (it does, near the top) and the live URL.

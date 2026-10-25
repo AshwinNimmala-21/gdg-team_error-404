@@ -9,7 +9,7 @@ The goal is to surface the decisions that would change what we build, and settle
 
 ## Before asking
 1. Read `AGENTS.md` (Decisions) and `PLAN.md` (Decisions log, Open questions).
-2. Never re-ask anything already settled there, or in KICKOFF_PROMPT.md §1a.
+2. Never re-ask anything already settled there, or in docs/process/KICKOFF_PROMPT.md §1a.
 3. Build the design tree for the current phase: list the open decisions, and under each one the choices that depend on it. Ask the parents first. Skip anything with an obvious default and note it under "Assumed".
 
 ## Round format

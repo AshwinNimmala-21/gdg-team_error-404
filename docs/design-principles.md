@@ -1,6 +1,6 @@
 # Clearlease design principles
 
-`ux-critic` and all UI work follow this file (from KICKOFF_PROMPT.md §4b).
+`ux-critic` and all UI work follow this file (from docs/process/KICKOFF_PROMPT.md §4b).
 
 ## Direction
 - Ground the look in the subject: leases, listings, inspection reports, a building super's clipboard. It should feel like a trustworthy, plain-spoken tool a tenant advocate would hand you. Not a SaaS landing page.

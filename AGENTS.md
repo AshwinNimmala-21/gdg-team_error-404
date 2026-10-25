@@ -1,6 +1,6 @@
-# Clearlease — agent facts (condensed from KICKOFF_PROMPT.md §0–4)
+# Clearlease — agent facts (condensed from docs/process/KICKOFF_PROMPT.md §0–4)
 
-Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for Housing" hackathon, Oct 24–25 2026. Goal: 1st GDG Best Overall + one MLH track. Full brief: `KICKOFF_PROMPT.md`; event facts: `docs/brief/`. Status and next steps: `PLAN.md`. Conflict priority: slides > `docs/brief/event-notes.md` > raw transcripts.
+Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for Housing" hackathon, Oct 24–25 2026. Goal: 1st GDG Best Overall + one MLH track. Full brief: `docs/process/KICKOFF_PROMPT.md`; event facts: `docs/process/brief/`. Status and next steps: `PLAN.md`. Conflict priority: slides > `docs/process/brief/event-notes.md` > raw transcripts.
 
 ## Facts
 - Theme: AI for Housing, DMV (DC/MD/VA). Validate a real problem; small-and-working beats big-and-broken.

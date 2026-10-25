@@ -3,7 +3,7 @@
 Last updated: Sun Oct 25 2026, 3:16 AM ET. The MVP works locally in live and demo mode. Two laptops from now on; read "Handoff" first.
 
 ## Handoff — Sat Oct 24, 9:15 PM ET
-`main` is pushed and clean. The gate passed at `0a040bf`: lint, `tsc --noEmit`, 44 unit tests, and `npm run build` from a clean checkout with no `.env`. The council plan this follows is `docs/council/report.md` ("The plan: 12 items, ranked").
+`main` is pushed and clean. The gate passed at `0a040bf`: lint, `tsc --noEmit`, 44 unit tests, and `npm run build` from a clean checkout with no `.env`. The council plan this follows is `docs/process/council/report.md` ("The plan: 12 items, ranked").
 
 **Ownership from now on**
 - **Yoshwan:** `lib/`, `app/api/`, `components/`. Finishing council items 2–6 on the code side.
@@ -14,7 +14,7 @@ Last updated: Sun Oct 25 2026, 3:16 AM ET. The MVP works locally in live and dem
 - Both edit `PLAN.md`. Run `git pull --rebase` before editing it, keep commits small, and never force-push.
 
 **Done since 4:50 PM (all on `main`)**
-- Council report and live review screenshots: `docs/council/report.md`, `docs/screenshots/council-review/`.
+- Council report and live review screenshots: `docs/process/council/report.md`, `docs/screenshots/council-review/`.
 - #1 The repo is public (checked with `gh repo view`).
 - #2 Gemma reliability, in `lib/ai/gemma.ts`: per-attempt timeouts, two retries with backoff on 5xx, network errors and timeouts, and a non-sticky step-down (`d928832`).
 - #3 A labelled saved result for the 4 built-in samples when the live model still fails (`11799f7`).
@@ -86,7 +86,7 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] Finish a) eval "after" incl. holdout (holdout: keyword baseline 100/100/0 beats Clearlease any-flag 83/100/1; hard set Clearlease 100/100/0 vs keyword 25/13/6; leases 13/13; legit "Suspiciously cheap" 6→0), b) README pass (Gemma-at-a-glance, Evaluation section, stale numbers fixed), c) ready to deploy from `dev` (Ashwin runs `scripts/deploy.sh` or DEPLOY.md)
 - [x] 9. Spanish end to end (Sun ~2:50 AM, `6d95c34`): toggle never reset (reproduced on live); all rule text via hand-written templates (`lib/client/rules-es.ts`), Spanish samples, "Texto original:" quotes, ES e2e 6/6, axe 0 in ES/EN, eval 0 verdict diffs
 - [x] D1–D3 (`9d22833`): Gemma 4 Apache-2.0 verified + download links; CONTRIBUTING, CODE_OF_CONDUCT (Covenant 3.0), THIRD_PARTY_NOTICES (no incompatible licenses; LGPL sharp-libvips only in built image); docs/code-tour.md
-- [ ] HANDED OVER to Yoshwan's laptop (Sun ~3:00 AM): Task C (+ Census API notice), Task A, Task B, D4, Finish. Instructions verbatim in catchup.md §15; status table in §14.
+- [ ] HANDED OVER to Yoshwan's laptop (Sun ~3:00 AM): Task C (+ Census API notice), Task A, Task B, D4, Finish. Instructions verbatim in docs/process/catchup.md §15; status table in §14.
 
 ### Morning questions
 - (Yoshwan's session, 5:06 AM) `.env.example` should list `GEMMA_PROVIDER` and `GEMMA_BASE_URL` (both optional; for self-hosting). Claude isn't allowed to read or edit `.env*` files, so a human needs to add those two names to the template.
@@ -104,8 +104,8 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
   - `scripts/e2e.mjs`: 4/4 PASS then (5/5 since the Blacksburg sample)
   - Screenshots at 375 and 1280 px: no horizontal overflow
   - Docker image built and run locally
-- [x] Phase 3 (cloud): deployed by Ashwin (catchup.md §1). **Redeploy `dev` before submitting**: the live URL may run older code.
-- [~] Phase 4: overnight queue (C, A, D4 done; B in progress) and council round 1 (`docs/council/rounds.md`) until feature freeze Sun 9:30 AM
+- [x] Phase 3 (cloud): deployed by Ashwin (docs/process/catchup.md §1). **Redeploy `dev` before submitting**: the live URL may run older code.
+- [~] Phase 4: overnight queue (C, A, D4 done; B in progress) and council round 1 (`docs/process/council/rounds.md`) until feature freeze Sun 9:30 AM
 - [ ] Phase 5: ship by Sun 12:30 PM
 
 ## Next steps

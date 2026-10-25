@@ -231,8 +231,8 @@ Written by three parallel subagents (docs only), reviewed and committed by Ashwi
 | A real-world inputs | **Done** (Yoshwan, 4:57 AM, `a5d46c5`) | Questions get a "what we can check" panel (`components/QuestionHelp.tsx`, `inputType`) with any FTC signs they describe; accent-insensitive quote checks; "1.6k" and no-break-space rent formats; Spanish/Spanglish vocabulary in the prompt. `scripts/eval/messy.jsonl` (20 items) live before → after: questions handled 0/5 → 4/5; scam 100%/100%/0 false alarms and rent 11/11 unchanged. Gate: e2e EN 5/5 + ES 6/6 live, axe 0 EN+ES (plus the question panel). |
 | B dark theme | **Done** (Yoshwan, `f364f1c`; work finished ~5:35 AM, committed 8:35 AM) | Follows the system + Light/Dark toggle, no flash, dark map; axe 0 dark+light × EN+ES; token table in `docs/design-principles.md`; screenshots `docs/screenshots/dark/` |
 | D4 self-hosted model (Ollama) | **Done** (Yoshwan, 5:06 AM) | `GEMMA_PROVIDER=ollama` + `GEMMA_BASE_URL` (`lib/ai/ollama.ts`, OpenAI-compatible endpoint, same retry ladder). Gemini default unchanged (tests + e2e EN 5/5, ES 6/6 live). Tested on Yoshwan's laptop (RTX 4050, Ollama 0.40.11, `OLLAMA_CONTEXT_LENGTH=16384`): e2b-it-qat 1/5 strict, e4b-it-qat 3/5 strict, photo works on both, 26B not tested. README "Self-host Gemma 4" has the table. |
-| Council round 1 | **Done** (`8977afc`, `e6d5122`) | `docs/council/rounds.md`: 77/100 → ~79, top-3 fixes implemented |
-| Finish 1–4 | **Not done**: session stalled ~5:35–8:35 AM | Only `docs/morning.md` was written (8:40). The full eval re-run, final live gate and code-tour line refresh were not done. |
+| Council round 1 | **Done** (`8977afc`, `e6d5122`) | `docs/process/council/rounds.md`: 77/100 → ~79, top-3 fixes implemented |
+| Finish 1–4 | **Not done**: session stalled ~5:35–8:35 AM | Only `docs/process/morning.md` was written (8:40). The full eval re-run, final live gate and code-tour line refresh were not done. |
 
 ## 15. Remaining instructions (verbatim)
 Ashwin's overnight queue prompt, copied word for word. Spanish fix and D1–D3 are done (section 14); continue with Task C, then A, B, D4 and Finish (the prompt's order is A first; Ashwin's later instruction put C right after the Spanish fix since it's small). Same working rules, gates and git commands.
@@ -284,7 +284,7 @@ D4. Self-hosted model path: add GEMMA_PROVIDER=gemini|ollama (OpenAI-compatible 
 FINISH
 1. Run the full evaluation live (easy, hard, holdout, student, messy, leases) and update docs/evaluation.md and the README tables.
 2. Final gate on the production build: live mode, light and dark, EN and ES.
-3. Write docs/morning.md: what changed (with commit hashes), current eval numbers, a 5-minute hand-check list, open questions, and the exact commands to deploy and to merge dev into main.
+3. Write docs/process/morning.md: what changed (with commit hashes), current eval numbers, a 5-minute hand-check list, open questions, and the exact commands to deploy and to merge dev into main.
 4. Push dev, then stop.
 ```
 
@@ -299,7 +299,7 @@ FINISH
 - **MLH track not decided.** We qualify for Gemma 4, Open-Source AI, Google Cloud and UI/UX; score all four in the morning before picking. Lean: **Gemma 4**. Open-Source AI becomes a contender if the self-hosted Gemma path (D4) actually works.
 
 ## 17. Morning plan (before the 9:30 AM freeze)
-1. Ashwin reads `docs/morning.md` (written by the Finish step), deploys from `dev` (**only Ashwin deploys**), runs `node scripts/e2e.mjs https://clearlease-477820387862.us-east4.run.app`, then merges `dev` into `main`.
+1. Ashwin reads `docs/process/morning.md` (written by the Finish step), deploys from `dev` (**only Ashwin deploys**), runs `node scripts/e2e.mjs https://clearlease-477820387862.us-east4.run.app`, then merges `dev` into `main`.
 2. Ashwin gives Yoshwan **Editor** access on the `clearlease-error404` Google Cloud project, if not done yet.
 3. At the venue: the 3-person usability test, student quotes (`docs/validation.md`), and a native Spanish speaker's skim of the ES UI.
 4. A side-by-side screenshot of the Gemini app vs. Clearlease on the same real listing. **Only report what actually happens.**

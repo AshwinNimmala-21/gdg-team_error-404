@@ -51,7 +51,7 @@ Failures showed "We couldn't reach the AI model" (`1280-sample1-error.png`, `128
 - **Free-tier honesty:** the README already states that Google may use free-tier inputs (`README.md:95`), so C's privacy concern is mostly handled.
 - **Docker:** a local build already happened (PLAN.md status line 14), so C's "run docker build" item is done.
 - **Git history is clean of secrets:** no `AIza…` keys, no HUD JWTs and no committed `.env` files in any commit. The only `KEY=` matches are Secret Manager references such as `GEMINI_API_KEY=GEMINI_API_KEY:latest`.
-- **Judging format:** per `docs/brief/event-notes.md:36-38`, judging works from the 2-minute video and the README. The Open-Source AI judges gave "AI scam detector for leasing" as their own example idea (`:26`).
+- **Judging format:** per `docs/process/brief/event-notes.md:36-38`, judging works from the 2-minute video and the README. The Open-Source AI judges gave "AI scam detector for leasing" as their own example idea (`:26`).
 
 **Uncommitted work:** `components/Report.tsx`, `app/globals.css` and the untracked `components/VerdictTags.tsx` are another session's in-progress work. This review doesn't touch them.
 
@@ -270,7 +270,7 @@ The product is ahead of its logistics. Tonight the repo is private, there is no 
 
 ### Member B (opus): product and pitch strategist
 
-I read AGENTS/PLAN/README, `docs/brief/*`, `docs/validation.md`, the samples and `lib/ai/gemma.ts`, and looked at the council screenshots. Nothing was edited.
+I read AGENTS/PLAN/README, `docs/process/brief/*`, `docs/validation.md`, the samples and `lib/ai/gemma.ts`, and looked at the council screenshots. Nothing was edited.
 
 #### 1. Problem story
 

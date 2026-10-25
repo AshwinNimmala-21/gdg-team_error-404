@@ -246,7 +246,7 @@ GEMMA_PROVIDER=ollama GEMMA_MODEL=gemma4:26b npm run dev   # GEMMA_BASE_URL defa
 
 The research behind every number and rule, with sources, is in [`docs/research/`](docs/research).
 
-## Project layout
+## Repository map
 
 ```
 app/(ui)/page.tsx        one page: intake form + report
@@ -260,6 +260,8 @@ public/samples/          5 fictional demo inputs
 scripts/eval/            labelled eval sets (easy, hard, student), runner, frozen keyword baseline
 scripts/a11y.mjs         axe-core audit (EN and ES) + page-error regression check
 scripts/deploy.sh        one-command Cloud Run deploy (macOS/Linux)
+docs/                    deploy runbook, evaluation, accessibility, validation, research notes, code tour
+docs/process/            hackathon working notes (brief, council reviews, overnight log); not needed to run the app
 ```
 
 ## Built with
