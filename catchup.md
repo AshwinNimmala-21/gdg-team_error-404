@@ -4,7 +4,6 @@ Written by Ashwin with Claude Code. Your handoff commit was `c5c8adc`; your last
 
 ## TL;DR
 - **All work is on branch `dev`, pushed. `main` is unchanged since your last commit (`bde37c3`).** `dev` contains all of `main` plus about 20 commits from tonight (82 files, about 6,300 lines added).
-- **The deployed site (`https://clearlease-477820387862.us-east4.run.app`) still runs Saturday-evening code** until someone redeploys from `dev`.
 - **Your stashed tag restyle (`stash@{0}`) will conflict** with tonight's changes to `components/Report.tsx` and `app/globals.css`. Details in "Merge notes" below.
 - Gate on the final commit: **81 unit tests pass**, lint clean, `npm run build` OK, `node scripts/e2e.mjs` **5/5 PASS live**, axe-core **0 violations** (English and Spanish).
 - The ownership rule was lifted for tonight (you were offline), so `lib/`, `app/api/` and `components/` were edited. Everything is listed below so you can review it.
@@ -111,7 +110,7 @@ Motivated by two misses in the first eval run; the causes were fixed in general,
   - Idempotent: APIs, roles and Firestore are only created if missing, a secret gets a new version only if the value changed, and an existing salt is kept.
   - Optional pieces (HUD, Census, Maps, Firestore) are skipped if not given.
   - `--dry-run` makes **zero** gcloud calls (verified with a fake `gcloud` on PATH).
-  - **The real run is untested.** For the next redeploy we recommend the simple `gcloud run deploy clearlease --source . --region us-east4`, which keeps existing settings.
+  - **The real run is untested.**
 - **README "Minimum setup":** only `GEMINI_API_KEY` is required. Verified with a production build where HUD, Census, the community salt and Maps were blanked: 5/5 samples live, saved figures labelled, no counter, no map.
 - **README "Self-host Gemma (Ollama)": explicitly untested and not wired in.** Ollama publishes `gemma4:26b` (16–19 GB, image input); we'd need an adapter in `lib/ai/gemma.ts`.
 - `docs/DEPLOY.md` points macOS/Linux users to the script.
@@ -141,10 +140,9 @@ Motivated by two misses in the first eval run; the causes were fixed in general,
 2. **Lockfile:** don't run a plain `npm install` on Ashwin's Mac and commit the result (it drops the `libc` fields). Use `npm ci`.
 3. **`PriceCheck.status`** has a new value, `"rough"`. Anything that switches on price status should handle it.
 4. **Sample IDs** now include `"blacksburg-sublet"`; e2e expects 5 cases.
-5. **`dev` has not been merged into `main`.** Plan: merge before the 9:30 AM freeze so the submitted repo shows this work, then redeploy and run `node scripts/e2e.mjs <URL>`.
+5. **`dev` has not been merged into `main`.** Plan: merge before the 9:30 AM freeze so the submitted repo shows this work.
 
 ## 11. Still to do (people, not code)
 - **Student interviews and the 3-person usability test** in `docs/validation.md` (stakeholder empathy, 5 points). Put 2 quotes in the README and 1 in the video.
 - **Video script** (`docs/video-script.md`) and **submission text** (`docs/submissions.md`, MLH Gemma 4 track + codingjam.dev), both still stubs.
 - A native Spanish speaker should skim the ES UI before the demo.
-- Redeploy from `dev` (or `main` after the merge) and smoke-test.
