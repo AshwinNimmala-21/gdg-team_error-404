@@ -59,6 +59,9 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 3. "What Gemma read" section: extracted facts, quotes highlighted in source text/transcript, photo thumbnail
 - [x] 4. Blacksburg sample (24060 sublet, Zelle before viewing) first, lease photo second; README persona Blacksburg-first
 - [x] 5. Accessibility (automated part done; 0 axe violations, contrast measured, map crash fixed + regression test). **Waiting on Ashwin's manual keyboard/VoiceOver check**, results go in docs/accessibility.md. Accessibility: axe-core scan (landing + report, 1280/375), fix violations, measured contrast, `docs/accessibility.md` → STOP for Ashwin's keyboard/VoiceOver check
+- [x] 5a. Map: 24060 shows downtown Blacksburg + VT campus, zoom 14, no pin (`c4047e6`)
+- [x] 5b. Student-market pricing: per-bedroom/per-person vs whole-unit benchmark ÷ bedrooms (labelled approximation) + sublet line; `scripts/eval/student.jsonl` before/after (`0baae36`)
+- [ ] 5c. Fixes from Ashwin's keyboard/VoiceOver check (waiting on his results)
 - [ ] 6. `scripts/deploy.sh`, README minimum setup, Ollama self-host section (labelled untested unless tested)
 - [ ] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
 - [ ] 8. Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip
