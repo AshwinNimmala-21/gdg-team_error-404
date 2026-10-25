@@ -108,7 +108,7 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
         </p>
       )}
       <div className="mt-3 flex gap-3">
-        <button type="submit" className="min-h-11 rounded-xs bg-pen px-4 font-semibold text-white hover:bg-pen-dark">
+        <button type="submit" className="min-h-11 rounded-xs bg-pen px-4 font-semibold text-sheet hover:bg-pen-dark">
           {t.update}
         </button>
         <button type="button" onClick={() => setEditing(false)} className="min-h-11 px-3 font-semibold text-pen underline underline-offset-2">

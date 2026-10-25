@@ -291,7 +291,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
           <button
             type="submit"
             aria-disabled={loading || undefined}
-            className="mt-5 min-h-12 w-full rounded-xs bg-pen px-5 text-[17px] font-bold text-white hover:bg-pen-dark aria-disabled:cursor-wait aria-disabled:bg-pen-dark"
+            className="mt-5 min-h-12 w-full rounded-xs bg-pen px-5 text-[17px] font-bold text-sheet hover:bg-pen-dark aria-disabled:cursor-wait aria-disabled:bg-pen-dark"
           >
             {loading ? t.checking : t.check}
           </button>
@@ -321,7 +321,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
           <div role="alert" className="rounded-xs border-2 border-stop bg-sheet p-5">
             <p className="text-lg font-bold text-stop">{t.errorH}</p>
             <p className="mt-1">{tr(status.message)}</p>
-            <button type="button" onClick={() => check()} className="mt-4 min-h-11 rounded-xs bg-pen px-4 font-semibold text-white hover:bg-pen-dark">
+            <button type="button" onClick={() => check()} className="mt-4 min-h-11 rounded-xs bg-pen px-4 font-semibold text-sheet hover:bg-pen-dark">
               {t.tryAgain}
             </button>
           </div>

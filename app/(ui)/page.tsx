@@ -2,6 +2,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { Checker } from "@/components/Checker";
 import { LangProvider, LangToggle, T } from "@/components/Lang";
+import { ThemeToggle } from "@/components/Theme";
 import { readMapsConfig } from "@/lib/server/maps-config";
 
 // The page shell is prerendered. Runtime settings (the Maps key) are read per request and streamed in.
@@ -16,10 +17,11 @@ export default function Home() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-sheet focus:p-2">
         <T k="skip" />
       </a>
-      <header className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 pt-5 lg:px-8">
+      <header className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 pt-5 lg:px-8">
         <p className="text-xl font-extrabold tracking-tight">Clearlease</p>
-        <div className="flex items-center gap-3">
-          <p className="text-right text-[14px] text-ink-soft">
+        <div className="contents sm:flex sm:items-center sm:gap-3">
+          {/* On a phone the tagline drops to its own line, so the two switches fit beside the name. */}
+          <p className="order-last w-full text-[14px] text-ink-soft sm:order-none sm:w-auto sm:text-right">
             <span className="sm:hidden">
               <T k="tagShort" />
             </span>
@@ -27,7 +29,10 @@ export default function Home() {
               <T k="tagLong" />
             </span>
           </p>
-          <LangToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <LangToggle />
+          </div>
         </div>
       </header>
       <main id="main">

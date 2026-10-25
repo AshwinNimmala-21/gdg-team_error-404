@@ -4,6 +4,7 @@ import { AdvancedMarker, APIProvider, APILoadingStatus, Map, useApiLoadingStatus
 import { geocodeZip } from "@/lib/client/geocode";
 import { mapViewFor, type MapView } from "@/lib/data/map-centers";
 import { useLang } from "./Lang";
+import { useTheme } from "./Theme";
 import { useEffect, useState } from "react";
 import type { MapsConfig } from "@/lib/server/maps-config";
 
@@ -42,10 +43,11 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
 /** A fixed, recognisable view (e.g. downtown + campus) instead of the ZIP's centroid. No pin: it's an area. */
 function AreaMap({ view, mapId }: { view: MapView; mapId: string }) {
   // If Maps rejected the key, don't mount <Map>: Google's code throws when it renders after an auth failure.
+  const scheme = useTheme() === "dark" ? "DARK" : "LIGHT";
   if (useMapsFailed()) return <MapUnavailable />;
   return (
     <div aria-hidden inert className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
-      <Map mapId={mapId} defaultCenter={{ lat: view.lat, lng: view.lng }} defaultZoom={view.zoom} gestureHandling="cooperative" disableDefaultUI clickableIcons={false} />
+      <Map key={scheme} colorScheme={scheme} mapId={mapId} defaultCenter={{ lat: view.lat, lng: view.lng }} defaultZoom={view.zoom} gestureHandling="cooperative" disableDefaultUI clickableIcons={false} />
     </div>
   );
 }
@@ -75,12 +77,13 @@ function ZipMap({ zip, mapId }: { zip: string; mapId: string }) {
   }, [geocoding, zip]);
 
   const failed = useMapsFailed();
+  const scheme = useTheme() === "dark" ? "DARK" : "LIGHT";
   const at = center?.zip === zip ? center.at : undefined;
   if (at === null || failed) return <MapUnavailable />;
   return (
     <div aria-hidden inert className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
       {at && (
-        <Map mapId={mapId} defaultCenter={at} defaultZoom={13} gestureHandling="cooperative" disableDefaultUI clickableIcons={false}>
+        <Map key={scheme} colorScheme={scheme} mapId={mapId} defaultCenter={at} defaultZoom={13} gestureHandling="cooperative" disableDefaultUI clickableIcons={false}>
           <AdvancedMarker position={at} title={`ZIP ${zip}`} />
         </Map>
       )}

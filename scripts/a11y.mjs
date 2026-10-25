@@ -8,6 +8,8 @@ import { createRequire } from "node:module";
 
 const base = process.argv.slice(2).find((a) => !a.startsWith("--")) ?? "http://localhost:3000";
 const es = process.argv.includes("--lang=es"); // scan the Spanish UI instead
+// --theme=dark emulates a dark system setting (the default "follow the system" path); the token table then reads dark values.
+const colorScheme = process.argv.includes("--theme=dark") ? "dark" : "light";
 const axePath = createRequire(import.meta.url).resolve("axe-core/axe.min.js");
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 const viewports = [
@@ -35,13 +37,13 @@ const browser = await chromium.launch({ channel: "chrome" });
 let total = 0;
 const pageErrors = [];
 for (const vp of viewports) {
-  const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height } });
+  const page = await browser.newPage({ viewport: { width: vp.width, height: vp.height }, colorScheme });
   await page.emulateMedia({ reducedMotion: "reduce" }); // no stamp animation mid-scan
   page.on("pageerror", (e) => pageErrors.push(`${vp.name}: ${e.message}`));
   await page.goto(base, { waitUntil: "networkidle" });
   await page.locator("[data-ready]").waitFor();
   if (es) await page.getByRole("button", { name: "Español" }).click();
-  total += await scan(page, `${vp.name}${es ? " (ES)" : ""}, landing`);
+  total += await scan(page, `${vp.name}${es ? " (ES)" : ""}${colorScheme === "dark" ? " (dark)" : ""}, landing`);
   for (const s of samples) {
     await Promise.all([
       page.waitForResponse((r) => r.url().endsWith("/api/check"), { timeout: 90_000 }),
@@ -55,7 +57,7 @@ for (const vp of viewports) {
 }
 
 // Contrast of the design tokens, read from the live CSS (WCAG 2.x relative luminance).
-const page = await browser.newPage();
+const page = await browser.newPage({ colorScheme });
 await page.goto(base, { waitUntil: "networkidle" });
 const tokens = await page.evaluate(() => {
   const cs = getComputedStyle(document.documentElement);

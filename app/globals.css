@@ -25,6 +25,58 @@
   --radius-xs: 2px;
 }
 
+/*
+ * Dark theme: carbon paper at night. The same report, re-inked: cool graphite paper, chalk-white ink, a lighter
+ * ballpoint blue, and verdict inks lifted to stay legible on their tints. Ratios are in docs/design-principles.md.
+ * It follows the system setting unless the reader picks Light or Dark (data-theme, set before first paint).
+ */
+:root {
+  color-scheme: light;
+  --selection: #c9d6f5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --selection: #34507f;
+    --color-paper: #161b22;
+    --color-sheet: #1f252e;
+    --color-ink: #e7ebf0;
+    --color-ink-soft: #a9b4c1;
+    --color-pen: #93b4ff;
+    --color-pen-dark: #bccfff;
+    --color-pen-tint: #2b3a5c;
+    --color-rule: #3b4553;
+    --color-ok: #7dd3a8;
+    --color-ok-tint: #1c3a2c;
+    --color-warn: #f0b85f;
+    --color-warn-tint: #3e2f15;
+    --color-stop: #ff8f80;
+    --color-stop-tint: #47211c;
+    --color-nil: #a9b4c1;
+    --color-nil-tint: #2a313b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --selection: #34507f;
+  --color-paper: #161b22;
+  --color-sheet: #1f252e;
+  --color-ink: #e7ebf0;
+  --color-ink-soft: #a9b4c1;
+  --color-pen: #93b4ff;
+  --color-pen-dark: #bccfff;
+  --color-pen-tint: #2b3a5c;
+  --color-rule: #3b4553;
+  --color-ok: #7dd3a8;
+  --color-ok-tint: #1c3a2c;
+  --color-warn: #f0b85f;
+  --color-warn-tint: #3e2f15;
+  --color-stop: #ff8f80;
+  --color-stop-tint: #47211c;
+  --color-nil: #a9b4c1;
+  --color-nil-tint: #2a313b;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }
@@ -42,7 +94,7 @@ body {
 }
 
 ::selection {
-  background: #c9d6f5;
+  background: var(--selection);
 }
 
 /* Native <details> marker replaced with our own rotating caret. */

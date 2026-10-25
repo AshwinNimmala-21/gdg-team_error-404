@@ -30,7 +30,7 @@ export const QuestionHelp = forwardRef<HTMLHeadingElement, { result: CheckResult
         <button
           type="button"
           onClick={onPaste}
-          className="mt-4 inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-white"
+          className="mt-4 inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-sheet"
         >
           {t.qPasteBtn}
         </button>

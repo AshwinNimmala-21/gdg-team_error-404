@@ -122,3 +122,41 @@ Desktop (1280): two columns. The left column (400px) is the sticky intake form a
 **Review: did v2 drift into a default?**
 - "Rotated rubber stamp" could become a gimmick if it's used everywhere. That's why it appears in exactly one place, carries real information (all three verdicts), and works as navigation.
 - The double ring and rough ink edge are specific to this subject (a leasing office's approval stamp, an inspector's mark). They aren't a generic badge.
+
+## Dark theme (Sun Oct 25, overnight)
+
+**Concept: carbon paper at night.** Same report, re-inked. Graphite paper and sheet, chalk-white ink, a lighter ballpoint blue, and verdict inks lifted to stay legible on their tints.
+
+**Rejected defaults:**
+- Near-black with one acid accent (banned above): the paper is a cool graphite (`#161b22`), not `#000`/`#0b0b0b`.
+- All three verdict colors survive, so severity still reads as icon + word + color.
+
+**Behaviour:**
+- It follows the system setting (`prefers-color-scheme`) until the reader picks Light or Dark. The header switch is two real buttons with `aria-pressed` and their names in the accessible label.
+- The choice is saved in `localStorage` (try/catch; it still works for the tab when storage is blocked).
+- A tiny inline script (`lib/client/theme-init.ts`) sets `<html data-theme>` before first paint, so there's no flash.
+- `color-scheme` matches, so form controls and scrollbars follow.
+- The Google map uses its own `colorScheme="DARK"`.
+- Photos and sample images are never inverted.
+- Filled buttons use `text-sheet` instead of `text-white`, so their text flips with the theme.
+
+**Tokens and measured contrast** (from the live CSS by `node scripts/a11y.mjs <url> --theme=dark`, WCAG 2.x):
+
+| Token | Dark value | Pair | Ratio |
+|---|---|---|---|
+| `paper` | `#161b22` | ink on paper | 14.45:1 |
+| `sheet` | `#1f252e` | ink on sheet | 12.87:1 |
+| `ink` | `#e7ebf0` | ink on pen-tint (highlighted quotes) | 9.42:1 |
+| `ink-soft` | `#a9b4c1` | on sheet / on paper | 7.33:1 / 8.23:1 |
+| `pen` | `#93b4ff` | on sheet (links); sheet on pen (filled buttons) | 7.50:1 / 7.50:1 |
+| `pen-dark` (hover) | `#bccfff` | on sheet | 9.91:1 |
+| `pen-tint` | `#2b3a5c` | background for highlights | n/a |
+| `rule` | `#3b4553` | decorative only | 1.59:1 (no minimum) |
+| `ok` / `ok-tint` | `#7dd3a8` / `#1c3a2c` | ok on sheet; ok on its tint | 8.63:1 / 6.95:1 |
+| `warn` / `warn-tint` | `#f0b85f` / `#3e2f15` | warn on sheet; on its tint | 8.61:1 / 7.23:1 |
+| `stop` / `stop-tint` | `#ff8f80` / `#47211c` | stop on sheet; on its tint | 6.97:1 / 6.32:1 |
+| `nil` / `nil-tint` | `#a9b4c1` / `#2a313b` | nil on its tint | 6.24:1 |
+
+- Lowest text pair: 6.24:1. Form-field borders (ink-soft on sheet) are 7.33:1, against the 3:1 non-text minimum.
+- axe-core: 0 violations in dark and light, English and Spanish, at 375 and 1280 px (landing plus three reports, all drawers open).
+- Screenshots: `docs/screenshots/dark/`.

@@ -68,7 +68,7 @@ export function LangToggle() {
       lang={l}
       aria-pressed={lang === l}
       onClick={() => setLang(l)}
-      className={`min-h-11 min-w-11 px-2.5 text-[14px] font-semibold ${lang === l ? "bg-ink text-white" : "text-pen underline underline-offset-2 hover:text-pen-dark"}`}
+      className={`min-h-11 min-w-11 px-2.5 text-[14px] font-semibold ${lang === l ? "bg-ink text-sheet" : "text-pen underline underline-offset-2 hover:text-pen-dark"}`}
     >
       {label}
       {/* The accessible name starts with the visible text (WCAG 2.5.3, label in name): "EN English". */}

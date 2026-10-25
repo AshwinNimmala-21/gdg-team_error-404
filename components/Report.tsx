@@ -180,7 +180,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
           <button
             type="button"
             onClick={onAddLease}
-            className="mt-4 inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-white"
+            className="mt-4 inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-sheet"
           >
             {t.addLease}
           </button>
@@ -335,7 +335,7 @@ function CopyQuestions({ questions }: { questions: string[] }) {
       <button
         type="button"
         onClick={copy}
-        className="inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-white"
+        className="inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-sheet"
       >
         {t.copyQs}
       </button>

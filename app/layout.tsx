@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Public_Sans } from "next/font/google";
+import { THEME_INIT_SCRIPT } from "@/lib/client/theme-init";
 import "./globals.css";
 
 const publicSans = Public_Sans({ variable: "--font-public-sans", subsets: ["latin"] });
@@ -12,14 +13,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#eef1f4",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#eef1f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#161b22" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${publicSans.variable} ${plexMono.variable} antialiased`}>
+    // data-theme is set by the inline script before React hydrates, so it may differ from the server HTML.
+    <html lang="en" className={`${publicSans.variable} ${plexMono.variable} antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

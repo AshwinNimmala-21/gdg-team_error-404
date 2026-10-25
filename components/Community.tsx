@@ -76,7 +76,7 @@ export function Community({ data }: { data: NonNullable<CheckResult["community"]
           type="button"
           onClick={flag}
           disabled={state === "sending"}
-          className="mt-2 inline-flex min-h-11 items-center rounded-xs border-2 border-stop px-4 font-semibold text-stop hover:bg-stop hover:text-white disabled:opacity-60"
+          className="mt-2 inline-flex min-h-11 items-center rounded-xs border-2 border-stop px-4 font-semibold text-stop hover:bg-stop hover:text-sheet disabled:opacity-60"
         >
           {state === "sending" ? c.flagging : c.flag}
         </button>
