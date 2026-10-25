@@ -1,18 +1,21 @@
 import type { Evidence } from "@/lib/types";
 import { Caret } from "./Icons";
+import { useLang } from "./Lang";
 
 export function Quote({ text, from }: { text: string; from?: "text" | "image" }) {
+  const { t } = useLang();
   return (
     <figure className="mt-1">
       <blockquote className="border-l-[3px] border-rule bg-paper/60 py-1 pr-2 pl-3 font-mono text-[13.5px] leading-relaxed break-words text-ink">
         “{text}”
       </blockquote>
-      {from === "image" && <figcaption className="mt-0.5 text-[13px] text-ink-soft">From your photo, as read by Gemma</figcaption>}
+      {from === "image" && <figcaption className="mt-0.5 text-[13px] text-ink-soft">{t.fromPhoto}</figcaption>}
     </figure>
   );
 }
 
 export function EvidenceItem({ e }: { e: Evidence }) {
+  const { t } = useLang();
   return (
     <li className="py-2.5">
       <p className={`text-[15px] font-semibold ${e.counted ? "text-ink" : "text-ink-soft"}`}>{e.label}</p>
@@ -20,7 +23,7 @@ export function EvidenceItem({ e }: { e: Evidence }) {
       {e.quote && <Quote text={e.quote} from={e.quoteFrom} />}
       {e.source && (
         <p className="mt-1 text-[13px]">
-          Source:{" "}
+          {t.source}{" "}
           <a className="text-pen underline underline-offset-2 hover:text-pen-dark" href={e.source.url} target="_blank" rel="noreferrer">
             {e.source.name}
           </a>
@@ -30,13 +33,14 @@ export function EvidenceItem({ e }: { e: Evidence }) {
   );
 }
 
-export function EvidenceDrawer({ items, label = "Show evidence" }: { items: Evidence[]; label?: string }) {
+export function EvidenceDrawer({ items, label }: { items: Evidence[]; label?: string }) {
+  const { t } = useLang();
   if (!items.length) return null;
   return (
     <details className="group mt-3">
       <summary className="inline-flex min-h-11 items-center gap-1.5 text-[15px] font-semibold text-pen hover:text-pen-dark">
         <Caret className="caret transition-transform motion-reduce:transition-none" />
-        {label} ({items.length})
+        {label ?? t.showEvidence} ({items.length})
       </summary>
       <ul className="mt-1 divide-y divide-rule border-t border-rule">
         {items.map((e, i) => (

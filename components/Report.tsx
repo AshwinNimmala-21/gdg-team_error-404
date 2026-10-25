@@ -8,16 +8,18 @@ import { Community } from "./Community";
 import { EvidenceDrawer, Quote } from "./Evidence";
 import { FactsBar } from "./FactsBar";
 import { GemmaRead } from "./GemmaRead";
+import { useLang } from "./Lang";
+import { ruleToSpanish } from "@/lib/client/rules-es";
 import { ToneIcon } from "./Icons";
 import { ListingMap } from "./ListingMap";
 import { InkFilter, Stamp } from "./Stamp";
 
 const TONE_TEXT: Record<Tone, string> = { ok: "text-ok", warn: "text-warn", stop: "text-stop", nil: "text-nil" };
 
-const GROUPS: { severity: ClauseFinding["severity"]; title: string; tone: Tone }[] = [
-  { severity: "conflict", title: "Fix before signing", tone: "stop" },
-  { severity: "ask", title: "Ask about", tone: "warn" },
-  { severity: "standard", title: "Looks standard", tone: "ok" },
+const GROUPS: { severity: ClauseFinding["severity"]; key: "fix" | "askAbout" | "standard"; tone: Tone }[] = [
+  { severity: "conflict", key: "fix", tone: "stop" },
+  { severity: "ask", key: "askAbout", tone: "warn" },
+  { severity: "standard", key: "standard", tone: "ok" },
 ];
 
 /** Quiet verdict reminder next to a section title: icon + word, no border. The stamp lives on the board. */
@@ -69,9 +71,11 @@ interface Props {
 }
 
 export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ result: r, onRescore, rescoring, onAddLease, maps, sourceText, imageUrl }, headingRef) {
-  const price = priceVerdict(r.price);
-  const scam = scamVerdict(r.scam);
-  const lease = leaseVerdict(r.lease);
+  const { t, lang } = useLang();
+  const price = priceVerdict(r.price, lang);
+  const scam = scamVerdict(r.scam, lang);
+  const lease = leaseVerdict(r.lease, lang);
+  const tr = (x: string) => (lang === "es" ? ruleToSpanish(x) : x);
 
   return (
     <article
@@ -82,19 +86,19 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
       <InkFilter />
       <header className="px-4 pt-5 pb-5 sm:px-8 sm:pt-7">
         <h2 id="report-title" ref={headingRef} tabIndex={-1} className="text-[22px] font-extrabold tracking-tight focus:outline-none sm:text-[26px]">
-          Your pre-sign report
+          {t.reportH}
         </h2>
 
         {/* The verdict board: the one bold moment. */}
-        <ul aria-label="Verdicts" className="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-5">
+        <ul aria-label={t.verdictsLabel} className="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-5">
           <li>
-            <Stamp verdict={price} label="Price check" href="#s1" tilt={-2.5} delay={60} />
+            <Stamp verdict={price} label={t.priceH} href="#s1" tilt={-2.5} delay={60} />
           </li>
           <li>
-            <Stamp verdict={scam} label="Scam risk" href="#s2" tilt={1.5} delay={240} />
+            <Stamp verdict={scam} label={t.scamH} href="#s2" tilt={1.5} delay={240} />
           </li>
           <li>
-            <Stamp verdict={lease} label="Lease clauses" href="#s3" tilt={-1} delay={420} />
+            <Stamp verdict={lease} label={t.leaseH} href="#s3" tilt={-1} delay={420} />
           </li>
         </ul>
 
@@ -104,9 +108,9 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
           <div role="note" className="mt-5 flex gap-3 rounded-xs border-l-4 border-warn bg-warn-tint/60 py-3 pr-3 pl-3.5 text-[15px]">
             <ToneIcon tone="warn" className="mt-0.5 shrink-0 text-warn" />
             <div className="min-w-0">
-              <p className="font-bold">Showing a saved result: the AI model didn&apos;t respond.</p>
+              <p className="font-bold">{t.savedH}</p>
               <p className="mt-1 text-ink-soft">
-                This is the pre-recorded answer for this sample, in Gemma&apos;s format. Checks of your own listings always use the live model.
+                {t.savedP}
               </p>
             </div>
           </div>
@@ -116,9 +120,9 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
           <div role="note" className="mt-5 flex gap-3 rounded-xs border-l-4 border-stop bg-stop-tint/60 py-3 pr-3 pl-3.5 text-[15px]">
             <ToneIcon tone="stop" className="mt-0.5 shrink-0 text-stop" />
             <div className="min-w-0">
-              <p className="font-bold text-stop">This text contained instructions aimed at AI tools. We ignored them.</p>
+              <p className="font-bold text-stop">{t.aiH}</p>
               {r.aiInstructions.quote && <Quote text={r.aiInstructions.quote} />}
-              <p className="mt-1 text-ink-soft">Real landlords don&apos;t hide notes for scam checkers. We count it as a red flag.</p>
+              <p className="mt-1 text-ink-soft">{t.aiP}</p>
             </div>
           </div>
         )}
@@ -132,14 +136,14 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
         <FactsBar key={JSON.stringify(r.read)} read={r.read} onSave={onRescore} busy={rescoring} />
       </header>
 
-      <Section id="s1" title="Price check" verdict={price}>
-        <Lead headline={r.price.headline} detail={r.price.detail} />
+      <Section id="s1" title={t.priceH} verdict={price}>
+        <Lead headline={tr(r.price.headline)} detail={r.price.detail} />
         {maps && r.read.zip && <ListingMap config={maps} zip={r.read.zip} place={r.read.areaName} />}
-        <EvidenceDrawer items={r.price.evidence} />
+        <EvidenceDrawer items={r.price.evidence} label={t.showEvidence} />
       </Section>
 
-      <Section id="s2" title="Scam risk" verdict={scam}>
-        <Lead headline={r.scam.headline} detail={r.scam.detail} />
+      <Section id="s2" title={t.scamH} verdict={scam}>
+        <Lead headline={tr(r.scam.headline)} detail={tr(r.scam.detail)} />
         {r.scam.flags.length > 0 && (
           <ul className="mt-5 space-y-5">
             {r.scam.flags.map((f) => (
@@ -147,12 +151,12 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
                 <ToneIcon tone={f.weight === 2 ? "stop" : "warn"} className={`mt-[3px] h-5 w-5 ${f.weight === 2 ? "text-stop" : "text-warn"}`} />
                 <div className="min-w-0">
                   <p className="font-semibold">
-                    {f.label}
-                    <span className="sr-only">{f.weight === 2 ? " (strong warning sign)" : " (warning sign)"}</span>
+                    {tr(f.label)}
+                    <span className="sr-only">{f.weight === 2 ? t.strong : t.sign}</span>
                   </p>
                   {f.evidence[0]?.quote && <Quote text={f.evidence[0].quote} from={f.evidence[0].quoteFrom} />}
                   {!f.evidence[0]?.quote && f.evidence[0]?.value && (
-                    <p className="mt-1 text-[15px] text-ink-soft">{f.id === "priceFarBelow" ? "See the price check above." : f.evidence[0].value}</p>
+                    <p className="mt-1 text-[15px] text-ink-soft">{f.id === "priceFarBelow" ? t.seePrice : f.evidence[0].value}</p>
                   )}
                 </div>
               </li>
@@ -161,7 +165,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
         )}
         {r.community && <Community data={r.community} />}
         <EvidenceDrawer
-          label="Show sources"
+          label={t.showSources}
           items={[
             ...r.scam.flags.flatMap((f) =>
               f.evidence.map((e) => ({ ...e, label: f.heuristic && !e.source ? `${f.label}. This is a Clearlease rule of thumb.` : f.label })),
@@ -171,15 +175,15 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
         />
       </Section>
 
-      <Section id="s3" title="Lease clauses" verdict={lease}>
-        <Lead headline={r.lease.headline} detail={r.lease.detail} />
+      <Section id="s3" title={t.leaseH} verdict={lease}>
+        <Lead headline={tr(r.lease.headline)} detail={tr(r.lease.detail)} />
         {r.lease.status === "not_provided" && (
           <button
             type="button"
             onClick={onAddLease}
             className="mt-4 inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-white"
           >
-            Add a photo of the lease
+            {t.addLease}
           </button>
         )}
         <LeaseGroups findings={r.lease.findings} />
@@ -189,7 +193,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
 
       <section aria-labelledby="questions" className="border-t-2 border-ink px-4 pt-6 pb-7 sm:px-8">
         <h3 id="questions" className="text-[20px] font-bold tracking-[-0.01em]">
-          Questions to ask before you sign
+          {t.questionsH}
         </h3>
         <ol className="mt-4 list-decimal space-y-3.5 pl-6 marker:font-semibold marker:text-ink-soft">
           {r.questions.map((q) => (
@@ -202,9 +206,10 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
       </section>
 
       <footer className="border-t border-rule bg-paper/50 px-4 py-5 text-[14px] sm:px-8">
-        <p className="font-semibold">This is not legal advice. Clearlease checks a few common rules; it can&apos;t see everything.</p>
+        <p className="font-semibold">{t.notLegal}</p>
+        {t.rulesEnglish && <p className="mt-1 text-ink-soft">{t.rulesEnglish}</p>}
         <p className="mt-2 text-ink-soft">
-          Free help{r.read.jurisdiction ? ` in ${r.read.jurisdiction === "DC" ? "DC" : r.read.jurisdiction === "VA" ? "Virginia" : "Maryland"}` : ""}:
+          {t.freeHelp}{r.read.jurisdiction ? ` ${t.in} ${r.read.jurisdiction === "DC" ? "DC" : r.read.jurisdiction === "VA" ? "Virginia" : "Maryland"}` : ""}:
         </p>
         <ul className="mt-1 space-y-1">
           {r.help.map((h) => (
@@ -222,6 +227,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
 
 /** Lease clauses grouped by what the renter should do, so the verdict isn't repeated on every clause. */
 function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
+  const { t } = useLang();
   if (findings.length === 0) return null;
   const uncounted = findings.filter((f) => !f.evidence[0]?.counted);
   return (
@@ -230,10 +236,10 @@ function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
         const items = findings.filter((f) => f.severity === g.severity && f.evidence[0]?.counted);
         if (!items.length) return null;
         return (
-          <section key={g.severity} aria-label={`${g.title}: ${items.length}`}>
+          <section key={g.severity} aria-label={`${t[g.key]}: ${items.length}`}>
             <h4 className={`flex items-center gap-1.5 border-b-2 border-current pb-1.5 text-[16px] font-bold ${TONE_TEXT[g.tone]}`}>
               <ToneIcon tone={g.tone} className="h-[18px] w-[18px] shrink-0" />
-              {g.title} <span className="font-semibold">({items.length})</span>
+              {t[g.key]} <span className="font-semibold">({items.length})</span>
             </h4>
             <ul className="mt-1 space-y-6 pt-3">
               {items.map((f, i) => (
@@ -244,10 +250,10 @@ function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
         );
       })}
       {uncounted.length > 0 && (
-        <section aria-label={`Not counted: ${uncounted.length}`}>
+        <section aria-label={`${t.notCounted}: ${uncounted.length}`}>
           <h4 className="flex items-center gap-1.5 border-b-2 border-current pb-1.5 text-[16px] font-bold text-nil">
             <ToneIcon tone="nil" className="h-[18px] w-[18px] shrink-0" />
-            Not counted <span className="font-semibold">({uncounted.length})</span>
+            {t.notCounted} <span className="font-semibold">({uncounted.length})</span>
           </h4>
           <ul className="mt-1 space-y-6 pt-3">
             {uncounted.map((f, i) => (
@@ -261,9 +267,10 @@ function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
 }
 
 function ClauseItem({ f }: { f: ClauseFinding }) {
+  const { lang } = useLang();
   return (
     <li>
-      <p className="font-bold">{f.title}</p>
+      <p className="font-bold">{lang === "es" ? ruleToSpanish(f.title) : f.title}</p>
       <p className="mt-0.5 max-w-[68ch] text-[15px] leading-relaxed">{f.plain}</p>
       <Quote text={f.evidence[0].quote ?? ""} from={f.evidence[0].quoteFrom} />
       <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-ink-soft">{f.why}</p>
@@ -280,19 +287,20 @@ function ClauseItem({ f }: { f: ClauseFinding }) {
 }
 
 function ModeLine({ r }: { r: CheckResult }) {
+  const { t } = useLang();
   const secs = (r.meta.latencyMs / 1000).toFixed(1);
   return (
     <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-ink-soft">
       {r.meta.mode === "live" && (
         <span>
-          Read by Gemma 4 (<code className="font-mono text-ink">{r.meta.model}</code>) in {secs}&nbsp;s
+          {t.readBy} (<code className="font-mono text-ink">{r.meta.model}</code>) {t.in} {secs}&nbsp;s
         </span>
       )}
       {r.meta.mode === "mock" && (
-        <span className="rounded-xs bg-warn-tint px-2 py-0.5 text-warn">Demo mode: no AI call. Sample answers are pre-recorded in Gemma&apos;s format.</span>
+        <span className="rounded-xs bg-warn-tint px-2 py-0.5 text-warn">{t.demoMode}</span>
       )}
-      {r.meta.mode === "rules-only" && <span>Updated with your edits (no new AI call)</span>}
-      {!r.meta.dataLive && <span>Saved figures: HUD FY2027 FMR, Census ACS 2020–2024 (live lookup unavailable)</span>}
+      {r.meta.mode === "rules-only" && <span>{t.rulesOnly}</span>}
+      {!r.meta.dataLive && <span>{t.savedFigures}</span>}
     </div>
   );
 }

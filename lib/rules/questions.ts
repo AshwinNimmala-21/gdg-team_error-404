@@ -1,9 +1,10 @@
 import { RULE_SHEETS } from "@/lib/data/rule-sheets";
 import type { ClauseType, LeaseCheck, PriceCheck, Question, ScamCheck, ScamFlagId } from "@/lib/types";
+import { questionToSpanish } from "./questions-es";
 
 const MAX = 6;
 
-const SCAM_Q: Partial<Record<ScamFlagId, Question>> = {
+export const SCAM_Q: Partial<Record<ScamFlagId, Question>> = {
   noInPersonViewing: {
     text: "Can I see the unit in person, or on a live video call, before I pay anything?",
     why: "Rental scammers generally won't show the place (FTC).",
@@ -30,7 +31,7 @@ const SCAM_Q: Partial<Record<ScamFlagId, Question>> = {
   },
 };
 
-function leaseQuestion(type: ClauseType, severity: "conflict" | "ask", lease: LeaseCheck): Question | null {
+export function leaseQuestion(type: ClauseType, severity: "conflict" | "ask", lease: LeaseCheck): Question | null {
   const sheet = lease.jurisdiction ? RULE_SHEETS[lease.jurisdiction] : null;
   const where = sheet?.name ?? "your state";
   switch (type) {
@@ -67,7 +68,7 @@ function leaseQuestion(type: ClauseType, severity: "conflict" | "ask", lease: Le
   }
 }
 
-export function buildQuestions(price: PriceCheck, scam: ScamCheck, lease: LeaseCheck): Question[] {
+export function buildQuestions(price: PriceCheck, scam: ScamCheck, lease: LeaseCheck, lang: "en" | "es" = "en"): Question[] {
   const out: Question[] = [];
   const add = (q: Question | null | undefined) => {
     if (q && !out.some((o) => o.text === q.text)) out.push(q);
@@ -93,5 +94,6 @@ export function buildQuestions(price: PriceCheck, scam: ScamCheck, lease: LeaseC
     text: "Who owns the property? Check the county's property records and compare the name with the landlord's ID.",
     why: "The FTC suggests checking tax-assessment records.",
   });
-  return out.slice(0, MAX);
+  const top = out.slice(0, MAX);
+  return lang === "es" ? top.map(questionToSpanish) : top;
 }

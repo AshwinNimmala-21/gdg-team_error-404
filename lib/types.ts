@@ -22,6 +22,8 @@ export interface CheckRequest {
   sampleId?: SampleId;
   /** SHA-256 of normalized phone numbers / emails, computed in the browser before redaction. */
   contactHashes?: string[];
+  /** Language for Gemma's clause explanations and the question templates. Default "en". */
+  lang?: "en" | "es";
 }
 
 export interface SourceRef {

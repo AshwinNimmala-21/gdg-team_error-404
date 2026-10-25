@@ -1,13 +1,15 @@
 "use client";
 
-import { AdvancedMarker, APIProvider, Map, useMapsLibrary } from "@vis.gl/react-google-maps";
+import { AdvancedMarker, APIProvider, APILoadingStatus, Map, useApiLoadingStatus, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { geocodeZip } from "@/lib/client/geocode";
 import { mapViewFor, type MapView } from "@/lib/data/map-centers";
+import { useLang } from "./Lang";
 import { useEffect, useState } from "react";
 import type { MapsConfig } from "@/lib/server/maps-config";
 
 /** Small map of the ZIP code's area, so a renter 300 miles away can see where the listing is. Optional. */
 export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: string; place: string | null }) {
+  const { lang } = useLang();
   const view = mapViewFor(zip);
   const area = view ? `${view.label} (ZIP ${zip})` : `ZIP ${zip}${place ? ` (${place})` : ""}`;
   return (
@@ -20,7 +22,7 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
         )}
       </APIProvider>
       <figcaption className="mt-1 text-[13px] text-ink-soft">
-        Area shown: {area}. We map the area, not the exact address.
+        {lang === "es" ? `Zona mostrada: ${area}. Mostramos la zona, no la dirección exacta.` : `Area shown: ${area}. We map the area, not the exact address.`}
       </figcaption>
     </figure>
   );
@@ -28,11 +30,23 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
 
 /** A fixed, recognisable view (e.g. downtown + campus) instead of the ZIP's centroid. No pin: it's an area. */
 function AreaMap({ view, mapId, label }: { view: MapView; mapId: string; label: string }) {
+  // If Maps rejected the key, don't mount <Map>: Google's code throws when it renders after an auth failure.
+  if (useMapsFailed()) return <MapUnavailable />;
   return (
     <div role="img" aria-label={label} className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
       <Map mapId={mapId} defaultCenter={{ lat: view.lat, lng: view.lng }} defaultZoom={view.zoom} gestureHandling="cooperative" disableDefaultUI clickableIcons={false} />
     </div>
   );
+}
+
+function useMapsFailed() {
+  const status = useApiLoadingStatus();
+  return status === APILoadingStatus.AUTH_FAILURE || status === APILoadingStatus.FAILED;
+}
+
+function MapUnavailable() {
+  const { lang } = useLang();
+  return <p className="text-[14px] text-ink-soft">{lang === "es" ? "No se pudo cargar el mapa de este código postal." : "The map couldn't load for this ZIP code."}</p>;
 }
 
 function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: string }) {
@@ -49,8 +63,9 @@ function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: stri
     };
   }, [geocoding, zip]);
 
+  const failed = useMapsFailed();
   const at = center?.zip === zip ? center.at : undefined;
-  if (at === null) return <p className="text-[14px] text-ink-soft">The map couldn&apos;t load for this ZIP code.</p>;
+  if (at === null || failed) return <MapUnavailable />;
   return (
     <div role="img" aria-label={label} className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
       {at && (

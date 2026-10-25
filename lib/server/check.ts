@@ -33,6 +33,7 @@ export const CheckRequestSchema = z.object({
   extraction: z.unknown().optional(),
   sampleId: z.enum(SAMPLE_IDS).optional(),
   contactHashes: z.array(z.string().regex(HASH_RE)).max(5).optional(),
+  lang: z.enum(["en", "es"]).optional(),
 });
 
 export class CheckFailure extends Error {
@@ -113,7 +114,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
     }
   } else {
     try {
-      const r = await extractWithGemma({ text, image: req.image });
+      const r = await extractWithGemma({ text, image: req.image, lang: req.lang });
       extraction = r.extraction;
       usage = r.usage;
       imageRead = Boolean(req.image);
@@ -134,7 +135,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
   const address = mode !== "rules-only" && findQuote(addr.quote, corpus) && findQuote(addr.value, corpus) ? addr.value : null;
   const keys = await communityKeys(address, facts.zip, req.contactHashes ?? []);
   const [benchmarks, counts] = await Promise.all([resolveBenchmarks(facts.zip, facts.bedrooms), readCounts(keys)]);
-  const result = runRules({ extraction, text, facts, benchmarks });
+  const result = runRules({ extraction, text, facts, benchmarks, lang: req.lang });
   const dataLive = Boolean(benchmarks.fmr?.live || benchmarks.census?.live);
 
   return {

@@ -6,14 +6,17 @@
 import { chromium } from "playwright-core";
 import { createRequire } from "node:module";
 
-const base = process.argv[2] ?? "http://localhost:3000";
+const base = process.argv.slice(2).find((a) => !a.startsWith("--")) ?? "http://localhost:3000";
+const es = process.argv.includes("--lang=es"); // scan the Spanish UI instead
 const axePath = createRequire(import.meta.url).resolve("axe-core/axe.min.js");
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"];
 const viewports = [
   { name: "desktop 1280", width: 1280, height: 900 },
   { name: "phone 375", width: 375, height: 812 },
 ];
-const samples = ["Blacksburg summer sublet", "Photo of a lease page", "Hidden AI instructions"];
+const samples = es
+  ? ["Subarriendo de verano en Blacksburg", "Foto de una página del contrato", "Instrucciones ocultas para la IA"]
+  : ["Blacksburg summer sublet", "Photo of a lease page", "Hidden AI instructions"];
 
 async function scan(page, label) {
   await page.addScriptTag({ path: axePath });
@@ -37,13 +40,14 @@ for (const vp of viewports) {
   page.on("pageerror", (e) => pageErrors.push(`${vp.name}: ${e.message}`));
   await page.goto(base, { waitUntil: "networkidle" });
   await page.locator("[data-ready]").waitFor();
-  total += await scan(page, `${vp.name}, landing`);
+  if (es) await page.getByRole("button", { name: "Español" }).click();
+  total += await scan(page, `${vp.name}${es ? " (ES)" : ""}, landing`);
   for (const s of samples) {
     await Promise.all([
       page.waitForResponse((r) => r.url().endsWith("/api/check"), { timeout: 90_000 }),
       page.getByRole("button", { name: new RegExp(s) }).first().click(),
     ]);
-    await page.getByRole("heading", { name: "Your pre-sign report" }).waitFor({ timeout: 90_000 });
+    await page.getByRole("heading", { name: es ? "Su informe antes de firmar" : "Your pre-sign report" }).waitFor({ timeout: 90_000 });
     await page.evaluate(() => document.querySelectorAll("details").forEach((d) => (d.open = true)));
     total += await scan(page, `${vp.name}, report: ${s} (all drawers open)`);
   }

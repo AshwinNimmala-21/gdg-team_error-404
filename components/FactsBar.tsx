@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { useLang } from "./Lang";
 import type { CheckResult, Overrides } from "@/lib/types";
 
 const money = (n: number) => `$${n.toLocaleString("en-US")}`;
-const size = (n: number) => (n === 0 ? "Studio" : `${n}-bedroom`);
 
 /** "We read: …" with an inline editor. Saving reruns the rules only (no model call). */
 export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; onSave: (o: Overrides) => void; busy: boolean }) {
+  const { t } = useLang();
   const [editing, setEditing] = useState(false);
   const [rent, setRent] = useState(read.rent?.toString() ?? "");
   const [beds, setBeds] = useState(read.bedrooms?.toString() ?? "");
@@ -44,18 +45,18 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
   const item = (label: string, value: string | null) => (
     <div className="flex items-baseline gap-1.5">
       <dt className="text-[13px] text-ink-soft">{label}</dt>
-      <dd className={`text-[16px] tabular-nums ${value ? "font-semibold" : "text-ink-soft"}`}>{value ?? "not found"}</dd>
+      <dd className={`text-[16px] tabular-nums ${value ? "font-semibold" : "text-ink-soft"}`}>{value ?? t.notFound}</dd>
     </div>
   );
 
   if (!editing)
     return (
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-dashed border-rule py-3">
-        <span className="text-[13px] font-semibold">We read:</span>
+        <span className="text-[13px] font-semibold">{t.weRead}</span>
         <dl className="flex flex-wrap gap-x-5 gap-y-1">
-          {item("Rent", read.rent !== null ? `${money(read.rent)}/mo${read.priceBasis === "per_bedroom" ? " per bedroom" : read.priceBasis === "per_person" ? " per person" : ""}` : null)}
-          {item("Size", read.bedrooms !== null ? `${size(read.bedrooms)}${read.priceBasis ? " (whole unit)" : ""}` : null)}
-          {item("ZIP", read.zip ? `${read.zip}${read.areaName ? ` (${read.areaName})` : ""}` : null)}
+          {item(t.rent, read.rent !== null ? `${money(read.rent)}${t.perMonth}${read.priceBasis === "per_bedroom" ? t.perBedroom : read.priceBasis === "per_person" ? t.perPerson : ""}` : null)}
+          {item(t.size, read.bedrooms !== null ? `${read.bedrooms === 0 ? t.studio : t.bedroomN(read.bedrooms)}${read.priceBasis ? t.wholeUnit : ""}` : null)}
+          {item(t.zip, read.zip ? `${read.zip}${read.areaName ? ` (${read.areaName})` : ""}` : null)}
         </dl>
         <button
           ref={editRef}
@@ -64,7 +65,7 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
           aria-disabled={busy || undefined}
           className="sm:ml-auto inline-flex min-h-11 items-center px-2 text-[15px] font-semibold text-pen underline underline-offset-2 hover:text-pen-dark disabled:opacity-60"
         >
-          {busy ? "Updating…" : "Edit what we read"}
+          {busy ? t.updating : t.editRead}
         </button>
       </div>
     );
@@ -77,26 +78,26 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
       className="mt-4 border-y border-dashed border-rule py-3"
       aria-describedby={error ? `${id}-err` : undefined}
     >
-      <p className="text-[14px] text-ink-soft">Fix anything we read wrong. We&apos;ll redo the checks without calling the AI again.</p>
+      <p className="text-[14px] text-ink-soft">{t.editHelp}</p>
       <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <label className="text-[14px] font-semibold">
-          Monthly rent ($)
+          {t.monthlyRent}
           <input className={field} inputMode="decimal" value={rent} onChange={(e) => setRent(e.target.value)} autoFocus />
         </label>
         <label className="text-[14px] font-semibold">
-          Bedrooms
+          {t.bedrooms}
           <select className={field} value={beds} onChange={(e) => setBeds(e.target.value)}>
-            <option value="">Not sure</option>
-            <option value="0">Studio</option>
+            <option value="">{t.notSure}</option>
+            <option value="0">{t.studio}</option>
             {[1, 2, 3, 4, 5].map((n) => (
               <option key={n} value={n}>
-                {n}-bedroom
+                {t.bedroomN(n)}
               </option>
             ))}
           </select>
         </label>
         <label className="text-[14px] font-semibold">
-          ZIP code
+          {t.zipLabel}
           <input className={field} inputMode="numeric" autoComplete="postal-code" maxLength={5} value={zip} onChange={(e) => setZip(e.target.value)} />
         </label>
       </div>
@@ -107,10 +108,10 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
       )}
       <div className="mt-3 flex gap-3">
         <button type="submit" className="min-h-11 rounded-xs bg-pen px-4 font-semibold text-white hover:bg-pen-dark">
-          Update the checks
+          {t.update}
         </button>
         <button type="button" onClick={() => setEditing(false)} className="min-h-11 px-3 font-semibold text-pen underline underline-offset-2">
-          Cancel
+          {t.cancel}
         </button>
       </div>
     </form>

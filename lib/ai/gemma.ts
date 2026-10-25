@@ -143,6 +143,7 @@ export async function generateWithRetries(generate: Generate, opts: RetryOptions
 export async function extractWithGemma(input: {
   text: string;
   image?: { mimeType: string; data: string };
+  lang?: "en" | "es";
 }): Promise<GemmaResult> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new ExtractionError("model_failed", "No Gemini API key is configured.");
@@ -150,7 +151,7 @@ export async function extractWithGemma(input: {
   const model = modelId();
 
   const generate: Generate = (level, signal) => {
-    const prompt = buildUserPrompt(input.text, Boolean(input.image)) + (level === 0 ? "" : SCHEMA_IN_PROMPT);
+    const prompt = buildUserPrompt(input.text, Boolean(input.image), input.lang) + (level === 0 ? "" : SCHEMA_IN_PROMPT);
     const parts: Part[] = [];
     if (input.image) parts.push({ inlineData: { mimeType: input.image.mimeType, data: input.image.data } });
     parts.push({ text: prompt });

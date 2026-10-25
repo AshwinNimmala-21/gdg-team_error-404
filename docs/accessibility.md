@@ -55,6 +55,12 @@ The audit found a production-only crash: run a text sample, then the lease-photo
 - **Unit test:** `lib/client/__tests__/geocode.test.ts` covers `undefined`, a synchronous throw, a rejection and empty answers. Run against the old logic, it fails with the exact production error. With the fix it passes.
 - **Browser check:** `scripts/a11y.mjs` fails on any uncaught page error during the text → photo → text sequence.
 
+## Spanish mode
+`node scripts/a11y.mjs http://localhost:3000 --lang=es` switches to Español first, then runs the same 8 scans: **0 violations**, 0 uncaught page errors (Oct 25, about 12:50 AM, dev server). The toggle is two real buttons in a labelled group with `aria-pressed`, each with its own `lang`, and the page's `<html lang>` switches to `es` so screen readers change voice.
+
+## Known issue: Google Maps error after the key is rejected
+When Google rejects the Maps key (seen only on a port the key doesn't allow, e.g. `localhost:3100`), running a lease photo and then the Blacksburg sample logs an uncaught `IntersectionObserver` error from inside Google's map script. The page keeps working (no error screen). It hasn't appeared on the dev server (allowed referrer) or in any e2e run. Two fix attempts didn't remove it; options are in PLAN.md.
+
 ## Manual checks
 Automated tools catch only part of what matters, so a person also did a keyboard-only and VoiceOver walkthrough. Results are below: 12 of 12 checks pass (K1 after a re-check).
 

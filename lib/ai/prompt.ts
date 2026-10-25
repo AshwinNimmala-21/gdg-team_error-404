@@ -22,7 +22,7 @@ export function escapeDelimiters(text: string): string {
   return text.replace(/<\s*\/?\s*untrusted_input\s*>/gi, (m) => m.replace(/</g, "‹").replace(/>/g, "›"));
 }
 
-export function buildUserPrompt(text: string, hasImage: boolean): string {
+export function buildUserPrompt(text: string, hasImage: boolean, lang: "en" | "es" = "en"): string {
   const body = text.trim() ? escapeDelimiters(text.trim()) : "(no text provided)";
   return [
     hasImage ? "An image is attached (a listing screenshot, a message or a lease page)." : "No image is attached.",
@@ -30,6 +30,9 @@ export function buildUserPrompt(text: string, hasImage: boolean): string {
     OPEN,
     body,
     CLOSE,
+    ...(lang === "es"
+      ? ["Write each clause's \"plain\" sentence in clear, simple Spanish (US Spanish, \"usted\"). Keep every quote exactly as written in the input, in its original language."]
+      : []),
     "Return the JSON object now.",
   ].join("\n");
 }

@@ -64,7 +64,9 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 5c. Manual a11y: 12/12 pass (K1 re-checked on clean prod build, no change needed). Per-bedroom: only "far below" checked, else neutral "Rough comparison" (`c6b410a`). Lease: deposit-as-fact cap check + blanket repairs rule, 13/13 (`fbc6667`)
 - [x] 6. `scripts/deploy.sh`, README minimum setup, Ollama self-host section (labelled untested unless tested)
 - [x] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
-- [ ] 8. Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip
+- [x] 8. Spanish toggle (started 12:33 AM, kept at ~12:55 AM): EN/ES switch, Gemma writes clause explanations in Spanish, hand-translated questions + labels + verdicts + short rule sentences, `<html lang>` switches, axe 0 violations in ES. Not translated: price detail, legal reasons, evidence. Spanish not reviewed by a native-speaking advocate.
+- [ ] OPEN (needs Ashwin's call): Google Maps `IntersectionObserver` error after a rejected Maps key (only on non-allowed referrers like localhost:3100; page keeps working). Two fixes failed. Options: (a) leave + document (done), (b) one shared APIProvider at page level so a rejected key is remembered, (c) hide the map entirely after the first auth failure via window.gm_authFailure.
+- [ ] 8 (old line) Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip
 - [ ] Finish a) eval run "after" incl. holdout, README before/after table; b) README pass; c) STOP: ready to deploy
 
 ## Status

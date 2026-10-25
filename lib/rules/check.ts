@@ -92,8 +92,9 @@ export function runRules(args: {
   text: string;
   facts: ResolvedFacts;
   benchmarks: Benchmarks;
+  lang?: "en" | "es";
 }): Omit<CheckResult, "meta" | "extraction" | "community"> & { notes: string[] } {
-  const { extraction: x, text, facts, benchmarks } = args;
+  const { extraction: x, text, facts, benchmarks, lang = "en" } = args;
   const corpus = makeCorpus(text, x.imageTranscript);
   const jurisdiction = facts.zip ? (lookupZip(facts.zip)?.state ?? stateForZip(facts.zip)) : null;
 
@@ -102,7 +103,7 @@ export function runRules(args: {
   const suspicious = scam.flags.some((f) => f.id === "priceFarBelow");
   const price = suspicious ? { ...basePrice, suspicious, detail: basePrice.detail.replace(FAR_BELOW_ALONE, FAR_BELOW_WITH_FLAGS) } : basePrice;
   const lease = computeLease(x, corpus, jurisdiction, facts.rent);
-  const questions = buildQuestions(price, scam, lease);
+  const questions = buildQuestions(price, scam, lease, lang);
   const ai = scam.flags.find((f) => f.id === "aiInstructions");
 
   return {
