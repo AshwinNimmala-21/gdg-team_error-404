@@ -50,6 +50,20 @@ Last updated: Sat Oct 24 2026, 9:15 PM ET. The MVP works locally in live and dem
 3. #2's 10-run live check, recorded here.
 4. #11 mini-eval (Gemma vs regex) if there's time.
 
+## Overnight sprint (Ashwin + Claude, Sat Oct 24 10:20 PM → Sun 9:30 AM freeze)
+Yoshwan is offline; ownership rule lifted for tonight (Ashwin may edit lib/, app/api/, components/, scripts/, docs/, README). Branch `dev`. Push workflow: `git pull origin main` (merge), `git pull --rebase origin dev`, then `git push origin dev`. No force-push.
+Gate after every step: `npm test`, `npm run lint`, `npm run build`, `node scripts/e2e.mjs http://localhost:3000` (4/4 PASS).
+Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `app/globals.css`; step 3 adds to Report.tsx, so expect a small merge.
+- [ ] 1. Eval baseline: `scripts/eval/dataset.jsonl` (~45 items, 10 holdout), `scripts/eval/run.mjs`, keyword baseline, run "before" in `docs/evaluation.md`
+- [ ] 2. Price bias fix: cheap alone = "Below usual range: verify before paying"; "Suspiciously cheap" only with another scam signal; tests; README paragraph
+- [ ] 3. "What Gemma read" section: extracted facts, quotes highlighted in source text/transcript, photo thumbnail
+- [ ] 4. Blacksburg sample (24060 sublet, Zelle before viewing) first, lease photo second; README persona Blacksburg-first
+- [ ] 5. Accessibility: axe-core scan (landing + report, 1280/375), fix violations, measured contrast, `docs/accessibility.md` → STOP for Ashwin's keyboard/VoiceOver check
+- [ ] 6. `scripts/deploy.sh`, README minimum setup, Ollama self-host section (labelled untested unless tested)
+- [ ] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
+- [ ] 8. Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip
+- [ ] Finish a) eval run "after" incl. holdout, README before/after table; b) README pass; c) STOP: ready to deploy
+
 ## Status
 - [x] Phase 0: safety rails, validation questions (`docs/validation.md`; **answers still needed**)
 - [x] Phase 1: clean slate, Next.js 16.4.3 scaffold, agents, skills, grill round 1

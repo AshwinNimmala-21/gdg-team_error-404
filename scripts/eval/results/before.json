@@ -1,0 +1,706 @@
+[
+ {
+  "id": "s01",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "mail you the key",
+   "can't show"
+  ],
+  "mode": "live",
+  "ms": 15077,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s02",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "first deposit gets"
+  ],
+  "mode": "live",
+  "ms": 17051,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s03",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "mail you the key"
+  ],
+  "mode": "live",
+  "ms": 12231,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s05",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "abroad",
+   "mission trip",
+   "mail the key"
+  ],
+  "mode": "live",
+  "ms": 11798,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s06",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "cash app"
+  ],
+  "mode": "live",
+  "ms": 13947,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s07",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "gift card",
+   "overseas",
+   "deployed",
+   "fedex"
+  ],
+  "mode": "live",
+  "ms": 11677,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s08",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "wire",
+   "western union",
+   "out of the country",
+   "whatsapp"
+  ],
+  "mode": "live",
+  "ms": 12749,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "landlordAway",
+   "pressure",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s10",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "ssn"
+  ],
+  "mode": "live",
+  "ms": 9835,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "some",
+  "flags": [
+   "sensitiveInfoEarly"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s11",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "venmo",
+   "overnight the key"
+  ],
+  "mode": "live",
+  "ms": 12925,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s12",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle"
+  ],
+  "mode": "live",
+  "ms": 17887,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s13",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "overseas",
+   "fedex"
+  ],
+  "mode": "live",
+  "ms": 12217,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s15",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "urgent"
+  ],
+  "mode": "live",
+  "ms": 12332,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s16",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "apple pay"
+  ],
+  "mode": "live",
+  "ms": 12607,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s17",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "money order",
+   "telegram"
+  ],
+  "mode": "live",
+  "ms": 11863,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s19",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "social security"
+  ],
+  "mode": "live",
+  "ms": 10253,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "sensitiveInfoEarly"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s20",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "abroad",
+   "can't show"
+  ],
+  "mode": "live",
+  "ms": 11023,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s22",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "western union",
+   "overseas",
+   "ship keys",
+   "gmail"
+  ],
+  "mode": "live",
+  "ms": 11652,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l01",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9762,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "some",
+  "flags": [
+   "priceFarBelow"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l02",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9926,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l03",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9701,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "some",
+  "flags": [
+   "priceFarBelow"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l04",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10080,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l06",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12838,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l07",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11017,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l08",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10192,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l09",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9706,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l11",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10478,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "some",
+  "flags": [
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l12",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [
+   "venmo"
+  ],
+  "mode": "live",
+  "ms": 10302,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "some",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l14",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10464,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l15",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9552,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l16",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10319,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l18",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9615,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "some",
+  "flags": [
+   "priceFarBelow"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l19",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10298,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "x01",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 45842,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "landlord_entry",
+   "waiver_of_rights"
+  ],
+  "expect": [
+   "security_deposit",
+   "landlord_entry",
+   "waiver_of_rights"
+  ]
+ },
+ {
+  "id": "x02",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 15389,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "landlord_entry",
+   "attorney_fees"
+  ],
+  "expect": [
+   "landlord_entry",
+   "attorney_fees"
+  ]
+ },
+ {
+  "id": "x03",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16220,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "security_deposit",
+   "late_fee"
+  ],
+  "expect": [
+   "security_deposit",
+   "late_fee"
+  ]
+ },
+ {
+  "id": "x04",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 14912,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "late_fee"
+  ],
+  "expect": [
+   "late_fee",
+   "repairs_on_tenant"
+  ]
+ },
+ {
+  "id": "x05",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 17945,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [],
+  "expect": []
+ }
+]
