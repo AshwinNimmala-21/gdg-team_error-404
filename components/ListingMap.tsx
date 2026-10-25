@@ -7,7 +7,11 @@ import { useLang } from "./Lang";
 import { useEffect, useState } from "react";
 import type { MapsConfig } from "@/lib/server/maps-config";
 
-/** Small map of the ZIP code's area, so a renter 300 miles away can see where the listing is. Optional. */
+/**
+ * Small map of the ZIP code's area, so a renter 300 miles away can see where the listing is. Optional.
+ * The map is decorative: the figcaption is the text alternative. Google's map has its own focusable parts, so the
+ * box is inert + aria-hidden rather than role="img" (axe: nested interactive content).
+ */
 export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: string; place: string | null }) {
   const { lang } = useLang();
   const view = mapViewFor(zip);
@@ -23,9 +27,9 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
     <figure className="mt-4">
       <APIProvider apiKey={config.apiKey}>
         {view ? (
-          <AreaMap view={view} mapId={config.mapId} label={lang === "es" ? `Mapa de ${area}` : `Map of ${area}`} />
+          <AreaMap view={view} mapId={config.mapId} />
         ) : (
-          <ZipMap zip={zip} mapId={config.mapId} label={lang === "es" ? `Mapa de la zona del código postal ${zip}${place ? `, ${place}` : ""}` : `Map of the area around ZIP ${zip}${place ? `, ${place}` : ""}`} />
+          <ZipMap zip={zip} mapId={config.mapId} />
         )}
       </APIProvider>
       <figcaption className="mt-1 text-[13px] text-ink-soft">
@@ -36,11 +40,11 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
 }
 
 /** A fixed, recognisable view (e.g. downtown + campus) instead of the ZIP's centroid. No pin: it's an area. */
-function AreaMap({ view, mapId, label }: { view: MapView; mapId: string; label: string }) {
+function AreaMap({ view, mapId }: { view: MapView; mapId: string }) {
   // If Maps rejected the key, don't mount <Map>: Google's code throws when it renders after an auth failure.
   if (useMapsFailed()) return <MapUnavailable />;
   return (
-    <div role="img" aria-label={label} className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
+    <div aria-hidden inert className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
       <Map mapId={mapId} defaultCenter={{ lat: view.lat, lng: view.lng }} defaultZoom={view.zoom} gestureHandling="cooperative" disableDefaultUI clickableIcons={false} />
     </div>
   );
@@ -56,7 +60,7 @@ function MapUnavailable() {
   return <p className="text-[14px] text-ink-soft">{lang === "es" ? "No se pudo cargar el mapa de este código postal." : "The map couldn't load for this ZIP code."}</p>;
 }
 
-function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: string }) {
+function ZipMap({ zip, mapId }: { zip: string; mapId: string }) {
   const geocoding = useMapsLibrary("geocoding");
   const [center, setCenter] = useState<{ zip: string; at: google.maps.LatLngLiteral | null } | null>(null);
 
@@ -74,7 +78,7 @@ function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: stri
   const at = center?.zip === zip ? center.at : undefined;
   if (at === null || failed) return <MapUnavailable />;
   return (
-    <div role="img" aria-label={label} className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
+    <div aria-hidden inert className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
       {at && (
         <Map mapId={mapId} defaultCenter={at} defaultZoom={13} gestureHandling="cooperative" disableDefaultUI clickableIcons={false}>
           <AdvancedMarker position={at} title={`ZIP ${zip}`} />
