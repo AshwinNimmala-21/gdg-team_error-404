@@ -195,6 +195,30 @@ Written by three parallel subagents (docs only), reviewed and committed by Ashwi
 - **Found by D2, not yet fixed:** the Census API terms ask apps to show "This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau." It's only in THIRD_PARTY_NOTICES.md today. Suggested: add it, verbatim in English, to the report footer (with a Spanish translation beside it in ES mode) as part of Task C. See open questions.
 
 ## 14. Overnight queue: status
+
+**Current state (Yoshwan's laptop, Sun 4:12 AM, branch `dev` at `4ef4ead`)**
+1. One page (`app/(ui)/page.tsx` → `components/Checker.tsx`): text + photo + ZIP in, 5 one-click samples, EN/ES toggle (`components/Lang.tsx`, `lib/i18n.ts`).
+2. The browser redacts contacts (`lib/client/redact.ts`) and shrinks photos (`lib/client/image.ts`), then sends one `POST /api/check` (`app/api/check/route.ts`), which applies the rate limit and body caps.
+3. `lib/server/check.ts` validates, then runs Gemma (`lib/ai/gemma.ts`: levels 0→2 step-down, 2 retries on 5xx/network/timeout, no retry on 429). It falls back to a labelled saved answer for unchanged samples only, or uses demo mode (`lib/ai/mock.ts`, `mock-es.ts`).
+4. Gemma only extracts: a strict Zod/JSON schema (`lib/ai/schema.ts`), a pinned prompt with `<untrusted_input>` delimiters (`lib/ai/prompt.ts`), and a quote for every fact.
+5. `lib/rules/quotes.ts` drops any quote not found in the input or Gemma's photo transcript (NFKC, case and punctuation folded; **accents are not folded yet**, Task A).
+6. `lib/rules/check.ts` resolves the facts. Price compares against the Census median (low edge) and HUD FY2027 FMR/SAFMR (high edge), live with a 3 s timeout, else saved (`lib/data/*`).
+7. `lib/rules/price.ts`: below/typical/above/rough. "Suspiciously cheap" needs another signal; per-bedroom rent is divided by the unit's bedrooms.
+8. `lib/rules/scam.ts`: 9 FTC-based checks, weights 1–2, tiers none/some/likely, "Not run" with no listing. A regex injection backstop; relocation that is only for work isn't counted.
+9. `lib/rules/lease.ts` + `lib/data/rule-sheets.ts`: VA/DC/MD clause checks with citations. Deposit-as-fact cap and blanket-repairs rules.
+10. `lib/rules/questions(-es).ts`: template questions. `lib/client/rules-es.ts`: hand-written Spanish for every rule sentence.
+11. Report (`components/Report.tsx`): stamped verdict board (`Stamp.tsx`), sections with `<details>` evidence, "What Gemma read" (`GemmaRead.tsx`, `<mark>` highlights), questions, help links, a map (`ListingMap.tsx`) and the community counter (`Community.tsx`, Firestore keyed hashes).
+12. Tests: 92 vitest (14 files). Gates: `scripts/e2e.mjs` (EN API, 5), `scripts/e2e-es.mjs` (ES browser, 6), `scripts/a11y.mjs` (axe + page errors), eval in `scripts/eval/` (easy/hard/student/holdout/leases, frozen keyword baseline).
+13. The level-0 Gemma call (schema + minimal thinking) got a 400 on 44/44 calls in Yoshwan's Sat soak. Every check is 2 API calls (level 1 succeeds), which raises 429 risk. This is still open.
+14. The map has `role="img"` on `dev`. Yoshwan's `inert`/`aria-hidden` fix (`e8a0352`) is on `main` only and comes in with the next `git pull origin main`.
+15. Hosting: Cloud Run (`Dockerfile`, standalone output). `.env` is excluded from the image; Maps config is read per request.
+
+**Baseline, Sun 4:03–4:11 AM, fresh production build on :3000, live Gemma** (every later gate is compared to this):
+- `npm test` 92/92, lint clean, `npm run build` OK.
+- e2e EN **5/5 live**; e2e ES **6/6**, 0 English sentences.
+- axe **8 violations in EN and 8 in ES** (1 per scan × 8 scans). All are `label-content-name-mismatch` on the EN/ES toggle: visible "EN"/"ES" isn't part of the `aria-label` "English"/"Español" (WCAG 2.5.3). 0 uncaught page errors. *This contradicts the earlier "0 violations"; fixed in Task C.*
+- The unstyled page at 3:30 AM was a stale `npm start` (PID 32756, started Sat 5:05 PM) serving an old build. Stopping only that PID, deleting `.next` and rebuilding fixed it; it was not a code bug.
+
 | Task | Status | Commits / notes |
 |---|---|---|
 | Spanish fix | **Done** | `6d95c34` |
