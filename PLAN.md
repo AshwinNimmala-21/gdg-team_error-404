@@ -58,7 +58,7 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 2. Price bias fix: cheap alone = "Below usual range: verify before paying"; "Suspiciously cheap" only with another scam signal; tests; README paragraph
 - [x] 3. "What Gemma read" section: extracted facts, quotes highlighted in source text/transcript, photo thumbnail
 - [x] 4. Blacksburg sample (24060 sublet, Zelle before viewing) first, lease photo second; README persona Blacksburg-first
-- [ ] 5. Accessibility: axe-core scan (landing + report, 1280/375), fix violations, measured contrast, `docs/accessibility.md` → STOP for Ashwin's keyboard/VoiceOver check
+- [x] 5. Accessibility (automated part done; 0 axe violations, contrast measured, map crash fixed + regression test). **Waiting on Ashwin's manual keyboard/VoiceOver check**, results go in docs/accessibility.md. Accessibility: axe-core scan (landing + report, 1280/375), fix violations, measured contrast, `docs/accessibility.md` → STOP for Ashwin's keyboard/VoiceOver check
 - [ ] 6. `scripts/deploy.sh`, README minimum setup, Ollama self-host section (labelled untested unless tested)
 - [ ] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
 - [ ] 8. Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip

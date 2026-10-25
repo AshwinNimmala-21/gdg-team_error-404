@@ -1,6 +1,7 @@
 "use client";
 
 import { AdvancedMarker, APIProvider, Map, useMapsLibrary } from "@vis.gl/react-google-maps";
+import { geocodeZip } from "@/lib/client/geocode";
 import { useEffect, useState } from "react";
 import type { MapsConfig } from "@/lib/server/maps-config";
 
@@ -26,10 +27,8 @@ function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: stri
   useEffect(() => {
     if (!geocoding) return;
     let alive = true;
-    new geocoding.Geocoder()
-      .geocode({ componentRestrictions: { postalCode: zip, country: "US" } })
-      .then((r) => alive && setCenter({ zip, at: r.results[0]?.geometry.location.toJSON() ?? null }))
-      .catch(() => alive && setCenter({ zip, at: null }));
+    // geocodeZip never throws: a rejected Maps key used to crash the whole report here (see lib/client/geocode.ts).
+    void geocodeZip(new geocoding.Geocoder(), zip).then((at) => alive && setCenter({ zip, at }));
     return () => {
       alive = false;
     };
