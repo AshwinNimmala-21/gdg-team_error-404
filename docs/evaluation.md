@@ -148,3 +148,93 @@ Run "after-leasefix" (all 8 leases, live Gemma): **clause-conflict recall 13 of 
 | x08 (new, VA) | security_deposit, repairs_on_tenant | repairs_on_tenant, security_deposit |
 
 Caveat: 8 leases written by us is a small set. It shows the fixes work on new wording, not that lease reading is solved.
+
+
+### Run "after", easy set (2026-10-25T05:19Z, http://localhost:3000)
+
+**Development set** (17 scam / 15 legit; errors: 0)
+
+| System | Precision | Recall | False alarms on legit listings |
+|---|---|---|---|
+| Clearlease: "Likely scam" | 100% | 94% | 0 of 15 |
+| Clearlease: any red flag (Some or Likely) | 89% | 100% | 2 of 15 |
+| Keyword baseline: any keyword | 94% | 100% | 1 of 15 |
+
+Legit listings labelled "Suspiciously cheap": none.
+Missed scams (no red flag): none. False alarms: l11 (pressure); l12 (riskyPayment).
+
+Clause-conflict recall: 13 of 13. Unexpected conflicts: 0.
+
+| Lease | Expected conflicts | Found conflicts |
+|---|---|---|
+| x01 | security_deposit, landlord_entry, waiver_of_rights | landlord_entry, waiver_of_rights, security_deposit |
+| x02 | landlord_entry, attorney_fees | landlord_entry, attorney_fees |
+| x03 | security_deposit, late_fee | security_deposit, late_fee |
+| x04 | late_fee, repairs_on_tenant | late_fee, repairs_on_tenant |
+| x05 | none | none |
+| x06 | security_deposit, landlord_entry | security_deposit, landlord_entry |
+| x07 | none | none |
+| x08 | security_deposit, repairs_on_tenant | repairs_on_tenant, security_deposit |
+
+Modes: live. Median latency: 12.6 s.
+
+**Holdout (never inspected while making changes)** (5 scam / 5 legit; errors: 0)
+
+| System | Precision | Recall | False alarms on legit listings |
+|---|---|---|---|
+| Clearlease: "Likely scam" | 100% | 80% | 0 of 5 |
+| Clearlease: any red flag (Some or Likely) | 83% | 100% | 1 of 5 |
+| Keyword baseline: any keyword | 100% | 100% | 0 of 5 |
+
+Legit listings labelled "Suspiciously cheap": none.
+Missed scams (no red flag): none. False alarms: l10 (landlordAway).
+
+### Run "after", hard set (2026-10-25T05:25Z, http://localhost:3000)
+
+**Hard set** (15 scam / 9 legit; errors: 0)
+
+| System | Precision | Recall | False alarms on legit listings |
+|---|---|---|---|
+| Clearlease: "Likely scam" | 100% | 100% | 0 of 9 |
+| Clearlease: any red flag (Some or Likely) | 100% | 100% | 0 of 9 |
+| Keyword baseline: any keyword | 25% | 13% | 6 of 9 |
+
+Legit listings labelled "Suspiciously cheap": none.
+Missed scams (no red flag): none. False alarms: none.
+
+Modes: live. Median latency: 12.8 s.
+
+| Category | Items | Clearlease correct (any red flag = scam) | Baseline correct (any keyword = scam) |
+|---|---|---|---|
+| payment-obfuscated | 5 | 5 | 0 |
+| obfuscated-spelling | 3 | 3 | 1 |
+| spanish | 3 | 3 | 1 |
+| legit-negation | 7 | 7 | 1 |
+| screenshot | 6 | 6 | 2 |
+
+## Before and after (all runs live, Oct 24–25)
+
+What changed between "before" and "after": cheap rent alone no longer counts as a scam sign (step 2), per-bedroom and per-person pricing plus the sublet line, the lease deposit and repairs fixes, and the Spanish option (English path unchanged). None of these were tuned to specific items; the lease fix was motivated by the "before" misses and then tested on 3 new leases.
+
+| Set | System | Before: precision / recall / false alarms | After: precision / recall / false alarms |
+|---|---|---|---|
+| Easy (17 scam / 15 legit) | Clearlease "Likely scam" | 100% / 94% / 0 | 100% / 94% / 0 |
+| Easy | Clearlease any red flag | 77% / 100% / 5 | **89% / 100% / 2** |
+| Easy | Keyword baseline | 94% / 100% / 1 | 94% / 100% / 1 |
+| **Holdout** (5 / 5, first opened in "after") | Clearlease "Likely scam" | 100% / 80% / 0 | 100% / 80% / 0 |
+| Holdout | Clearlease any red flag | 71% / 100% / 2 | 83% / 100% / 1 |
+| Holdout | Keyword baseline | 100% / 100% / 0 | 100% / 100% / 0 |
+| Hard (15 / 9) | Clearlease "Likely scam" | 100% / 100% / 0 | 100% / 100% / 0 |
+| Hard | Clearlease any red flag | 94% / 100% / 1 | **100% / 100% / 0** |
+| Hard | Keyword baseline | 25% / 13% / 6 | 25% / 13% / 6 |
+| Leases | Clause-conflict recall | 7 of 9 (5 leases) | **13 of 13** (8 leases, 3 written after the fix), 0 unexpected |
+| All listing sets | Legitimate listings labelled "Suspiciously cheap" | 6 (l01, l03, l12, l18, l20, h23) | **0** |
+
+The holdout "before" numbers were computed from `scripts/eval/results/before-holdout.json`, saved unread at the first run and opened only for this table.
+
+**Plain reading:**
+- The price-bias fix did what it was meant to: no legitimate listing is called "Suspiciously cheap" any more, and false alarms from price alone are gone. The remaining false alarms come from real-sounding signals: "units go fast" (pressure), "Venmo to split utilities" (payment app), and "the owner lives out of state" (owner away, though a local manager shows it).
+- **On the easy set and the holdout, a simple keyword scan is as good as Clearlease or better.** On the 5-and-5 holdout it made no mistakes, while Clearlease's softer "Some red flags" tier raised one false alarm. Ordinary scam posts use ordinary scam words.
+- Clearlease's advantage shows on the hard set (paraphrased payments, misspellings, Spanish, anti-scam disclaimers, screenshots) and on leases, which a keyword scan can't judge at all.
+- "Likely scam" is the verdict to trust: it raised 0 false alarms in every set. It missed 1 easy scam and 1 holdout scam that still got "Some red flags".
+- Each run is a single pass of a live model; reruns can move a flag or two (for example, the Blacksburg sample has shown 6 or 7 of 9 flags).

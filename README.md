@@ -6,6 +6,13 @@
 
 **AI model: Gemma 4, `gemma-4-26b-a4b-it`** (open weights, [Apache 2.0](https://ai.google.dev/gemma/apache_2)), called through the Gemini API. It reads messy listings, landlord messages and lease *photos* into structured, quoted facts. Every number, threshold and verdict is computed in TypeScript.
 
+**Gemma 4 at a glance**
+- **Core, not decoration:** every check is one Gemma 4 call that turns text or a photo into a strict JSON extraction, each fact with a verbatim quote. Without Gemma there's nothing to check.
+- **Multimodal:** lease photos and chat screenshots are read directly (image input), with a transcript we use to verify every quote.
+- **Visible in the product:** each report has a "What Gemma read" section showing the extracted facts and highlighting the exact words in your text or photo. The header shows the model ID and latency.
+- **Measured:** on a hard eval set we wrote as a stress test (paraphrased payment requests, misspellings, Spanish, anti-scam disclaimers, screenshots), Clearlease caught 15 of 15 scams with 0 false alarms, while a keyword scanner caught 2 and raised 6 false alarms. On ordinary listings a keyword scan does about as well, and we say so ([`docs/evaluation.md`](docs/evaluation.md)).
+- **Open weights:** the same model can run on a nonprofit's own hardware (see "Self-host Gemma", untested).
+
 ![Clearlease report for a Facebook-style scam listing: suspiciously cheap, likely scam](docs/screenshots/desktop-scam.png)
 
 <p align="center"><img src="docs/screenshots/phone-lease.png" width="300" alt="Phone view: a lease photo read by Gemma, with clauses to fix before signing"></p>
@@ -26,7 +33,7 @@
 
 **What we measure:** scam signals caught *before* a deposit leaves; lease clauses flagged that conflict with state law; time to a first verdict (one click on a sample, about 10 s live).
 
-**Student validation:** interviews with VT students are in progress. Answers go in [`docs/validation.md`](docs/validation.md) as they come in.
+**Student validation:** interviews with VT students and a 3-person usability test ("Is this listing safe?") are in progress. Answers go in [`docs/validation.md`](docs/validation.md) only from real conversations.
 
 ## What it does
 
@@ -55,6 +62,27 @@ Also included:
 
 **En español.** An EN/ES switch sits at the top of the page. In Spanish mode, Gemma writes each lease clause's plain-language explanation in Spanish (quotes stay in the original language, so they can still be verified), the "questions to ask" come from hand-translated templates, and the main labels, verdicts, scam-flag labels and headlines are translated. The page's `lang` attribute switches too, so screen readers change voice. Still in English: the longer price explanation, the legal reason under each clause, and the evidence drawers; the report says so in Spanish. Spanish mode passes the same axe audit (0 violations). The Spanish was written by us with Claude Code and has not been reviewed by a native-speaking tenant advocate yet.
 
+## Evaluation
+
+We built a labelled evaluation before changing anything, froze a keyword-only baseline, and kept 10 items as a holdout we didn't open until the end. Full method, items, sources and caveats: [`docs/evaluation.md`](docs/evaluation.md). All runs use live Gemma 4.
+
+| Set | System | Before: precision / recall / false alarms | After |
+|---|---|---|---|
+| Easy (32 listings) | Clearlease, any red flag | 77% / 100% / 5 of 15 | **89% / 100% / 2 of 15** |
+| Easy | Keyword baseline | 94% / 100% / 1 of 15 | 94% / 100% / 1 of 15 |
+| Holdout (10, opened last) | Clearlease, any red flag | 71% / 100% / 2 of 5 | 83% / 100% / 1 of 5 |
+| Holdout | Keyword baseline | 100% / 100% / 0 of 5 | 100% / 100% / 0 of 5 |
+| Hard (24, incl. 6 screenshots) | Clearlease, any red flag | 94% / 100% / 1 of 9 | **100% / 100% / 0 of 9** |
+| Hard | Keyword baseline | 25% / 13% / 6 of 9 | 25% / 13% / 6 of 9 |
+| Leases | Clause conflicts found | 7 of 9 | **13 of 13** (3 new leases), 0 false |
+| All | Legitimate listings called "Suspiciously cheap" | 6 | **0** |
+
+**Honest reading:**
+- On ordinary listings, and on our holdout, a keyword scan is as good as Clearlease or better.
+- Clearlease's edge is paraphrase, negation ("we never accept Zelle"), Spanish, screenshots and leases.
+- "Likely scam" never fired on a legitimate listing in any set.
+- All items were written by us (3 are reconstructions of published cases), so treat these as a stress test, not field accuracy.
+
 ## How the AI is used (and bounded)
 
 ```mermaid
@@ -75,12 +103,12 @@ flowchart LR
   SM["Secret Manager"] -.->|"API keys at runtime"| API
 ```
 
-**Why the AI is necessary.** Listings and leases are messy, and they arrive as screenshots and phone photos. Gemma 4 reads both (it is multimodal) and turns them into one strict JSON shape: rent, bedrooms, ZIP, payment methods, seven scam signals and lease clauses. Every field carries a **verbatim quote** from the input. It also understands negation and paraphrase ("we never take wire transfers" is *not* a red flag), which keyword rules can't. We use one Gemma call per check.
+**Why the AI is necessary.** Listings and leases are messy, and they arrive as screenshots and phone photos. Gemma 4 reads both (it is multimodal) and turns them into one strict JSON shape: rent, bedrooms, ZIP, payment methods, seven scam signals and lease clauses. Every field carries a **verbatim quote** from the input. It also understands negation and paraphrase ("we never take wire transfers" is *not* a red flag), which keyword rules can't: on our hard eval set a keyword scanner raised false alarms on 6 of 9 legitimate listings with disclaimers like that. We use one Gemma call per check.
 
 **How it's bounded:**
-- **The model extracts; code decides.** No prices, scores or legal judgments come from the model. Thresholds live in [`lib/rules/`](lib/rules) with 29 unit tests.
+- **The model extracts; code decides.** No prices, scores or legal judgments come from the model. Thresholds live in [`lib/rules/`](lib/rules), covered by 81 unit tests.
 - **Grounding check.** Each quote must appear in your text, or in Gemma's own transcript of your photo. Unmatched quotes are dropped and shown as "not counted". Extracted numbers must appear inside their quote.
-- **Prompt-injection defense.** Your text is wrapped as delimited data, and the delimiters are escaped. The system prompt is pinned. Output must validate against the schema, or you get a safe error rather than a guess. A second, rule-based detector catches phrases like "ignore previous instructions" even if the model misses them. Sample 4 shows the attack being ignored *and* counted as a red flag.
+- **Prompt-injection defense.** Your text is wrapped as delimited data, and the delimiters are escaped. The system prompt is pinned. Output must validate against the schema, or you get a safe error rather than a guess. A second, rule-based detector catches phrases like "ignore previous instructions" even if the model misses them. Sample 5 shows the attack being ignored *and* counted as a red flag.
 - **Not legal advice.** Every report says so and links to free help for the renter's state.
 
 **Why `gemma-4-26b-a4b-it`.** It's a mixture-of-experts model with about 3.8B parameters active per token (of 25.2B total). That makes it fast and cheap enough for a free tool, and a nonprofit can self-host the open weights.
@@ -105,13 +133,14 @@ Hosting is one Cloud Run service that scales to zero, plus Firestore and Secret 
 - **Your device redacts before sending.** Phone numbers, emails and long ID/account numbers are removed in the browser. Photos are resized and re-encoded on the device, which strips location (EXIF/GPS) data.
 - **Honest about the model host.** Gemma 4 on the Gemini API is free tier only, and Google may use free-tier inputs to improve its products. The page says this plainly next to the button. For stricter privacy, a nonprofit can run the same open weights on its own hardware.
 - **Community counter, minimal by design.** Contacts are SHA-256 hashed *in the browser*, then keyed with a server secret (HMAC). Firestore stores only `{count, firstSeen}` under those keyed hashes: no text, images or IPs. Flags need a short-lived signed token from a real check.
-- **Abuse and cost guards.** 10 checks per minute per client, 12,000-character text limit, 8 MB image cap (enforced on the server too), MIME allowlist, and a streamed body size cap.
+- **Abuse and cost guards.** A per-client rate limit (10 checks per minute by default; the deployed site uses 30 because judges share venue Wi-Fi), 12,000-character text limit, 8 MB image cap (enforced on the server too), MIME allowlist, and a streamed body size cap.
 - **Sources are cited and caveated.** Our own rules of thumb (the 25% price cut-off, off-platform contact) are labeled "Clearlease rule of thumb" in the UI.
 
 ## Accessibility and design
 
 - Built mobile-first for a renter standing outside the building. Tested at 320, 375 and 1280 px with no horizontal scroll, and photo upload works from the camera roll.
-- **Automated audit: 0 axe-core violations** (WCAG 2.0/2.1/2.2 A and AA rules) on the landing page and three finished reports, at 1280 px and 375 px, with every evidence drawer open. Details and how to rerun: [`docs/accessibility.md`](docs/accessibility.md).
+- **Automated audit: 0 axe-core violations** (WCAG 2.0/2.1/2.2 A and AA rules) on the landing page and three finished reports, at 1280 px and 375 px, with every evidence drawer open, in English and in Spanish. Details and how to rerun: [`docs/accessibility.md`](docs/accessibility.md).
+- **Manual check: 12 of 12 pass.** A keyboard-only walkthrough (skip link, tab order, focus to the report, drawers, edit and Escape, lease photo) and a VoiceOver walkthrough (report-ready announcement, headings, warning-sign wording, quote markers, map as one item, form errors), done by a teammate on macOS.
 - Verdicts are never color-only: icon + word + color. **Text contrast is 5.71:1 or higher on every pair (measured)**: body text 16.45:1, secondary text 7.48:1, links 7.63:1, highlighted quotes 13.29:1, and the lowest is green text on its tint. Form-field borders are 6.60–7.48:1. Color values are in [`docs/design-principles.md`](docs/design-principles.md).
 - Keyboard: visible focus ring, logical tab order, native `<details>` for evidence, Escape closes the editor, and focus moves to the report when it's ready.
 - Screen readers: `aria-live` announcements, field-level errors (`aria-invalid`), a skip link, and a summary of all three verdicts.
@@ -190,11 +219,14 @@ The research behind every number and rule, with sources, is in [`docs/research/`
 app/(ui)/page.tsx        one page: intake form + report
 app/api/check/route.ts   validation, rate limit, extraction, rules
 app/api/flag/route.ts    anonymous community flag
-components/              Checker, Report, Stamp, Evidence, FactsBar, Community, ListingMap
+components/              Checker, Report, GemmaRead, Stamp, Evidence, FactsBar, Community, ListingMap, Lang (EN/ES)
 lib/ai/                  Gemma client, schema, pinned prompt, demo-mode extractions
 lib/rules/               price, scam, lease, questions, quote verification (+ tests)
 lib/data/                HUD/Census saved data + live lookups, ZIP areas, rule sheets, help links
-public/samples/          4 fictional demo inputs
+public/samples/          5 fictional demo inputs
+scripts/eval/            labelled eval sets (easy, hard, student), runner, frozen keyword baseline
+scripts/a11y.mjs         axe-core audit (EN and ES) + page-error regression check
+scripts/deploy.sh        one-command Cloud Run deploy (macOS/Linux)
 ```
 
 ## Built with

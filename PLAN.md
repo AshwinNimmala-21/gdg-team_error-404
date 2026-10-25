@@ -66,7 +66,7 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
 - [x] 8. Spanish toggle (started 12:33 AM, kept at ~12:55 AM): EN/ES switch, Gemma writes clause explanations in Spanish, hand-translated questions + labels + verdicts + short rule sentences, `<html lang>` switches, axe 0 violations in ES. Not translated: price detail, legal reasons, evidence. Spanish not reviewed by a native-speaking advocate.
 - [ ] OPEN (needs Ashwin's call): Google Maps `IntersectionObserver` error after a rejected Maps key (only on non-allowed referrers like localhost:3100; page keeps working). Two fixes failed. Options: (a) leave + document (done), (b) one shared APIProvider at page level so a rejected key is remembered, (c) hide the map entirely after the first auth failure via window.gm_authFailure.
-- [ ] Finish a) eval run "after" incl. holdout, README before/after table; b) README pass; c) STOP: ready to deploy
+- [x] Finish a) eval "after" incl. holdout (holdout: keyword baseline 100/100/0 beats Clearlease any-flag 83/100/1; hard set Clearlease 100/100/0 vs keyword 25/13/6; leases 13/13; legit "Suspiciously cheap" 6→0), b) README pass (Gemma-at-a-glance, Evaluation section, stale numbers fixed), c) ready to deploy from `dev` (Ashwin runs `scripts/deploy.sh` or DEPLOY.md)
 
 ## Status
 - [x] Phase 0: safety rails, validation questions (`docs/validation.md`; **answers still needed**)
