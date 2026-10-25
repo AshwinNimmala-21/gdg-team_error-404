@@ -328,6 +328,8 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
             onRescore={rescore}
             rescoring={rescoring}
             maps={maps}
+            sourceText={lastText}
+            imageUrl={image?.previewUrl ?? null}
             onAddLease={() => {
               addingLease.current = true;
               fileRef.current?.click();

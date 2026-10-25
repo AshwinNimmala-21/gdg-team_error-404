@@ -56,7 +56,7 @@ Gate after every step: `npm test`, `npm run lint`, `npm run build`, `node script
 Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `app/globals.css`; step 3 adds to Report.tsx, so expect a small merge.
 - [x] 1. Eval baseline (+ 24-item hard set after review; baseline keywords frozen): `scripts/eval/dataset.jsonl` (~45 items, 10 holdout), `scripts/eval/run.mjs`, keyword baseline, run "before" in `docs/evaluation.md`
 - [x] 2. Price bias fix: cheap alone = "Below usual range: verify before paying"; "Suspiciously cheap" only with another scam signal; tests; README paragraph
-- [ ] 3. "What Gemma read" section: extracted facts, quotes highlighted in source text/transcript, photo thumbnail
+- [x] 3. "What Gemma read" section: extracted facts, quotes highlighted in source text/transcript, photo thumbnail
 - [ ] 4. Blacksburg sample (24060 sublet, Zelle before viewing) first, lease photo second; README persona Blacksburg-first
 - [ ] 5. Accessibility: axe-core scan (landing + report, 1280/375), fix violations, measured contrast, `docs/accessibility.md` → STOP for Ashwin's keyboard/VoiceOver check
 - [ ] 6. `scripts/deploy.sh`, README minimum setup, Ollama self-host section (labelled untested unless tested)

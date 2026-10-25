@@ -7,6 +7,7 @@ import type { CheckResult, ClauseFinding, Overrides } from "@/lib/types";
 import { Community } from "./Community";
 import { EvidenceDrawer, Quote } from "./Evidence";
 import { FactsBar } from "./FactsBar";
+import { GemmaRead } from "./GemmaRead";
 import { ToneIcon } from "./Icons";
 import { ListingMap } from "./ListingMap";
 import { InkFilter, Stamp } from "./Stamp";
@@ -61,9 +62,13 @@ interface Props {
   rescoring: boolean;
   onAddLease: () => void;
   maps: MapsConfig | null;
+  /** The text exactly as sent (after on-device redaction), for highlighting quotes. */
+  sourceText: string;
+  /** Local preview of the photo, if one was sent. */
+  imageUrl: string | null;
 }
 
-export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ result: r, onRescore, rescoring, onAddLease, maps }, headingRef) {
+export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ result: r, onRescore, rescoring, onAddLease, maps, sourceText, imageUrl }, headingRef) {
   const price = priceVerdict(r.price);
   const scam = scamVerdict(r.scam);
   const lease = leaseVerdict(r.lease);
@@ -179,6 +184,8 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
         )}
         <LeaseGroups findings={r.lease.findings} />
       </Section>
+
+      <GemmaRead result={r} sourceText={sourceText} imageUrl={imageUrl} />
 
       <section aria-labelledby="questions" className="border-t-2 border-ink px-4 pt-6 pb-7 sm:px-8">
         <h3 id="questions" className="text-[20px] font-bold tracking-[-0.01em]">
