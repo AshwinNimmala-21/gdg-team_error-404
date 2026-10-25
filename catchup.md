@@ -91,10 +91,10 @@ Motivated by two misses in the first eval run; the causes were fixed in general,
 
 ## 6. Bug fixed: map crash (found by the a11y audit)
 - **Symptom:** on a production build, text sample → photo sample → the whole page showed Next.js's error screen (`Cannot read properties of undefined (reading 'then')`).
-- **Cause:** after Maps rejects the key (a referrer it doesn't allow), `Geocoder.geocode()` returns `undefined`, and `ListingMap` called `.then` on it. The deployed site wasn't affected (its referrer is allowed), but any key misconfiguration would have been.
+- **Cause:** after Maps rejects the key (a referrer it doesn't allow), `Geocoder.geocode()` returns `undefined`, and `ListingMap` called `.then` on it. The deployed site and `localhost:3000` weren't affected, because our Maps key only allows those two referrers; any other port or domain (e.g. a self-hoster, or `localhost:3100`) would have been.
 - **Fix:** `lib/client/geocode.ts` → `geocodeZip()` never throws or rejects. `ListingMap` uses it, and also shows "The map couldn't load" when `useApiLoadingStatus()` reports an auth failure.
 - **Regression tests:** `lib/client/__tests__/geocode.test.ts`. Verified to fail with the exact production error against the old logic. `scripts/a11y.mjs` also fails on any uncaught page error during text → photo → text.
-- **Known and accepted (decision (a), documented in `docs/accessibility.md` and PLAN.md):** when the Maps key is rejected (only seen on `localhost:3100`), a lease photo followed by the Blacksburg sample logs an uncaught `IntersectionObserver` error from inside Google's map script. The page keeps working. Two fix attempts didn't remove it. Options (b) one shared `APIProvider` and (c) hide the map after `gm_authFailure` are noted in PLAN.md if you want to take it.
+- **Known and accepted (decision (a), documented in `docs/accessibility.md` and PLAN.md):** when the Maps key is rejected (only possible on referrers the key doesn't allow, i.e. anything except `localhost:3000` and our Cloud Run URL; seen on `localhost:3100`), a lease photo followed by the Blacksburg sample logs an uncaught `IntersectionObserver` error from inside Google's map script. The page keeps working. Two fix attempts didn't remove it. Options (b) one shared `APIProvider` and (c) hide the map after `gm_authFailure` are noted in PLAN.md if you want to take it.
 
 ## 7. Accessibility: `scripts/a11y.mjs`, `docs/accessibility.md`
 - `axe-core` was added as a devDependency. It was already in the lockfile via the ESLint a11y plugin, so the lockfile diff is **one line**. Note that `npm install` on Ashwin's Mac (npm 11.9) strips the `libc` fields from about 70 lockfile entries; we restored your lockfile and did not commit that.
@@ -111,7 +111,7 @@ Motivated by two misses in the first eval run; the causes were fixed in general,
   - Optional pieces (HUD, Census, Maps, Firestore) are skipped if not given.
   - `--dry-run` makes **zero** gcloud calls (verified with a fake `gcloud` on PATH).
   - **The real run is untested.**
-- **README "Minimum setup":** only `GEMINI_API_KEY` is required. Verified with a production build where HUD, Census, the community salt and Maps were blanked: 5/5 samples live, saved figures labelled, no counter, no map.
+- **README "Minimum setup":** only `GEMINI_API_KEY` is required. The Maps row explains that our key only allows `localhost:3000` and the Cloud Run URL, so self-hosters need their own key. Verified with a production build where HUD, Census, the community salt and Maps were blanked: 5/5 samples live, saved figures labelled, no counter, no map.
 - **README "Self-host Gemma (Ollama)": explicitly untested and not wired in.** Ollama publishes `gemma4:26b` (16–19 GB, image input); we'd need an adapter in `lib/ai/gemma.ts`.
 - `docs/DEPLOY.md` points macOS/Linux users to the script.
 

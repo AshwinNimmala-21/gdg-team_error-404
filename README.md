@@ -167,7 +167,7 @@ Only **one key is required**: `GEMINI_API_KEY` (free from [aistudio.google.com/a
 | `HUD_TOKEN` | No | Saved HUD FY2027 Fair Market Rents, labelled "saved figure" in the evidence |
 | `CENSUS_KEY` | No | Saved Census ACS 2020–24 medians, labelled the same way |
 | `COMMUNITY_SALT` (+ Firestore) | No | The anonymous "flag this listing" counter is simply off |
-| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | No | No area map |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | No | No area map. The key is a browser key restricted by referrer: ours only allows `http://localhost:3000` and our Cloud Run URL. On any other port or domain the report shows "The map couldn't load for this ZIP code" and everything else still works. Self-hosters need their own key with their own referrers. |
 
 Checked on Oct 25: a production build with only `GEMINI_API_KEY` set (the other four blanked) passed all 5 samples live (`node scripts/e2e.mjs`), showed saved figures, no counter and no map.
 
