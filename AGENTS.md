@@ -25,7 +25,7 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
   - Lease: Looks standard / Ask about N clauses / Clauses to fix before signing
   - Each verdict = icon + word + color.
 - Evidence in native `<details>`. "We read: … [Edit]" reruns the rules only. One `POST /api/check`. Full list in PLAN.md "Decisions".
-- Ownership after the MVP: Yoshwan = `app/api` + `lib`, Ashwin = `app/(ui)` + `components`.
+- Ownership (from Sat 9:15 PM): Yoshwan = `lib/` + `app/api/` + `components/`. Ashwin = `README.md` + `docs/` + the Cloud Run deploy, and doesn't touch `components/` or `lib/`. Details in PLAN.md "Handoff".
 - Price benchmark = HUD FMR (FY2027) for the bedroom count. The model never computes prices or legality. Quotes are verified against the input before a flag counts.
 
 ## Stack (do not substitute)

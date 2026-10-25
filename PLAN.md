@@ -1,6 +1,54 @@
 # Clearlease — plan and status
 
-Last updated: Sat Oct 24 2026, about 4:50 PM. The MVP works locally in live and demo mode; Cloud Run deploy is next (the team runs it).
+Last updated: Sat Oct 24 2026, 9:15 PM ET. The MVP works locally in live and demo mode. Two laptops from now on; read "Handoff" first.
+
+## Handoff — Sat Oct 24, 9:15 PM ET
+`main` is pushed and clean. The gate passed at `0a040bf`: lint, `tsc --noEmit`, 44 unit tests, and `npm run build` from a clean checkout with no `.env`. The council plan this follows is `docs/council/report.md` ("The plan: 12 items, ranked").
+
+**Ownership from now on**
+- **Yoshwan:** `lib/`, `app/api/`, `components/`. Finishing council items 2–6 on the code side.
+- **Ashwin:** `README.md`, `docs/` (validation, video script, submissions) and the Cloud Run deploy. **Ashwin does not touch `components/` or `lib/` tonight.**
+- Not named in the split, so assumed (say so if wrong):
+  - `app/(ui)/` and `app/globals.css` go with Yoshwan, since they go with `components/`.
+  - `Dockerfile`, `.dockerignore`, `.gcloudignore` and `docs/DEPLOY.md` go with Ashwin, since they're part of the deploy.
+- Both edit `PLAN.md`. Run `git pull --rebase` before editing it, keep commits small, and never force-push.
+
+**Done since 4:50 PM (all on `main`)**
+- Council report and live review screenshots: `docs/council/report.md`, `docs/screenshots/council-review/`.
+- #1 The repo is public (checked with `gh repo view`).
+- #2 Gemma reliability, in `lib/ai/gemma.ts`: per-attempt timeouts, two retries with backoff on 5xx, network errors and timeouts, and a non-sticky step-down (`d928832`).
+- #3 A labelled saved result for the 4 built-in samples when the live model still fails (`11799f7`).
+- #6a A staged, honest wait for photo checks (`2cd303f`).
+- #6b The scam verdict is "Not run" (neutral) when only a lease was given.
+- #6c The README contrast claim is now true (both in `fbad6e0`).
+- #8 "Relocating for work" no longer trips the "owner away" flag. The rule judges the whole sentence and fails closed (`cd37af6`, `0c53c30`).
+- `docs/DEPLOY.md` already uses `--timeout 120`.
+
+**In progress (Yoshwan)**
+- **Verdict tag restyle: stashed, not committed.** It's `stash@{0}`, "WIP verdict tag restyle prototype", and exists only on Yoshwan's laptop.
+  - Files: new `components/VerdictTags.tsx`, plus changes to `components/Report.tsx` and `app/globals.css`. Screenshots are in `docs/screenshots/tags/{1,2,3}/`.
+  - Three options sit behind `?tags=1|2|3`; without the parameter the stamps stay.
+  - Waiting on a pick. Then: delete the other two and `components/Stamp.tsx`, make the winner the default, and update `docs/design-principles.md`.
+- #2 verification is not done yet: 10 live sample runs in a row, with the pass count recorded here.
+- #6d Sample-aware error copy (`components/Checker.tsx`) is not done.
+- #6e Map `inert`/`aria-hidden` (`components/ListingMap.tsx`) is not done.
+
+**Next: Ashwin**
+1. #4 Deploy with `docs/DEPLOY.md`.
+   - Add `RATE_LIMIT_PER_MIN=30`.
+   - Run `--min-instances 1` from Sun 9 AM to 2 PM only.
+   - Allow the Maps key referrer `https://*.run.app/*`.
+   - Run `node scripts/e2e.mjs <URL>` and put the URL on README line 1.
+2. #5 Add 5–8 VT student answers to `docs/validation.md` before 11 PM. Put 2 quotes in the README and 1 in the video.
+3. #9 Write the video script in `docs/` tonight; record Sun 7–9 AM.
+4. #12 Write the submission text for MLH OrganizerHQ and codingjam.dev in `docs/`: Gemma 4 track, model ID `gemma-4-26b-a4b-it`, Claude Code disclosure.
+5. #10 README pass after the deploy.
+
+**Next: Yoshwan**
+1. Pick a tag option and commit it.
+2. #6d and #6e.
+3. #2's 10-run live check, recorded here.
+4. #11 mini-eval (Gemma vs regex) if there's time.
 
 ## Status
 - [x] Phase 0: safety rails, validation questions (`docs/validation.md`; **answers still needed**)
@@ -17,6 +65,7 @@ Last updated: Sat Oct 24 2026, about 4:50 PM. The MVP works locally in live and 
 - [ ] Phase 5: ship by Sun 12:30 PM
 
 ## Next steps
+The current list is under "Handoff". The list below is from 4:50 PM; (a) is done as council #3.
 1. The team deploys with `docs/DEPLOY.md`, runs `node scripts/e2e.mjs <URL>`, and puts the URL at the top of the README.
 2. The team collects 3–5 student answers into `docs/validation.md`. The judge scores 1c (5 pts) at 0 without them.
 3. Phase 4 candidates, ranked by points per hour:
@@ -26,8 +75,8 @@ Last updated: Sat Oct 24 2026, about 4:50 PM. The MVP works locally in live and 
    - (d) A self-hosted Gemma option (`GEMMA_BASE_URL`) for the open-source and privacy story.
    - (e) Judge re-score after the README and deploy.
 
-## Ownership (after the MVP)
-Yoshwan: `app/api` + `lib`. Ashwin: `app/(ui)` + `components`. Until the MVP is done, everything is built on Yoshwan's laptop.
+## Ownership
+Superseded on Sat Oct 24 at 9:15 PM; see "Handoff". Yoshwan owns `lib/`, `app/api/` and `components/`. Ashwin owns `README.md`, `docs/` and the deploy.
 
 ## Decisions (grill round 1, accepted 2026-10-24)
 - R1.1 Verdict words:
