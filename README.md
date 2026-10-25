@@ -13,6 +13,11 @@
 - **Measured:** on a hard eval set we wrote as a stress test (paraphrased payment requests, misspellings, Spanish, anti-scam disclaimers, screenshots), Clearlease caught 15 of 15 scams with 0 false alarms, while a keyword scanner caught 2 and raised 6 false alarms. On ordinary listings a keyword scan does about as well, and we say so ([`docs/evaluation.md`](docs/evaluation.md)).
 - **Open weights:** the same pipeline runs on a nonprofit's own hardware with `GEMMA_PROVIDER=ollama` (see "Self-host Gemma 4": tested with the small e2b/e4b models on a laptop; they over-flag, so use `gemma4:26b`).
 
+**Not just another scam keyword list.** A keyword scan is about as good on ordinary listings (our own evaluation says so). What it can't do:
+- **Every claim is checked in code.** A flag counts only if its quote is found word for word in what you gave us, and lease numbers must appear inside their clause.
+- **It reads leases against the law.** Virginia, DC and Maryland rule sheets with statute citations, and real HUD and Census rent ranges for the ZIP code.
+- **It reads what keywords can't.** Screenshots and lease photos, paraphrased payment requests, negation ("we never take wire transfers" isn't a red flag), and Spanish. It also can't be talked into "safe": injected instructions become a red flag.
+
 ![Clearlease report for a Facebook-style scam listing: suspiciously cheap, likely scam](docs/screenshots/desktop-scam.png)
 
 <p align="center"><img src="docs/screenshots/phone-lease.png" width="300" alt="Phone view: a lease photo read by Gemma, with clauses to fix before signing"></p>
@@ -31,7 +36,11 @@
 - **Rent already burdens DMV renters.** The DC metro's median rent is $2,027/month ([USAFacts, ACS 2020–24](https://usafacts.org/answers/how-much-do-households-spend-on-rent/state/washington-dc/)). **51.5% of Maryland renter households** spend 30% or more of their income on housing ([USAFacts](https://usafacts.org/answers/how-many-households-in-the-united-states-spend-too-much-on-housing/state/maryland/)). A bad lease clause or a lost deposit hurts.
 - **Leases are written for landlords.** First-time renters sign clauses like "Landlord may enter at any time without notice" without knowing that Virginia, DC and Maryland law say otherwise.
 
-**What we measure:** scam signals caught *before* a deposit leaves; lease clauses flagged that conflict with state law; time to a first verdict (one click on a sample, about 10 s live).
+**Impact we can measure so far** (from our evaluation, all live Gemma, synthetic and reconstructed items; we have no field data yet):
+- **Scams caught before money moves:** 15 of 15 on the hard set (paraphrase, misspellings, Spanish, screenshots) with 0 false alarms; a keyword scan caught 2 with 6 false alarms ([`docs/evaluation.md`](docs/evaluation.md)).
+- **Lease clauses that conflict with state law:** 13 of 13 found across 8 test leases, 0 unexpected. This was measured before the Sun 5 AM rule that also checks clause numbers against their quotes; it will be re-run.
+- **No false "Suspiciously cheap":** 0 legitimate listings labelled that way, down from 6 before the bias fix.
+- **Time and cost to a verdict:** about 11–12 s for a listing and about 33 s for a lease photo; about $0.54 to $0.97 per 1,000 checks at hosted prices (see "Cost").
 
 **Student validation:** interviews with VT students and a 3-person usability test ("Is this listing safe?") are in progress. Answers go in [`docs/validation.md`](docs/validation.md) only from real conversations.
 

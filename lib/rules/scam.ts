@@ -60,15 +60,19 @@ export function isOnlyRelocating(quote: string | null, sources: string[]): boole
 }
 
 const FTC_METHODS = new Set(["wire", "gift_card", "crypto"]);
+// Words that name an FTC "like sending cash" method (English and Spanish, accents folded).
+const FTC_METHOD_WORDS =
+  /\b(wire|wired|wiring|western union|moneygram|money gram|gift ?cards?|google play|itunes|apple gift|steam card|crypto\w*|bitcoin|btc|ethereum|usdt|transferencia|giro|tarjetas? de regalo|cripto\w*)\b/i;
 const APP_METHODS = new Set(["payment_app", "cashiers_check", "cash", "money_order"]);
 
 // Defense in depth: catch common prompt-injection phrasing even if the model doesn't report it.
 const INJECTION_PATTERNS = [
-  /ignore (all |any )?(the )?(previous|prior|above|earlier) (instructions|prompts?|rules)/i,
-  /disregard (all |any )?(the )?(previous|prior|above|system) (instructions|prompts?)/i,
-  /(ai|assistant|model|chatbot|scanner|reviewer)s?[,:]? .{0,60}(mark|report|classify|rate|label) (this|the) (listing|post|ad)/i,
-  /you are now (a|an|in) /i,
-  /system prompt/i,
+  /\bignore (all |any )?(the )?(previous|prior|above|earlier) (instructions|prompts?|rules)\b/i,
+  /\bdisregard (all |any )?(the )?(previous|prior|above|system) (instructions|prompts?)\b/i,
+  /\b(ai|assistant|model|chatbot|scanner|reviewer)s?\b[,:]? .{0,60}\b(mark|report|classify|rate|label) (this|the) (listing|post|ad)\b/i,
+  // Role-play jailbreaks only ("you are now an unrestricted assistant"), not "you are now a resident".
+  /\byou are now (a|an|in) (ai|assistant|model|chatbot|different|new|unrestricted|developer|jailbreak)\b/i,
+  /\bsystem prompt\b/i,
   // Spanish phrasing
   /ignor\p{L}* (todas |cualquier )?(las )?(instrucciones|indicaciones|reglas) (anteriores|previas)/iu,
   /(ia|asistente|modelo|verificador|revisor)\p{L}*[,:]?.{0,80}(rep[oó]rtel[oa]|m[aá]rquel[oa]|clasif[ií]quel[oa]|calif[ií]quel[oa]) como/iu,
@@ -129,10 +133,12 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
 
   const pay = x.signals.riskyPayment;
   if (pay.present) {
-    const ftc = pay.methods.some((m) => FTC_METHODS.has(m));
+    // The heavy FTC flag (weight 2) needs the method in the quote itself, not just in the model's "methods" list;
+    // otherwise it falls back to the lighter "can't get back" flag.
+    const ftc = pay.methods.some((m) => FTC_METHODS.has(m)) && FTC_METHOD_WORDS.test(foldAccents(pay.quote ?? ""));
     const app = pay.methods.some((m) => APP_METHODS.has(m));
     if (ftc) add("riskyPayment", "Wants payment by wire transfer, gift card or crypto", 2, quoted(pay.quote, corpus, "Payment request", FTC));
-    else if (app || pay.methods.length === 0)
+    else if (app || pay.methods.length === 0 || pay.methods.some((m) => FTC_METHODS.has(m)))
       add("riskyPayment", "Wants payment you can't get back (payment app, cashier's check or cash)", 1, quoted(pay.quote, corpus, "Payment request", DC_OAG));
   }
 

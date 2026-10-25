@@ -13,12 +13,14 @@ const W = {
     farBelow: "Below usual range: verify before paying", below: "Below usual range", unknown: "Not enough info",
     notRun: "Not run", likely: "Likely scam", some: "Some red flags", none: "No red flags found",
     fix: "Fix before signing", ask: (n: number) => `Ask about ${n} clause${n === 1 ? "" : "s"}`, standard: "Looks standard", noLease: "No lease yet",
+    noClauses: "No clauses found", checkWording: "Check the wording",
   },
   es: {
     typical: "Precio normal", above: "Por encima de lo usual", rough: "Comparación aproximada", suspicious: "Sospechosamente barato",
     farBelow: "Por debajo de lo usual: verifique antes de pagar", below: "Por debajo de lo usual", unknown: "Faltan datos",
     notRun: "No se revisó", likely: "Probable estafa", some: "Algunas señales de alerta", none: "Sin señales de alerta",
     fix: "Corregir antes de firmar", ask: (n: number) => `Pregunte sobre ${n} cláusula${n === 1 ? "" : "s"}`, standard: "Parece estándar", noLease: "Sin contrato todavía",
+    noClauses: "No se encontraron cláusulas", checkWording: "Revise el texto",
   },
 };
 
@@ -55,9 +57,10 @@ export function leaseVerdict(l: LeaseCheck, lang: Lang = "en"): Verdict {
     case "fix":
       return { word: w.fix, tone: "stop" };
     case "ask":
-      return { word: w.ask(asks), tone: "warn" };
+      return asks > 0 ? { word: w.ask(asks), tone: "warn" } : { word: w.checkWording, tone: "warn" };
     case "standard":
-      return { word: w.standard, tone: "ok" };
+      // Green only when we actually checked something; an empty lease read isn't approval.
+      return l.findings.some((f) => f.evidence[0]?.counted) ? { word: w.standard, tone: "ok" } : { word: w.noClauses, tone: "nil" };
     default:
       return { word: w.noLease, tone: "nil" };
   }

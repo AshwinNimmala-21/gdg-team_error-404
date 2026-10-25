@@ -87,6 +87,8 @@ const S: Record<string, string> = {
   "Add the ZIP code to compare these with your state's rules.": "Agregue el código postal para comparar estas cláusulas con las reglas de su estado.",
   "The clauses we check look standard": "Las cláusulas que revisamos parecen estándar",
   "We didn't find the clauses we check": "No encontramos las cláusulas que revisamos",
+  "We only count clauses we can find word for word. Read the original wording, or try a clearer photo.":
+    "Solo contamos las cláusulas que encontramos palabra por palabra. Lea el texto original o intente con una foto más clara.",
   "We check deposits, late fees, entry, renewal, waivers, legal fees, repairs and extra fees.":
     "Revisamos depósitos, cargos por pago tardío, entrada, renovación, renuncias, honorarios legales, reparaciones y cargos extra.",
   "Still read the whole lease.": "Aun así, lea todo el contrato.",
@@ -279,6 +281,7 @@ const PATTERNS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^(\d+) of (\d+) checks flagged$/, (m) => `${m[1]} de ${m[2]} revisiones con alerta`],
   [/^(\d+) clauses? may conflict with (.+) law$/, (m) => `${m[1]} cláusula${m[1] === "1" ? " puede" : "s pueden"} contradecir la ley de ${state(m[2])}`],
   [/^Ask about (\d+) clauses?$/, (m) => `Pregunte sobre ${m[1]} cláusula${m[1] === "1" ? "" : "s"}`],
+  [/^We couldn't match (\d+) clauses? to your text$/, (m) => `No pudimos encontrar ${m[1] === "1" ? "1 cláusula" : `${m[1]} cláusulas`} palabra por palabra en su texto`],
   // price detail sentences
   [/^Usual range: (\$[\d,]+) \((.+?)\) to (\$[\d,]+) \((.+?)\)\.$/, (m) => `Rango usual: ${m[1]} (${refName(m[2])}) a ${m[3]} (${refName(m[4])}).`],
   [/^Local benchmark: (\$[\d,]+) \((.+?)\)\.$/, (m) => `Referencia local: ${m[1]} (${refName(m[2])}).`],

@@ -100,12 +100,12 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] Research in `docs/research/`: HUD FMR, Census ACS, FTC red flags, VA/DC/MD tenant law, help links + Gemma facts
 - [x] Phase 2: MVP plan (this file)
 - [x] Phase 3 (local): the MVP works in **live mode**, using the Gemma 4, HUD, Census and Maps keys from `.env`, and in demo mode (`MOCK_AI=1`)
-  - 29 unit tests pass
-  - `scripts/e2e.mjs`: 4/4 PASS, live and mock
+  - 29 unit tests at the time (126 at Sun 5:25 AM)
+  - `scripts/e2e.mjs`: 4/4 PASS then (5/5 since the Blacksburg sample)
   - Screenshots at 375 and 1280 px: no horizontal overflow
   - Docker image built and run locally
-- [ ] Phase 3 (cloud): Cloud Run deploy. **The team runs** `docs/DEPLOY.md`; gcloud isn't installed on this laptop.
-- [ ] Phase 4: rubric revision rounds until feature freeze Sun 9:30 AM
+- [x] Phase 3 (cloud): deployed by Ashwin (catchup.md §1). **Redeploy `dev` before submitting**: the live URL may run older code.
+- [~] Phase 4: overnight queue (C, A, D4 done; B in progress) and council round 1 (`docs/council/rounds.md`) until feature freeze Sun 9:30 AM
 - [ ] Phase 5: ship by Sun 12:30 PM
 
 ## Next steps
@@ -152,14 +152,14 @@ Made by Claude under the "no STOPs until MVP" instruction. Each one is a recomme
   - rent ≤ 0.75 × low edge also raises the FTC "a lot cheaper than most rents" scam flag. The FTC gives no number, and the UI says so.
 
   The bands are constants in `lib/rules/price.ts`, with tests.
-- A3 **Scam scoring:** 9 checks, mapped to FTC red flags plus one for AI-targeted instructions.
+- A3 **Scam scoring:** 9 checks, mapped to FTC red flags plus one for AI-targeted instructions. *Superseded in detail by `lib/rules/scam.ts` (the source of truth): `landlordAway` and `sensitiveInfoEarly` weigh 2, there's no payment+viewing override, the FTC payment flag needs the method named in its quote (Sun 5:25 AM), and "Suspiciously cheap" only counts alongside another flag.*
   - Strong flags (weight 2): risky payment method, pay before viewing, can't see the unit in person, price far below the benchmark, hidden AI instructions. All others weigh 1.
   - Tiers:
     - total 0 → No red flags found
     - total 1–3 → Some red flags
     - total ≥ 4, or risky payment combined with (pay before viewing or no viewing) → Likely scam
 - A4 **Quote verification:** each model quote must appear in the user's text, or in Gemma's own transcript of the image, after normalization (lowercase, collapse whitespace, unify quote and dash characters). A flag whose quote fails the check is dropped and shown in the evidence as "not counted (quote not found)". Extracted numbers must appear inside their quote.
-- A5 **One Gemma call per check.** It extracts facts and writes a one-sentence plain-language explanation per clause. Legal rules and citations come only from our jurisdiction JSON. Questions come from TypeScript templates. One call keeps latency and cost low.
+- A5 **One Gemma call per check** (true again since Sun 5:15 AM: the hosted path starts at JSON mode because the strict schema mode got HTTP 400 on 46/46 calls). It extracts facts and writes a one-sentence plain-language explanation per clause. Legal rules and citations come only from our jurisdiction JSON. Questions come from TypeScript templates. One call keeps latency and cost low.
 - A6 **Rescore without the model:** the client resends `{text, extraction, overrides}`. The server validates the extraction with the same Zod schema and reruns only the rules.
 - A7 **Mock mode:** if `MOCK_AI=1` or there's no `GEMINI_API_KEY`, the 4 samples use recorded extractions. Any other text goes through a basic regex extractor. Images need the real model, and the UI says so. Every result shows a "Demo mode" badge.
 - A8 **Request body:** JSON with a base64 image.
@@ -259,7 +259,7 @@ interface Extraction {
     landlordAway:        Signal;       // out of town / overseas / deployed
     pressure:            Signal;       // urgency, "many applicants", deadlines
     offPlatformContact:  Signal;       // move to WhatsApp/text/personal email
-    noScreeningOrLease:  Signal;       // no application, no lease, no ID/credit check
+    sensitiveInfoEarly:  Signal;       // asks for SSN / credit report early (replaced noScreeningOrLease, A17)
   };
   clauses: {                           // ≤ 12, only from lease text/images
     type: "auto_renewal" | "landlord_entry" | "late_fee" | "security_deposit"
@@ -369,7 +369,7 @@ export interface PriceCheck {
 }
 
 export type ScamFlagId = "priceFarBelow" | "payBeforeViewing" | "riskyPayment" | "noInPersonViewing"
-  | "landlordAway" | "pressure" | "offPlatformContact" | "noScreeningOrLease" | "aiInstructions";
+  | "landlordAway" | "pressure" | "offPlatformContact" | "sensitiveInfoEarly" | "aiInstructions";
 
 export interface ScamCheck {
   status: "none_found" | "some" | "likely";

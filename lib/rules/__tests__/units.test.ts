@@ -110,7 +110,9 @@ describe("lease rules by jurisdiction", () => {
   it("clauses with unverifiable quotes are shown but not counted", () => {
     const r = computeLease(leaseWith([c("waiver_of_rights", "made up clause")]), corpus, "VA", 2000);
     expect(r.findings[0].evidence[0].counted).toBe(false);
-    expect(r.status).toBe("standard");
+    expect(r.status).toBe("ask"); // was "standard" (green) before council round 1: an unmatched lease is not approval
+    expect(r.headline).toBe("We couldn't match 1 clause to your text");
+    expect(r.findings[0].title).not.toMatch(/conflict|illegal/i);
   });
   it("no ZIP: everything becomes a question", () => {
     const r = computeLease(leaseWith([c("waiver_of_rights", "Landlord may enter after giving notice")]), corpus, null, null);

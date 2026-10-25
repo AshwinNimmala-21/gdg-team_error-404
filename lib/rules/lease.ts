@@ -145,10 +145,12 @@ export function computeLease(x: Extraction, corpus: Corpus, jurisdiction: Jurisd
     const { severity, why } = judge(c, sheet, rent);
     const law = sheet?.laws[c.type] ?? null;
     const t = TITLES[c.type];
+    // An unmatched quote is demoted to "ask", and its title follows the demoted severity, not the original one.
+    const sev = where ? severity : "ask";
     return {
       type: c.type,
-      severity: where ? severity : "ask",
-      title: t[severity] ?? t.default,
+      severity: sev,
+      title: t[sev] ?? t.default,
       plain: c.plain,
       why: where ? why : "We couldn't match this clause to the exact text, so we didn't count it. Read the original wording.",
       law,
@@ -177,6 +179,15 @@ export function computeLease(x: Extraction, corpus: Corpus, jurisdiction: Jurisd
       status: "ask",
       headline: `Ask about ${asks} clause${asks > 1 ? "s" : ""}`,
       detail: sheet ? "Nothing clearly conflicts with the rules we check, but these deserve a clear answer." : "Add the ZIP code to compare these with your state's rules.",
+      jurisdiction,
+      findings,
+    };
+  // Clauses were read, but none matched the text word for word: say so instead of reading as "standard".
+  if (findings.length > 0 && counted.length === 0)
+    return {
+      status: "ask",
+      headline: `We couldn't match ${findings.length} clause${findings.length > 1 ? "s" : ""} to your text`,
+      detail: "We only count clauses we can find word for word. Read the original wording, or try a clearer photo.",
       jurisdiction,
       findings,
     };
