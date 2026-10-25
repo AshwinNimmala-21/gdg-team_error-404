@@ -127,19 +127,47 @@ cp .env.example .env                  # optional: add keys; without them it runs
 npm run dev                           # http://localhost:3000
 ```
 
-- **No keys at all:** demo mode. The 5 samples use recorded extractions in Gemma's exact format, and the rules, data and UI run for real. You can force it with `MOCK_AI=1`.
-- **With `GEMINI_API_KEY`:** live Gemma.
-- **With `HUD_TOKEN` and `CENSUS_KEY`:** live ZIP-level rents. Otherwise it uses the saved FY2027 / ACS 2020–24 figures, with a visible "Saved figures" badge.
+### Minimum setup
+Only **one key is required**: `GEMINI_API_KEY` (free from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). Everything else is optional and degrades visibly:
+
+| Key | Required? | Without it |
+|---|---|---|
+| `GEMINI_API_KEY` | **Yes**, for live Gemma | Demo mode: the 5 samples use recorded extractions in Gemma's exact format; other text gets a basic keyword reader; photos can't be read. Force it with `MOCK_AI=1`. |
+| `HUD_TOKEN` | No | Saved HUD FY2027 Fair Market Rents, labelled "saved figure" in the evidence |
+| `CENSUS_KEY` | No | Saved Census ACS 2020–24 medians, labelled the same way |
+| `COMMUNITY_SALT` (+ Firestore) | No | The anonymous "flag this listing" counter is simply off |
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | No | No area map |
+
+Checked on Oct 25: a production build with only `GEMINI_API_KEY` set (the other four blanked) passed all 5 samples live (`node scripts/e2e.mjs`), showed saved figures, no counter and no map.
 
 ```bash
-npm test            # 29 unit tests (rules, grounding, redaction, injection, schema)
+npm test            # 75 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map)
 npm run lint
 npm run build && npm start              # production server (standalone, like Cloud Run)
 node scripts/e2e.mjs http://localhost:3000            # API check of the 5 samples
 node scripts/screenshots.mjs http://localhost:3000    # clicks every sample at 375 and 1280 px (uses your installed Chrome)
 ```
 
-**Deploy to Google Cloud Run:** our live instance is <https://clearlease-477820387862.us-east4.run.app>. To deploy your own, see [`docs/DEPLOY.md`](docs/DEPLOY.md). It's copy-paste PowerShell covering Cloud Run, Secret Manager, Firestore and Maps key restrictions.
+### Deploy your own (Google Cloud Run)
+Our live instance is <https://clearlease-477820387862.us-east4.run.app>. On macOS or Linux, one script does it:
+
+```bash
+gcloud auth login                                   # once
+PROJECT=your-project-id ./scripts/deploy.sh --dry-run   # see every command first; makes no gcloud calls
+PROJECT=your-project-id ./scripts/deploy.sh             # asks for GEMINI_API_KEY (hidden input); optional keys can be skipped
+```
+
+- **Secrets** are read from your environment or typed with hidden input, stored in Secret Manager, and passed to `gcloud` on stdin, never as command-line arguments. The script never reads `.env` files, and `.gcloudignore` keeps them out of the build.
+- **Safe to re-run:** APIs, IAM roles and Firestore are only created if missing. A secret gets a new version only if you type a different value. An existing community salt is kept.
+- **Optional pieces** (HUD, Census, Maps, the Firestore counter) are skipped when you don't provide them.
+- Settings: `us-east4`, 512 MiB, 1 CPU, `--timeout 120`, at most 3 instances (scales to zero), `RATE_LIMIT_PER_MIN=30`.
+- The script's dry run is tested. The real run follows the same commands as [`docs/DEPLOY.md`](docs/DEPLOY.md), the PowerShell runbook we used for the live deploy.
+
+### Self-host Gemma (Ollama): untested, not wired in
+**We have not built or tested this.** Clearlease calls Gemma 4 through the Gemini API only. It's here because the model's open weights are what make self-hosting possible for a nonprofit that can't send tenant documents to a cloud API:
+- Ollama publishes Gemma 4, including `gemma4:26b` (about 16–19 GB, text and image input), per [ollama.com/library/gemma4](https://ollama.com/library/gemma4). After `ollama pull gemma4:26b`, it runs on a machine with enough GPU or unified memory.
+- To use it, `lib/ai/gemma.ts` would need a small adapter that sends the same system prompt, the delimited user input, the image and the JSON schema to Ollama's local API instead of `@google/genai`, then parses the reply with the same Zod schema. Everything after extraction (quote verification, rules, data) would stay the same.
+- What we haven't checked: whether Ollama's JSON output matches our schema as reliably as the Gemini API, how fast photo reading is on typical hardware, and memory use.
 
 ## APIs and data
 

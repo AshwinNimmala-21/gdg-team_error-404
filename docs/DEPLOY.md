@@ -1,5 +1,7 @@
 # Deploy Clearlease to Google Cloud Run
 
+**On macOS or Linux, use `scripts/deploy.sh` instead** (`PROJECT=your-project-id ./scripts/deploy.sh --dry-run` first). It runs the same steps, asks for secrets with hidden input and is safe to re-run.
+
 These commands are for Windows PowerShell and assume you've never used gcloud. Run them from the repo root. Each step has a one-line "why". Expect about 15 minutes the first time. Hosting is Google Cloud only.
 
 **What gets deployed:**
