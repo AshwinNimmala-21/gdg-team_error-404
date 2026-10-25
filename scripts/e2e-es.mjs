@@ -78,7 +78,9 @@ for (const run of runs) {
   const text = await page.locator("article").first().evaluate((el) => {
     // Visible text, one line per text node, skipping quotes, the user's own text, code and screen-reader-only spans.
     // The map widget itself is Google's UI (labels, its own error text); our caption around it is still checked.
-    const skip = "blockquote, mark, [data-quote], code, .sr-only, svg, figure > [role=img]";
+    // [lang=en] marks English shown on purpose (the Census API notice must appear verbatim, with a translation beside it).
+    // The map box is inert + aria-hidden: Google's own control text inside it is never presented to anyone.
+    const skip = "blockquote, mark, [data-quote], code, .sr-only, svg, figure > [inert][aria-hidden=true], [lang=en]";
     const out = [];
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {

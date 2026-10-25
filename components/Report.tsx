@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, useState, type ReactNode } from "react";
 import { leaseVerdict, priceVerdict, scamVerdict, type Tone, type Verdict } from "@/lib/client/verdicts";
 import type { MapsConfig } from "@/lib/server/maps-config";
 import type { CheckResult, ClauseFinding, Overrides } from "@/lib/types";
@@ -202,6 +202,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
             </li>
           ))}
         </ol>
+        {r.questions.length > 0 && <CopyQuestions questions={r.questions.map((q) => q.text)} />}
       </section>
 
       <footer className="border-t border-rule bg-paper/50 px-4 py-5 text-[14px] sm:px-8">
@@ -219,6 +220,10 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
             </li>
           ))}
         </ul>
+        <p className="mt-3 text-[13px] text-ink-soft">
+          <span lang="en">{t.censusNotice}</span>
+          {t.censusNoticeEs && <span className="mt-0.5 block">{t.censusNoticeEs}</span>}
+        </p>
       </footer>
     </article>
   );
@@ -292,15 +297,62 @@ function ModeLine({ r }: { r: CheckResult }) {
   return (
     <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-ink-soft">
       {r.meta.mode === "live" && (
-        <span>
+        // Links to "What Gemma read" and moves focus there, so keyboard and screen-reader users land on it too.
+        <a
+          href="#gemma-read-h"
+          onClick={() => document.getElementById("gemma-read-h")?.focus({ preventScroll: true })}
+          className="text-ink-soft underline underline-offset-2 hover:text-pen-dark"
+        >
           {t.readBy} (<code className="font-mono text-ink">{r.meta.model}</code>) {t.in} {secs}&nbsp;s
-        </span>
+        </a>
       )}
       {r.meta.mode === "mock" && (
         <span className="rounded-xs bg-warn-tint px-2 py-0.5 text-warn">{t.demoMode}</span>
       )}
       {r.meta.mode === "rules-only" && <span>{t.rulesOnly}</span>}
       {!r.meta.dataLive && <span>{t.savedFigures}</span>}
+    </div>
+  );
+}
+
+/** "Copy these questions": a short, polite message to the landlord, in the current language. */
+function CopyQuestions({ questions }: { questions: string[] }) {
+  const { t } = useLang();
+  const [state, setState] = useState<"idle" | "copied" | "blocked">("idle");
+  const message = [t.copyHello, "", ...questions.map((q, i) => `${i + 1}. ${q}`), "", t.copyThanks].join("\n");
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(message);
+      setState("copied");
+    } catch {
+      setState("blocked"); // insecure context, permission denied or no clipboard API: show the text to copy by hand
+    }
+  }
+
+  return (
+    <div className="mt-5">
+      <button
+        type="button"
+        onClick={copy}
+        className="inline-flex min-h-11 items-center rounded-xs border-2 border-pen px-4 font-semibold text-pen hover:bg-pen hover:text-white"
+      >
+        {t.copyQs}
+      </button>
+      <p aria-live="polite" className="mt-2 text-[14px] text-ink-soft">
+        {state === "copied" ? t.copied : state === "blocked" ? t.copyBlocked : ""}
+      </p>
+      {state === "blocked" && (
+        <textarea
+          readOnly
+          aria-label={t.copyQs}
+          value={message}
+          rows={Math.min(12, questions.length + 4)}
+          onFocus={(e) => e.currentTarget.select()}
+          ref={(el) => el?.select()}
+          className="mt-2 block w-full rounded-xs border border-ink-soft bg-sheet p-3 font-mono text-[14px] leading-relaxed"
+        />
+      )}
     </div>
   );
 }

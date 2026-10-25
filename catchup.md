@@ -225,7 +225,7 @@ Written by three parallel subagents (docs only), reviewed and committed by Ashwi
 | D1 Gemma 4 license | **Done** | `9d22833` (Apache 2.0 verified; README download links) |
 | D2 CONTRIBUTING / CODE_OF_CONDUCT / THIRD_PARTY_NOTICES | **Done** | `9d22833` |
 | D3 code tour | **Done** | `9d22833` (refresh line numbers before the video) |
-| C small polish | Not started | Also add the Census API notice (section 13) |
+| C small polish | **Done** (Yoshwan, 4:21 AM) | "Read by Gemma 4" line links to and focuses "What Gemma read" (live mode only; verified in Task A's live gate). "Copy these questions" with a polite landlord message, aria-live, and a selectable fallback when the clipboard is blocked. Tagline "Virginia, DC and Maryland" (ES too). Census API notice verbatim (census.gov ToS, "Attribution"), with a Spanish translation beside it in ES. Also fixed the baseline axe failure (toggle label-in-name; 8+8 → 0+0) and English clause explanations in the Spanish saved/demo lease answer. e2e-es skip list updated for the inert map. Gate (demo mode): 93 tests, lint, build, e2e EN 5/5, ES 6/6, axe 0 EN+ES. |
 | A real-world inputs | Not started | |
 | B dark theme | Not started | |
 | D4 self-hosted model (Ollama) | Not started | Ollama is not installed on Ashwin's Mac; `ollama.com/library/gemma4` lists `gemma4:26b` (16–19 GB) and smaller e2b/e4b/12b tags |

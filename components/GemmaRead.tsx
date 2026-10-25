@@ -144,7 +144,7 @@ export function GemmaRead({ result: r, sourceText, imageUrl }: { result: CheckRe
 
   return (
     <section aria-labelledby="gemma-read-h" className="border-t border-rule px-4 pt-6 pb-7 sm:px-8">
-      <h3 id="gemma-read-h" className="text-[20px] leading-tight font-bold tracking-[-0.01em]">
+      <h3 id="gemma-read-h" tabIndex={-1} className="scroll-mt-4 text-[20px] leading-tight font-bold tracking-[-0.01em]">
         {lang === "es" ? "Lo que leyó Gemma" : "What Gemma read"}
       </h3>
       <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-ink-soft">

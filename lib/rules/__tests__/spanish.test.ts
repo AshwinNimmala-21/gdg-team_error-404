@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { SAMPLE_EXTRACTIONS } from "@/lib/ai/mock";
-import { SAMPLE_EXTRACTIONS_ES } from "@/lib/ai/mock-es";
+import { LEASE_PLAIN_ES, SAMPLE_EXTRACTIONS_ES, sampleExtraction } from "@/lib/ai/mock-es";
 import { ExtractionSchema } from "@/lib/ai/schema";
 import { ruleToSpanish } from "@/lib/client/rules-es";
 import { redact } from "@/lib/client/redact";
@@ -35,6 +35,17 @@ describe("Spanish samples give the same verdicts as the English ones", () => {
       expect(es.aiInstructions.detected).toBe(en.aiInstructions.detected);
     });
   }
+});
+
+describe("recorded lease answer in Spanish (demo mode and saved-result fallback)", () => {
+  it("explains every clause in Spanish and keeps the English quotes", () => {
+    const en = SAMPLE_EXTRACTIONS["lease-photo"];
+    const es = sampleExtraction("lease-photo", "es");
+    expect(en.clauses.every((c) => LEASE_PLAIN_ES[c.plain])).toBe(true);
+    expect(es.clauses.map((c) => c.plain)).toEqual(en.clauses.map((c) => LEASE_PLAIN_ES[c.plain]));
+    expect(es.clauses.map((c) => c.quote)).toEqual(en.clauses.map((c) => c.quote));
+    expect(sampleExtraction("lease-photo", "en")).toBe(en);
+  });
 });
 
 describe("Spanish-aware checks (English behaviour unchanged)", () => {
