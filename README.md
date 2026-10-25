@@ -2,6 +2,8 @@
 
 **A pre-sign check for renters in DC, Maryland and Virginia.** Paste a rental listing or snap a photo of a lease. In about 10 seconds you get three verdicts you can act on: is the **price** normal, are there **scam** warning signs, and which **lease clauses** to push back on. Each verdict quotes the exact words that triggered it.
 
+**Try it live: <https://clearlease-477820387862.us-east4.run.app>.** Click any of the four fictional samples; no sign-up. It runs on Google Cloud Run in us-east4.
+
 **AI model: Gemma 4, `gemma-4-26b-a4b-it`** (open weights, [Apache 2.0](https://ai.google.dev/gemma/apache_2)), called through the Gemini API. It reads messy listings, landlord messages and lease *photos* into structured, quoted facts. Every number, threshold and verdict is computed in TypeScript.
 
 ![Clearlease report for a Facebook-style scam listing: suspiciously cheap, likely scam](docs/screenshots/desktop-scam.png)
@@ -129,7 +131,7 @@ node scripts/e2e.mjs http://localhost:3000            # API check of the 4 sampl
 node scripts/screenshots.mjs http://localhost:3000    # clicks every sample at 375 and 1280 px (uses your installed Chrome)
 ```
 
-**Deploy to Google Cloud Run:** see [`docs/DEPLOY.md`](docs/DEPLOY.md). It's copy-paste PowerShell covering Cloud Run, Secret Manager, Firestore and Maps key restrictions.
+**Deploy to Google Cloud Run:** our live instance is <https://clearlease-477820387862.us-east4.run.app>. To deploy your own, see [`docs/DEPLOY.md`](docs/DEPLOY.md). It's copy-paste PowerShell covering Cloud Run, Secret Manager, Firestore and Maps key restrictions.
 
 ## APIs and data
 
