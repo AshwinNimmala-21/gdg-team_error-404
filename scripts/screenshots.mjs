@@ -9,7 +9,7 @@ const base = process.argv[2] ?? "http://localhost:3000";
 const out = path.resolve(process.argv[3] ?? "docs/screenshots");
 mkdirSync(out, { recursive: true });
 
-const samples = ["Arlington 1-bedroom", "Facebook deal", "Photo of a lease page", "Hidden AI instructions"];
+const samples = ["Blacksburg summer sublet", "Photo of a lease page", "Arlington 1-bedroom", "Facebook deal", "Hidden AI instructions"];
 const viewports = [
   { name: "375", width: 375, height: 812 },
   { name: "1280", width: 1280, height: 900 },

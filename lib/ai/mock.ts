@@ -1,7 +1,7 @@
 import type { SampleId } from "@/lib/types";
 import type { Extraction } from "./schema";
 
-// Demo mode (MOCK_AI=1 or no GEMINI_API_KEY). The four samples get extractions written in the
+// Demo mode (MOCK_AI=1 or no GEMINI_API_KEY). The five samples get extractions written in the
 // exact shape Gemma returns; quotes are copied from public/samples/*. Other text gets a basic
 // keyword extractor so the page still works without a key. Every quote still goes through the
 // same verification and rules as live mode.
@@ -159,6 +159,25 @@ export const SAMPLE_EXTRACTIONS: Record<SampleId, Extraction> = {
         plain: "If there's any disagreement, you pay the landlord's lawyer and court costs, even if you're right.",
       }),
     ],
+  }),
+  "blacksburg-sublet": base({
+    listing: {
+      rent: { amount: 575, quote: "$575/month" },
+      bedrooms: { count: 1, quote: "1BR apartment off Prices Fork Rd" },
+      zip: { value: "24060", quote: "Blacksburg VA 24060" },
+      address: { value: null, quote: null },
+      deposit: { amount: null, quote: null },
+      applicationFee: { amount: null, quote: null },
+    },
+    signals: {
+      payBeforeViewing: { present: true, quote: "send the first month ($575) on Zelle before the viewing" },
+      riskyPayment: { present: true, quote: "send the first month ($575) on Zelle", methods: ["payment_app"] },
+      noInPersonViewing: { present: true, quote: "nobody can show it right now" },
+      landlordAway: { present: true, quote: "Posting for a friend who already left for her internship" },
+      pressure: { present: true, quote: "It's going fast, three people messaged this morning." },
+      offPlatformContact: { present: true, quote: "Message me on GroupMe, not here." },
+      sensitiveInfoEarly: no,
+    },
   }),
 };
 

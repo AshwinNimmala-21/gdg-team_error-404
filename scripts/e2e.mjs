@@ -1,4 +1,4 @@
-// API end-to-end check of the 4 demo samples against a running server.
+// API end-to-end check of the 5 demo samples against a running server.
 // Usage: node scripts/e2e.mjs [baseUrl]   (exit code 1 on any mismatch)
 import { readFileSync } from "node:fs";
 
@@ -10,6 +10,7 @@ const redact = (t) =>
     .replace(/(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\b\d{3})[\s.-]?\d{3}[\s.-]\d{4}\b/g, "[phone removed]");
 
 const cases = [
+  { id: "blacksburg-sublet", file: "blacksburg-sublet.txt", price: ["below", "typical"], scam: "likely", lease: "not_provided" },
   { id: "fine-arlington", file: "fine-arlington.txt", price: ["typical"], scam: "none_found", lease: "not_provided" },
   { id: "scam-facebook", file: "scam-facebook.txt", price: ["below"], scam: "likely", lease: "not_provided", flags: 7 },
   { id: "lease-photo", image: "lease-page.jpg", price: ["typical"], scam: "not_run", lease: "fix" },

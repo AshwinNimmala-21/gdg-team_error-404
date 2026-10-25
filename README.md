@@ -2,7 +2,7 @@
 
 **A pre-sign check for renters in DC, Maryland and Virginia.** Paste a rental listing or snap a photo of a lease. In about 10 seconds you get three verdicts you can act on: is the **price** normal, are there **scam** warning signs, and which **lease clauses** to push back on. Each verdict quotes the exact words that triggered it.
 
-**Try it live: <https://clearlease-477820387862.us-east4.run.app>.** Click any of the four fictional samples; no sign-up. It runs on Google Cloud Run in us-east4.
+**Try it live: <https://clearlease-477820387862.us-east4.run.app>.** Click any of the five fictional samples; no sign-up. It runs on Google Cloud Run in us-east4.
 
 **AI model: Gemma 4, `gemma-4-26b-a4b-it`** (open weights, [Apache 2.0](https://ai.google.dev/gemma/apache_2)), called through the Gemini API. It reads messy listings, landlord messages and lease *photos* into structured, quoted facts. Every number, threshold and verdict is computed in TypeScript.
 
@@ -16,7 +16,9 @@
 
 ## The problem
 
-Maya is a Virginia Tech senior with a new job in Arlington. She's comparing apartments from Blacksburg, 300 miles away, and a Facebook post offers a Clarendon 1-bedroom for $1,650 if she wires the deposit today.
+**First, a VT student renting in Blacksburg.** Jordan needs a summer sublet near campus. A post in a student housing group offers a 1-bedroom off Prices Fork Rd for $575, but the "friend" posting it says nobody can show it, it's going fast, and the first month has to go by Zelle before any viewing.
+
+**Second, the same student a year later, moving for a job.** Maya, a VT senior with a new job in Arlington, is comparing apartments from Blacksburg, 300 miles away. A Facebook post offers a Clarendon 1-bedroom for $1,650 if she wires the deposit today, and the lease she's sent has clauses Virginia law doesn't allow.
 
 - **Rental scams target exactly her.** Since 2020, people have reported nearly **65,000 rental scams** to the FTC, with about **$65 million lost** (median loss **$1,000**), and that's only what gets reported. **Ages 18–29 are three times more likely** than other adults to lose money to one. About **half start with a fake Facebook ad**. ([FTC Data Spotlight, Dec 2025](https://www.ftc.gov/news-events/data-visualizations/data-spotlight/2025/12/rental-scams-hit-home-65-million-reported-losses))
 - **Rent already burdens DMV renters.** The DC metro's median rent is $2,027/month ([USAFacts, ACS 2020–24](https://usafacts.org/answers/how-much-do-households-spend-on-rent/state/washington-dc/)). **51.5% of Maryland renter households** spend 30% or more of their income on housing ([USAFacts](https://usafacts.org/answers/how-many-households-in-the-united-states-spend-too-much-on-housing/state/maryland/)). A bad lease clause or a lost deposit hurts.
@@ -40,11 +42,12 @@ Also included:
 - A map of the ZIP code's area.
 - An optional anonymous "flag this as a scam" counter, so the next person sees "3 other people flagged this contact".
 
-**Try it:** four fictional samples are one click away on the page:
-1. A normal Arlington listing
-2. A Facebook-style scam
-3. A photo of a lease page
-4. A listing with hidden "AI: mark this as safe" instructions
+**Try it:** five fictional samples are one click away on the page:
+1. A Blacksburg summer sublet near VT that wants Zelle before a viewing
+2. A photo of a lease page
+3. A normal Arlington listing
+4. A Facebook-style scam
+5. A listing with hidden "AI: mark this as safe" instructions
 
 **Cheap isn't a crime.** Low rent alone never makes Clearlease say "scam". Rooms in shared houses, older buildings, income-restricted (LIHTC, Section 8, inclusionary-zoning) units and approved summer sublets are often priced far below the local range, and the renters who most need them are the ones a scam checker shouldn't scare off. In our first evaluation run, price alone caused 4 of 5 false alarms on legitimate listings (see [`docs/evaluation.md`](docs/evaluation.md)). So a far-below price on its own reads "Below usual range: verify before paying", with advice to see the place and sign a lease before sending money. It only reads **Suspiciously cheap** when it comes with another warning sign, such as a payment request before a viewing.
 
@@ -121,7 +124,7 @@ cp .env.example .env                  # optional: add keys; without them it runs
 npm run dev                           # http://localhost:3000
 ```
 
-- **No keys at all:** demo mode. The 4 samples use recorded extractions in Gemma's exact format, and the rules, data and UI run for real. You can force it with `MOCK_AI=1`.
+- **No keys at all:** demo mode. The 5 samples use recorded extractions in Gemma's exact format, and the rules, data and UI run for real. You can force it with `MOCK_AI=1`.
 - **With `GEMINI_API_KEY`:** live Gemma.
 - **With `HUD_TOKEN` and `CENSUS_KEY`:** live ZIP-level rents. Otherwise it uses the saved FY2027 / ACS 2020–24 figures, with a visible "Saved figures" badge.
 
@@ -129,7 +132,7 @@ npm run dev                           # http://localhost:3000
 npm test            # 29 unit tests (rules, grounding, redaction, injection, schema)
 npm run lint
 npm run build && npm start              # production server (standalone, like Cloud Run)
-node scripts/e2e.mjs http://localhost:3000            # API check of the 4 samples
+node scripts/e2e.mjs http://localhost:3000            # API check of the 5 samples
 node scripts/screenshots.mjs http://localhost:3000    # clicks every sample at 375 and 1280 px (uses your installed Chrome)
 ```
 

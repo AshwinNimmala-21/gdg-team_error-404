@@ -21,6 +21,15 @@ function run(id: SampleId, text: string) {
 }
 
 describe("demo samples (saved data, recorded extractions)", () => {
+  it("(0) Blacksburg sublet: Zelle before a viewing is a likely scam, every flag quoted", () => {
+    const r = run("blacksburg-sublet", sampleText("blacksburg-sublet.txt"));
+    expect(r.read).toMatchObject({ rent: 575, bedrooms: 1, zip: "24060", jurisdiction: "VA" });
+    expect(r.scam.status).toBe("likely");
+    expect(r.scam.dropped).toHaveLength(0);
+    expect(r.scam.flags.map((f) => f.id)).toEqual(expect.arrayContaining(["payBeforeViewing", "riskyPayment", "noInPersonViewing", "offPlatformContact"]));
+    expect(r.lease.status).toBe("not_provided");
+  });
+
   it("(a) fine Arlington 1BR: typical price, no red flags, no lease", () => {
     const r = run("fine-arlington", sampleText("fine-arlington.txt"));
     expect(r.read).toMatchObject({ rent: 2350, bedrooms: 1, zip: "22203", jurisdiction: "VA" });

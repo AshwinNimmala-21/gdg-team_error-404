@@ -2,7 +2,7 @@ import type { ClauseType, Extraction, InputKind } from "@/lib/ai/schema";
 
 export type { ClauseType, Extraction, InputKind };
 
-export const SAMPLE_IDS = ["fine-arlington", "scam-facebook", "lease-photo", "injection"] as const;
+export const SAMPLE_IDS = ["blacksburg-sublet", "fine-arlington", "scam-facebook", "lease-photo", "injection"] as const;
 export type SampleId = (typeof SAMPLE_IDS)[number];
 
 export type ImageMime = "image/jpeg" | "image/png" | "image/webp";

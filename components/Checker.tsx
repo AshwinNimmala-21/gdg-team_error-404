@@ -11,9 +11,10 @@ import { CameraIcon } from "./Icons";
 import { Report } from "./Report";
 
 const SAMPLES: { id: SampleId; title: string; note: string; file: string }[] = [
+  { id: "blacksburg-sublet", title: "Blacksburg summer sublet", note: "Near VT, Zelle before you see it", file: "/samples/blacksburg-sublet.txt" },
+  { id: "lease-photo", title: "Photo of a lease page", note: "Auto-renewal and entry without notice", file: "/samples/lease-page.jpg" },
   { id: "fine-arlington", title: "Arlington 1-bedroom", note: "A normal listing from a managed building", file: "/samples/fine-arlington.txt" },
   { id: "scam-facebook", title: "Facebook deal", note: "Cheap, owner overseas, wire the deposit", file: "/samples/scam-facebook.txt" },
-  { id: "lease-photo", title: "Photo of a lease page", note: "Auto-renewal and entry without notice", file: "/samples/lease-page.jpg" },
   { id: "injection", title: "Hidden AI instructions", note: "A listing that tries to trick checkers", file: "/samples/injection.txt" },
 ];
 
