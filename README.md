@@ -30,7 +30,7 @@ Maya is a Virginia Tech senior with a new job in Arlington. She's comparing apar
 
 | | Verdict | How it's decided |
 |---|---|---|
-| **1. Price check** | Typical / Below usual range / **Suspiciously cheap** / Above usual range | Rent vs. a local range for the same bedroom count. The low end is the Census ACS median gross rent for that ZIP (B25031); the high end is HUD's FY2027 Fair Market Rent (ZIP-level Small Area FMR where HUD publishes one). Rent 25%+ below the low end triggers the FTC's "a lot cheaper than most rents in the area" warning. |
+| **1. Price check** | Typical / Below usual range / Below usual range: verify before paying / **Suspiciously cheap** / Above usual range | Rent vs. a local range for the same bedroom count. The low end is the Census ACS median gross rent for that ZIP (B25031); the high end is HUD's FY2027 Fair Market Rent (ZIP-level Small Area FMR where HUD publishes one). Rent 25%+ below the low end says "verify before paying". It becomes **Suspiciously cheap**, and counts as the FTC's "a lot cheaper than most rents in the area" scam sign, only when at least one other red flag also fired. |
 | **2. Scam risk** | No red flags found / Some red flags / **Likely scam** | 9 checks mapped to the FTC's published rental-scam red flags: wire/gift-card/crypto payment, money before viewing, no in-person showing, owner overseas, pressure, SSN/credit report up front, off-platform contact, a far-below-market price, and hidden instructions aimed at AI tools. A flag counts only if its quote is found in your input. |
 | **3. Lease clauses** | Looks standard / Ask about N clauses / **Fix before signing** | Gemma reads the lease (text or photo) and explains each clause in plain English. TypeScript compares it with our VA/DC/MD rule sheet: entry notice, deposit caps, late-fee caps, liability waivers, attorney fees, auto-renewal and repairs. Every rule cites the statute. |
 
@@ -45,6 +45,8 @@ Also included:
 2. A Facebook-style scam
 3. A photo of a lease page
 4. A listing with hidden "AI: mark this as safe" instructions
+
+**Cheap isn't a crime.** Low rent alone never makes Clearlease say "scam". Rooms in shared houses, older buildings, income-restricted (LIHTC, Section 8, inclusionary-zoning) units and approved summer sublets are often priced far below the local range, and the renters who most need them are the ones a scam checker shouldn't scare off. In our first evaluation run, price alone caused 4 of 5 false alarms on legitimate listings (see [`docs/evaluation.md`](docs/evaluation.md)). So a far-below price on its own reads "Below usual range: verify before paying", with advice to see the place and sign a lease before sending money. It only reads **Suspiciously cheap** when it comes with another warning sign, such as a payment request before a viewing.
 
 ## How the AI is used (and bounded)
 

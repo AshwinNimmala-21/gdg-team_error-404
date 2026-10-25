@@ -10,7 +10,14 @@ import type { Evidence, PriceCheck } from "@/lib/types";
 // Cut-offs are Clearlease rules of thumb, not HUD or FTC numbers.
 export const BELOW_RATIO = 0.85; // under 85% of the low edge → below market
 export const ABOVE_RATIO = 1.25; // over 125% of the high edge → above market
-export const FAR_BELOW_RATIO = 0.75; // 25%+ under the low edge → FTC "a lot cheaper" scam sign
+export const FAR_BELOW_RATIO = 0.75; // 25%+ under the low edge → FTC "a lot cheaper" sign, counted only with another scam sign
+
+// Cheap rent on its own is not a scam sign: rooms in shared houses, older buildings and income-restricted
+// units are often priced this far under the local range. It only counts alongside another red flag.
+export const FAR_BELOW_ALONE =
+  "Well under most places like it. Rooms in shared houses, older buildings and income-restricted units are often priced like this, so that alone isn't a red flag. Verify before paying: see it in person and sign a lease before you send money.";
+export const FAR_BELOW_WITH_FLAGS =
+  "Rent this far under local rents, together with the other warning signs below, matches the FTC's description of rental scams. Our cut-off (25% under) is a Clearlease rule of thumb, not an FTC number.";
 
 export interface PriceInput {
   rent: number | null;
@@ -68,7 +75,7 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
   const base = { rent, bedrooms, zip, areaName: b.area?.place ?? null, benchmark: b.fmr, census: b.census, evidence, missing };
 
   if (rent === null || bedrooms === null || refs.length === 0 || rent <= 0) {
-    return { ...base, status: "unknown", ratio: null, range: null, farBelow: false, ...unknownCopy(missing) };
+    return { ...base, status: "unknown", ratio: null, range: null, farBelow: false, suspicious: false, ...unknownCopy(missing) };
   }
 
   const lowRef = refs.reduce((a, r) => (r.amount < a.amount ? r : a));
@@ -92,14 +99,14 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
   const detail = `${rangeLine} ${
     status === "below"
       ? farBelow
-        ? "Rent this far under local rents is a common scam sign, according to the FTC. Our cut-off (25% under) is a Clearlease rule of thumb, not an FTC number."
+        ? FAR_BELOW_ALONE
         : "Cheaper than most places like it. That can be a real deal, but see the unit before you pay anything."
       : status === "above"
         ? "Ask what's included (utilities, parking, amenities) and compare a few similar listings nearby."
         : "Both figures include utilities, so a listing without utilities can sit a bit lower and still be normal."
   }`;
 
-  return { ...base, status, ratio, range: { low: lowRef.amount, high: highRef.amount }, farBelow, headline, detail };
+  return { ...base, status, ratio, range: { low: lowRef.amount, high: highRef.amount }, farBelow, suspicious: false, headline, detail };
 }
 
 function unknownCopy(missing: PriceCheck["missing"]): { headline: string; detail: string } {

@@ -43,6 +43,7 @@ for (const it of items) {
     row.ms = r.ms;
     row.price = j.price.status;
     row.priceWord = j.price.status === "below" ? (j.price.farBelow ? "far-below" : "below") : j.price.status;
+    row.suspicious = j.price.suspicious;
     row.scam = j.scam.status;
     row.flags = j.scam.flags.map((f) => f.id);
     row.conflicts = j.lease.findings.filter((f) => f.severity === "conflict" && f.evidence[0]?.counted).map((f) => f.type);
@@ -86,8 +87,9 @@ function table(label, set) {
     const s = scores(ok, f);
     lines.push(`| ${name} | ${pct(s.precision)} | ${pct(s.recall)} | ${s.falseAlarms} |`);
   }
-  const legitFarBelow = ok.filter((r) => r.label === "legit" && r.priceWord === "far-below").map((r) => r.id);
-  lines.push("", `Legit listings priced "far below" (would read "Suspiciously cheap"): ${legitFarBelow.length ? legitFarBelow.join(", ") : "none"}.`);
+  // Before step 2, every "far below" price read "Suspiciously cheap"; after it, only price.suspicious does.
+  const legitFarBelow = ok.filter((r) => r.label === "legit" && (r.suspicious ?? r.priceWord === "far-below")).map((r) => r.id);
+  lines.push("", `Legit listings labelled "Suspiciously cheap": ${legitFarBelow.length ? legitFarBelow.join(", ") : "none"}.`);
   const missed = ok.filter((r) => r.label === "scam" && r.scam !== "likely" && r.scam !== "some").map((r) => r.id);
   const alarms = ok.filter((r) => r.label === "legit" && (r.scam === "likely" || r.scam === "some")).map((r) => `${r.id} (${r.flags.join(", ")})`);
   lines.push(`Missed scams (no red flag): ${missed.join(", ") || "none"}. False alarms: ${alarms.join("; ") || "none"}.`);

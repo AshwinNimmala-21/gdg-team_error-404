@@ -13,7 +13,9 @@ export function priceVerdict(p: PriceCheck): Verdict {
     case "above":
       return { word: "Above usual range", tone: "warn" };
     case "below":
-      return p.farBelow ? { word: "Suspiciously cheap", tone: "stop" } : { word: "Below usual range", tone: "warn" };
+      // "Suspiciously cheap" needs cheap rent plus another scam sign; cheap alone just says to verify.
+      if (p.suspicious) return { word: "Suspiciously cheap", tone: "stop" };
+      return p.farBelow ? { word: "Below usual range: verify before paying", tone: "warn" } : { word: "Below usual range", tone: "warn" };
     default:
       return { word: "Not enough info", tone: "nil" };
   }

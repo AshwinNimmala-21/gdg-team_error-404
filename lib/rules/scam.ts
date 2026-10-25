@@ -93,22 +93,24 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
     else dropped.push({ ...ev, label: `${label} (not counted: we couldn't find this quote in what you shared)` });
   };
 
-  if (price.farBelow && price.rent !== null && price.range) {
-    flags.push({
-      id: "priceFarBelow",
-      label: "Rent is far below similar rentals",
-      weight: 2,
-      heuristic: true,
-      evidence: [
-        {
-          label: "FTC: “If the rent is a lot cheaper than most rents in the area, it could be a sign of a scam.”",
-          value: `${money(price.rent)} is ${Math.round((1 - (price.ratio ?? 1)) * 100)}% under the low end of the usual local range (${money(price.range.low)}). Clearlease flags 25% or more.`,
-          counted: true,
-          source: FTC,
-        },
-      ],
-    });
-  }
+  // Cheap rent counts only alongside another red flag (see FAR_BELOW_ALONE in price.ts). Added after the others.
+  const priceFlag = (): ScamFlag | null =>
+    price.farBelow && price.rent !== null && price.range
+      ? {
+          id: "priceFarBelow",
+          label: "Rent is far below similar rentals",
+          weight: 2,
+          heuristic: true,
+          evidence: [
+            {
+              label: "FTC: “If the rent is a lot cheaper than most rents in the area, it could be a sign of a scam.”",
+              value: `${money(price.rent)} is ${Math.round((1 - (price.ratio ?? 1)) * 100)}% under the low end of the usual local range (${money(price.range.low)}). Clearlease counts 25% or more, and only alongside another warning sign.`,
+              counted: true,
+              source: FTC,
+            },
+          ],
+        }
+      : null;
 
   const pay = x.signals.riskyPayment;
   if (pay.present) {
@@ -141,6 +143,9 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   } else if (modelSaw) {
     dropped.push({ ...modelSaw, label: "Instructions aimed at AI tools (not counted: quote not found)" });
   }
+
+  const cheap = flags.length > 0 ? priceFlag() : null;
+  if (cheap) flags.unshift(cheap);
 
   const score = flags.reduce((s, f) => s + f.weight, 0);
   // Scam signs live in listings and landlord messages. With neither (e.g. a lease alone), a clean result

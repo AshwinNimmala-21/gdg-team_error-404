@@ -4,7 +4,7 @@ import { helpLinksFor } from "@/lib/data/help";
 import { lookupZip, stateForZip } from "@/lib/data/zip-areas";
 import type { CheckResult, Evidence, Overrides } from "@/lib/types";
 import { computeLease } from "./lease";
-import { bedLabel, computePrice, money } from "./price";
+import { bedLabel, computePrice, FAR_BELOW_ALONE, FAR_BELOW_WITH_FLAGS, money } from "./price";
 import { bedroomsInQuote, findQuote, makeCorpus, numberInQuote, type Corpus } from "./quotes";
 import { buildQuestions } from "./questions";
 import { computeScam } from "./scam";
@@ -68,8 +68,10 @@ export function runRules(args: {
   const corpus = makeCorpus(text, x.imageTranscript);
   const jurisdiction = facts.zip ? (lookupZip(facts.zip)?.state ?? stateForZip(facts.zip)) : null;
 
-  const price = computePrice(facts, benchmarks);
-  const scam = computeScam(x, corpus, price, `${text}\n${x.imageTranscript ?? ""}`);
+  const basePrice = computePrice(facts, benchmarks);
+  const scam = computeScam(x, corpus, basePrice, `${text}\n${x.imageTranscript ?? ""}`);
+  const suspicious = scam.flags.some((f) => f.id === "priceFarBelow");
+  const price = suspicious ? { ...basePrice, suspicious, detail: basePrice.detail.replace(FAR_BELOW_ALONE, FAR_BELOW_WITH_FLAGS) } : basePrice;
   const lease = computeLease(x, corpus, jurisdiction, facts.rent);
   const questions = buildQuestions(price, scam, lease);
   const ai = scam.flags.find((f) => f.id === "aiInstructions");

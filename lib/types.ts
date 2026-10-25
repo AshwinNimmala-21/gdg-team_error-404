@@ -53,6 +53,8 @@ export interface PriceCheck {
   ratio: number | null;
   range: { low: number; high: number } | null;
   farBelow: boolean;
+  /** Far below the usual range AND at least one other scam sign fired. Cheap rent alone never sets this. */
+  suspicious: boolean;
   missing: ("rent" | "bedrooms" | "zip" | "area")[];
   evidence: Evidence[];
 }
