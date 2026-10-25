@@ -66,4 +66,17 @@ describe("generateWithRetries", () => {
     await expect(run(denied.generate)).rejects.toMatchObject({ code: "model_failed" });
     expect(denied.levels).toHaveLength(1);
   });
+
+  it("logs every failed attempt by kind only, never the model's text", async () => {
+    const lines: string[] = [];
+    const s = scripted([400, "bad-json", 503, "network", "ok"]);
+    await generateWithRetries(s.generate, { attemptMs: 1_000, sleep: noSleep, log: (m) => lines.push(m) });
+    expect(lines).toEqual([
+      "level=0 status=400 retry=0",
+      "level=1 invalid_output retry=0",
+      "level=2 status=503 retry=0",
+      "level=2 network retry=1",
+    ]);
+    expect(lines.join(" ")).not.toContain("The user wants");
+  });
 });

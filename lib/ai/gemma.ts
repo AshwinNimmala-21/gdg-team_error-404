@@ -123,6 +123,7 @@ export async function generateWithRetries(generate: Generate, opts: RetryOptions
         if (err.status < 500) throw new ExtractionError("model_failed", `Gemma request failed (${err.status}).`);
         transient = `Gemma request failed (${err.status}).`;
       } else if (err instanceof ExtractionError) {
+        if (err.code === "invalid_output") log(`level=${level} invalid_output retry=${retries}`);
         if (err.code === "invalid_output" && level < 2) {
           level = (level + 1) as Level;
           continue;
