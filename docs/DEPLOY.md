@@ -92,7 +92,7 @@ gcloud run deploy clearlease `
   --region us-east4 `
   --allow-unauthenticated `
   --set-secrets "GEMINI_API_KEY=GEMINI_API_KEY:latest,HUD_TOKEN=HUD_TOKEN:latest,CENSUS_KEY=CENSUS_KEY:latest,COMMUNITY_SALT=COMMUNITY_SALT:latest" `
-  --set-env-vars "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$MAPS_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=DEMO_MAP_ID" `
+  --set-env-vars "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$MAPS_KEY,NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=DEMO_MAP_ID,RATE_LIMIT_PER_MIN=30" `
   --memory 512Mi --cpu 1 --concurrency 40 --timeout 120 --max-instances 3
 ```
 
@@ -101,6 +101,7 @@ What the flags do:
 - `--allow-unauthenticated` makes it a public website.
 - `--set-secrets` mounts the Secret Manager values as env vars at runtime.
 - `--timeout 120` covers a lease photo (about 34 s) plus up to two retries; `lib/ai/gemma.ts` stops at 110 s.
+- `RATE_LIMIT_PER_MIN=30` raises the per-IP limit from the default 10. Judges and the demo often share one venue Wi-Fi IP.
 - `--max-instances 3` caps cost and keeps the in-memory rate limit meaningful.
 
 The first deploy asks to create an Artifact Registry repository. Answer **Y**. Building takes about 3–5 minutes.
