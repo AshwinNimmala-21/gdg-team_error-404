@@ -1,9 +1,11 @@
+> Working log from the hackathon. Some early decisions were later superseded; the README and the code are the source of truth.
+
 # Clearlease — agent facts (condensed from docs/process/KICKOFF_PROMPT.md §0–4)
 
 Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for Housing" hackathon, Oct 24–25 2026. Goal: 1st GDG Best Overall + one MLH track. Full brief: `docs/process/KICKOFF_PROMPT.md`; event facts: `docs/process/brief/`. Status and next steps: `PLAN.md`. Conflict priority: slides > `docs/process/brief/event-notes.md` > raw transcripts.
 
 ## Facts
-- Theme: AI for Housing, DMV (DC/MD/VA). Validate a real problem; small-and-working beats big-and-broken.
+- Theme: AI for Housing, DMV (Virginia, DC and Maryland). Validate a real problem; small-and-working beats big-and-broken.
 - Submission window **Sun Oct 25 11:00–12:30 PM, hard**. Closing 2:00 PM. Demo video **2 min**. README is scored heavily.
 - Tracks: all teams are in GDG Best Overall. Exactly ONE MLH track. We build to qualify for **all four** (Gemma 4, Open-Source AI, UI/UX, Google Cloud) and pick one Sun 9:30 AM. Readiness table: PLAN.md §4b.
 - **Hosting: Google Cloud only** (Cloud Run + Secret Manager + Firestore + Maps). No Vercel.
@@ -12,7 +14,7 @@ Team error-404 (Ashwin Nimmala, Yoshwan Pathipati), GDG @ Virginia Tech "AI for 
 - Submit to both MLH OrganizerHQ (public repo + LICENSE, 2-min video, one track) and codingjam.dev (VT chapter). Everything built this weekend; Claude Code use disclosed.
 
 ## Decisions (settled — do not re-ask)
-- Product: **Clearlease**, a pre-sign check for DMV renters (students, new grads relocating, first-time renters). Demo story: VT grad with a new Arlington job comparing listings from 300 miles away.
+- Product: **Clearlease**, a pre-sign check for DMV renters (students, new grads relocating, first-time renters). Demo story: Jordan, a VT student who rents a Blacksburg sublet first and later, with a new Arlington job, compares listings from 300 miles away.
 - Inputs: pasted text + uploaded image (screenshot / lease photo) + ZIP. PDF only if a Phase 4 round earns it.
 - Output: three verdict cards (Price check, Scam risk, Lease clauses) + evidence drawer + "questions to ask before you sign". No search, history, chat box or login. Optional extras:
   - a ZIP-area map (Maps key read at runtime)

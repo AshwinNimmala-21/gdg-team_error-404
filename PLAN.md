@@ -1,3 +1,5 @@
+> Working log from the hackathon. Some early decisions were later superseded; the README and the code are the source of truth.
+
 # Clearlease — plan and status
 
 Last updated: Sun Oct 25 2026, 3:16 AM ET. The MVP works locally in live and demo mode. Two laptops from now on; read "Handoff" first.

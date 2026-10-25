@@ -61,7 +61,7 @@ Contrast values computed with the WCAG 2.x relative-luminance formula (node one-
 ### Layout
 Mobile (375):
 ```
-Clearlease                       for DC, MD, VA renters
+Clearlease                       for VA, DC and MD renters
 Check a rental before you send money.
 short sub-line
 ┌ Listing or lease text ─────────────┐

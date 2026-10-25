@@ -26,7 +26,7 @@ Button and heading names are exactly as they appear in the UI (`lib/i18n.ts`, En
 | **1:30-1:50 AI and Gemma 4 fit** | Split screen. Left: the hard-set result as a two-row table, "Clearlease: 15 of 15 scams, 0 false alarms of 9" and "Keyword scan: 2 of 15, 6 false alarms of 9". Caption underneath: "On ordinary listings a keyword scan does about as well. Our edge is paraphrase, negation, Spanish, screenshots and leases (README, Evaluation)." Right: the "Read by Gemma 4 (`gemma-4-26b-a4b-it`)" line again (**model ID on screen, 2nd time**). Last 4 s: the cost line "about $0.54 (text) to $0.97 (photo) per 1,000 checks at hosted prices". | Screen recording of the README "Evaluation" section is fine for the table; no clicks in the app. Optional 3 s cut to `lib/ai/gemma.ts` showing the model ID. | N7 |
 | **1:50-2:00 Impact** | End card: Clearlease name, the live URL, the repo URL, "Gemma 4 `gemma-4-26b-a4b-it`, Apache 2.0", "Not legal advice". | None. | N8 |
 
-**Lease-wait note (about 33 s live).** The lease photo takes about 33 s live <!-- source: README.md "Cost (measured)": ~33 s; PLAN.md §7 -->. Never fake it, never cut it silently:
+**Lease-wait note (about 33 s live).** The lease photo takes about 33 s live <!-- source: docs/model.md "Cost (measured)": ~33 s; PLAN.md §7 -->. Never fake it, never cut it silently:
 - Record the real wait once, start to finish, on the live URL.
 - In the edit, play the wait at 4x and put a caption on screen for the whole sped-up stretch: **"Wait sped up 4x (about 33 s live)"**. That makes 33 s into about 8 s.
 - Keep the real status text ("Reading your lease photo...") in frame so a viewer sees it is the live app.
@@ -60,7 +60,7 @@ Three people from VT tried it; all three spotted the scam.
 The model is gemma-4-26b-a4b-it, shown under every report. Keywords can't do this: on our hard set they caught 2 of 15 scams and raised 6 false alarms. Clearlease caught 15 of 15, with none. A check costs about a dollar per thousand.
 
 **N8 (1:50-2:00)**
-Your text and photos are never stored, and the weights are open, so a campus housing office or tenant nonprofit could run it. Clearlease: check before you send money.
+We never store your text or photos. Open weights mean a nonprofit could run it. Clearlease: check before you send money.
 
 **Word count (spoken narration, N1 to N8):** see the count at the end of this file.
 
@@ -72,7 +72,7 @@ Sources for the numbers in the narration:
 - Three times as likely, ages 18-29: `README.md` "The problem" and `docs/research/ftc-red-flags.md` S2 (FTC Data Spotlight, Dec 22, 2025) <!-- source: docs/research/ftc-red-flags.md S2 -->.
 - Median loss $1,000 (on screen only, not in the narration): `docs/research/ftc-red-flags.md` S1 <!-- source: docs/research/ftc-red-flags.md S1 -->.
 - 15 of 15 scams, 0 false alarms of 9; keyword scan 2 of 15 (13% recall), 6 false alarms of 9: `docs/evaluation.md` "Run after, hard set" and `README.md` "Evaluation" <!-- source: docs/evaluation.md "Run after, hard set"; README.md "Gemma 4 at a glance" -->.
-- About a dollar per thousand checks: $0.54 (text) and $0.97 (photo) per 1,000 at hosted 26B-A4B prices; the Gemini API itself is $0 on the free tier <!-- source: README.md "Cost (measured)"; PLAN.md §7 -->.
+- About a dollar per thousand checks: $0.54 (text) and $0.97 (photo) per 1,000 at hosted 26B-A4B prices; the Gemini API itself is $0 on the free tier <!-- source: docs/model.md "Cost (measured)"; PLAN.md §7 -->.
 - Virginia statute: "Va. Code § 55.1-1229(A)" for landlord entry <!-- source: lib/data/rule-sheets.ts:51 -->. Quoted lease words are in `scripts/samples/lease-page.html` clause 9.
 
 ---
@@ -85,7 +85,7 @@ Sources for the numbers in the narration:
 - **Model ID on screen twice:** (1) the "Read by Gemma 4 (`gemma-4-26b-a4b-it`) in N s" line at 0:36-0:50, (2) the same line or the end card at 1:30-1:50. It is also in the README and the code. If a judge cannot see the ID, they assume we did not use the model.
 - **Captions on for the whole video** (many judges watch without sound). Burn in the stat sources in the first 20 s.
 - **Voice:** Yoshwan narrates, Ashwin edits (council plan item 9). Read the quoted lease words slowly.
-- **Fresh run, fresh numbers.** The flag count on the scam sample can move between runs (the README notes 6 or 7 of 9 on the Blacksburg sample). Do not say a count in the narration; show it on screen.
+- **Fresh run, fresh numbers.** The flag count on the scam sample can move between runs (`docs/evaluation.md` notes 6 or 7 of 9 on the Blacksburg sample). Do not say a count in the narration; show it on screen.
 - **Keep one complete backup take**, 2:00 end to end, recorded on a second run, so a failed live call on the day does not cost the submission.
 - **Code walkthrough (optional, 3 s only).** `docs/code-tour.md` has "say this on camera" lines per stop. Its line numbers date from commit `2306aa7`, so refresh them before filming any code.
 - **Do not show real personal data.** All samples are fictional. If you paste your own text, the browser removes emails, phone numbers, SSN-format and long ID numbers (not names or addresses), but do not rely on it on camera.
@@ -118,5 +118,5 @@ Do not say "it just worked a minute ago" or imply the screenshot is live. Say "h
 
 ## Word count
 
-- Spoken narration N1 to N8: **243 words** (N1 44, N2 29, N3 26, N4 26, N5 36, N6 11, N7 42, N8 29), about 1:52 at 130 words per minute. N1 is 44 words, about 20 s, so it fits its 0:00-0:20 slot.
+- Spoken narration N1 to N8: **235 words** (N1 44, N2 29, N3 26, N4 26, N5 36, N6 11, N7 42, N8 21), about 1:48 at 130 words per minute. N1 is 44 words, about 20 s, so it fits its 0:00-0:20 slot.
 - 30-second fallback: **76 words**.

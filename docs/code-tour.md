@@ -122,3 +122,25 @@ machine translation). Quotes always stay in the original language so they can be
 4. Scroll to **What Gemma read** and open **Show the quotes in your text**: verified quotes are highlighted in what was sent (phones/emails already removed).
 5. In any section, open **Show evidence** (or **Show sources** under scams) to see each benchmark, quote and statute link. Dropped quotes show as "not counted".
 6. Switch **EN / ES** and run a sample again to see the Spanish report.
+
+## Architecture as a Mermaid diagram
+
+The same flow as [`architecture.png`](architecture.png), in a form you can read in the source:
+
+```mermaid
+flowchart LR
+  U["Renter on phone or laptop"] -->|"text, photo, ZIP"| UI["Next.js page"]
+  UI -->|"redact emails, phones, ID numbers; shrink photo on device"| UI
+  UI -->|"POST /api/check"| API["Cloud Run: /api/check"]
+  API --> G1["Rate limit, size + type checks"]
+  G1 --> AI["Gemma 4 26B A4B (Gemini API): read text + image into quoted JSON"]
+  AI --> V["Zod schema + quote verification"]
+  V --> R["TypeScript rules: price, scam, lease, questions"]
+  D["HUD FMR + Census ACS (live, else saved FY2027 data)"] --> R
+  J["VA / DC / MD rule sheets with citations"] --> R
+  F["FTC red flags"] --> R
+  R --> RES["3 verdicts + quoted evidence + questions + help links"]
+  RES --> UI
+  API <-->|"keyed hashes + counts only"| FS[("Firestore: community flag counter")]
+  SM["Secret Manager"] -.->|"API keys at runtime"| API
+```

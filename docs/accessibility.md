@@ -86,3 +86,14 @@ Run by Ashwin on Sat Oct 24, about 11:55 PM ET, on a MacBook with Safari/Chrome 
 | V4 | "Quote start" and "quote end" around highlighted quotes are clear | Pass |
 | V5 | Map is one item ("Approximate area…"), no trap in map controls | Pass: read as one item; Tab moves past it |
 | V6 | Empty submit: error is read and focus goes to the text box | Pass |
+
+## Summary (moved from the README)
+
+- Built mobile-first for a renter standing outside the building. Tested at 320, 375 and 1280 px with no horizontal scroll, and photo upload works from the camera roll.
+- **Automated audit: 0 axe-core violations** (WCAG 2.0/2.1/2.2 A and AA rules) on the landing page and three finished reports, at 1280 px and 375 px, with every evidence drawer open, in English and in Spanish. 
+- **Manual check: 11 of 12 pass by hand, and the 12th by a scripted re-check.** The skip-link check failed by hand only because the test URL ended in `#main` with the dev overlay open; a scripted re-check of the production build passed. A keyboard-only walkthrough (skip link, tab order, focus to the report, drawers, edit and Escape, lease photo) and a VoiceOver walkthrough (report-ready announcement, headings, warning-sign wording, quote markers, map as one item, form errors), done by a teammate on macOS.
+- Verdicts are never color-only: icon + word + color. **Text contrast is 5.71:1 or higher on every pair (measured)**: body text 16.45:1, secondary text 7.48:1, links 7.63:1, highlighted quotes 13.29:1, and the lowest is green text on its tint. Form-field borders are 6.60–7.48:1. Color values are in [`design-principles.md`](design-principles.md).
+- Keyboard: visible focus ring, logical tab order, native `<details>` for evidence, Escape closes the editor, and focus moves to the report when it's ready.
+- Screen readers: `aria-live` announcements, field-level errors (`aria-invalid`), a skip link, and a summary of all three verdicts.
+- `prefers-reduced-motion` turns off the only animation (the stamp landing).
+- The look is a housing inspection report: Public Sans (the US government's typeface) for interface text, IBM Plex Mono for anything quoted from your input, and one bold moment, the ink stamp.

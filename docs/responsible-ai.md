@@ -1,0 +1,21 @@
+# Responsible AI, privacy and price fairness
+
+## Privacy and safety
+
+- **Your text and photos are never stored or logged.** No accounts and no database of checks. The server never logs request bodies or model output, and a photo is sent to the model for the check and then dropped.
+- **Your device redacts before sending.** The browser removes exactly four things from your text ([`lib/client/redact.ts`](../lib/client/redact.ts)): email addresses, phone numbers, SSN-format numbers, and long ID or account numbers (10 or more digits). It does **not** remove names, street addresses or anything inside a photo, so the page asks you to cover names, signatures and account numbers in photos first. Photos are resized and re-encoded on the device, which strips location (EXIF/GPS) data.
+- **Honest about the model host.** Gemma 4 on the Gemini API is free tier only, and Google may use free-tier inputs to improve its products. The page says this plainly next to the button. For stricter privacy, a nonprofit can run the same open weights on its own hardware.
+- **Community counter, minimal by design.** Firestore is written to only when someone flags a listing, and then it stores one-way fingerprints and counts: `{count, firstSeen}` under keyed hashes of the listing's contact details or street address. Contacts are SHA-256 hashed *in the browser*, then keyed with a server secret (HMAC). No text, images or IPs. Flags need a short-lived signed token from a real check.
+- **Abuse and cost guards.** A per-client rate limit (10 checks per minute by default; the deployed site uses 30 because judges share venue Wi-Fi), 12,000-character text limit, 8 MB image cap (enforced on the server too), MIME allowlist, and a streamed body size cap.
+- **Sources are cited and caveated.** Our own rules of thumb (the 25% price cut-off, off-platform contact) are labeled "Clearlease rule of thumb" in the UI.
+- **Grounding.** Each quote must appear in your text, or in Gemma's own transcript of your photo. Unmatched quotes are dropped and shown as "not counted". Extracted numbers must appear inside their quote.
+- **Prompt-injection defense.** Your text is wrapped as delimited data, and the delimiters are escaped. The system prompt is pinned. Output must validate against the schema, or you get a safe error rather than a guess. (Only for the 5 built-in samples, a failed live call shows a saved answer instead, labelled "Showing a saved result".) A second, rule-based detector catches phrases like "ignore previous instructions" even if the model misses them. Sample 5 shows the attack being ignored *and* counted as a red flag.
+- **Not legal advice.** Every report says so and links to free help for the renter's state.
+
+## Cheap isn't a crime
+
+Low rent alone never makes Clearlease say "scam". Rooms in shared houses, older buildings, income-restricted (LIHTC, Section 8, inclusionary-zoning) units and approved summer sublets are often priced far below the local range, and the renters who most need them are the ones a scam checker shouldn't scare off. In our first evaluation run, price alone caused 4 of 5 false alarms on legitimate listings (see [`evaluation.md`](evaluation.md)). So a far-below price on its own reads "Below usual range: verify before paying", with advice to see the place and sign a lease before sending money. It only reads **Suspiciously cheap** when it comes with another warning sign, such as a payment request before a viewing.
+
+## Student rentals are priced per bedroom
+
+When a listing says "$650 per bedroom" or "$575 per person", Gemma reports that (with the quote) along with the whole unit's bedroom count, and our code compares the rent with the whole unit's HUD and Census benchmarks divided by the number of bedrooms. That's an approximation, so it's only used to catch prices **far below** that share. Otherwise the report says "Rough comparison only: per-bedroom rents near campus often run above an even split of area averages. Compare 2–3 nearby listings and ask what's included." It never calls a student rental "above usual range". Sublets, summer and short-term rentals get one more line: "Summer sublets often list below market; price alone isn't a red flag here."

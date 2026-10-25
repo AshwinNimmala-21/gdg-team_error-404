@@ -24,10 +24,10 @@ Clearlease
 Paste a rental listing or lease photo; Gemma 4 checks price, scam signs and lease clauses.
 ```
 
-### Description (4332 chars)
+### Description (4388 chars)
 ```text
 THE PROBLEM
-Renters in DC, Maryland and Virginia, especially students and new grads signing from far away, are asked to send money before they see a unit, and are handed leases they can't judge. The FTC reports nearly 65,000 rental scams since 2020 with about $65 million lost, and adults 18-29 are three times more likely than others to lose money to one (FTC Data Spotlight, Dec 2025). Our demo persona is a Virginia Tech student comparing Blacksburg and Arlington listings from 300 miles away. We interviewed 3 people from Virginia Tech (friends, so not a random sample): all 3 had seen a fake-seeming listing, and on the live site all 3 called our Blacksburg sample a likely scam with the right reasons.
+Renters in Virginia, DC and Maryland, especially students and new grads signing from far away, are asked to send money before they see a unit, and are handed leases they can't judge. The FTC reports nearly 65,000 rental scams since 2020 with about $65 million lost, and adults 18-29 are three times more likely than others to lose money to one (FTC Data Spotlight, Dec 2025). Our demo persona, Jordan, is a Virginia Tech student who rents a Blacksburg sublet first and later, with a new job, compares Arlington listings from 300 miles away. We interviewed 3 people from Virginia Tech (friends, so not a random sample): all 3 had seen a fake-seeming listing, and on the live site all 3 called our Blacksburg sample a likely scam with the right reasons.
 
 WHAT IT DOES
 Clearlease is a pre-sign check. You paste a listing or landlord message, or add a photo of a lease or a chat screenshot. In about 10 seconds you get three verdicts, each with an icon, a word and a color: (1) Price check against HUD Fair Market Rent and Census ACS rent for that ZIP and bedroom count; (2) Scam risk, nine checks mapped to the FTC's published rental-scam red flags; (3) Lease clauses compared with Virginia, DC and Maryland rule sheets with statute citations. Every flag quotes the exact words that triggered it, and the report ends with questions to ask before you sign. It is not legal advice, and says so.
@@ -43,6 +43,18 @@ We built a labelled evaluation and froze a keyword-only baseline before changing
 
 ACCESSIBILITY, SPANISH AND PRIVACY
 0 axe-core violations in English and Spanish on the landing page and three finished reports at 375 and 1280 px, plus a manual keyboard and VoiceOver check (11 of 12 by hand; the 12th, the skip link, passed on a scripted re-check of the production build). Verdicts are never color-only. The UI is fully available in Spanish with hand-written rule text (no machine translation), and quotes stay in the original language so they can be verified. Text and photos are never stored or logged. Before sending, the browser removes emails, phone numbers, SSN-format numbers and long ID numbers; photos are re-encoded on the device (stripping GPS). The page says the free Gemini API tier may use inputs to improve Google's products. With Gemma 4's open weights (Apache 2.0) a nonprofit can self-host: the same pipeline runs on Ollama, tested on a laptop with the small e2b and e4b models (they over-flag).
+```
+
+### Short version (≤ 1,500 characters) (1333 chars)
+For forms with a smaller limit.
+```text
+Clearlease is a pre-sign check for renters in Virginia, DC and Maryland. Paste a listing or landlord message, or add a photo of a lease, and in about 10 seconds you get three verdicts: is the price typical for that ZIP and bedroom count (HUD Fair Market Rent and Census ACS), are there rental-scam warning signs (nine checks mapped to the FTC's red flags), and which lease clauses to question (Virginia, DC and Maryland rule sheets with statute citations). Every flag quotes the exact words that triggered it.
+
+Gemma 4 (gemma-4-26b-a4b-it, Gemini API) reads text and lease photos into strict JSON where every fact carries a verbatim quote. Our code checks each quote against the input, and TypeScript rules decide every verdict; the model never does. Hidden instructions aimed at AI tools are ignored and counted as a red flag.
+
+On our 24-item hard set, Clearlease caught 15 of 15 scams with 0 false alarms; a keyword scan caught 2 with 6 false alarms. On ordinary listings a keyword scan is about as good, and we say so. Three people from Virginia Tech tried it, and all three called our Blacksburg sample a likely scam with the right reasons.
+
+Text and photos are never stored or logged, and every report says it is not legal advice. Full Spanish mode. One Cloud Run service; about $0.54 to $0.97 per 1,000 checks at hosted prices.
 ```
 
 ### How we built it / tech used (1144 chars)
@@ -105,17 +117,17 @@ The core description is identical for every track. Change only these items. Re-c
 
 - **Open-Source AI** (swap `Best Use of Gemma 4` for `Best Open-Source AI Project`):
   - Description: shorten "HOW GEMMA 4 IS USED" to two sentences and move the last sentence of "ACCESSIBILITY, SPANISH AND PRIVACY" (open weights, Apache 2.0) to the top as: "Clearlease is Apache-2.0 licensed and runs on Gemma 4, an open-weights model (Apache 2.0)."
-  - Add to "How we built it": "Repo has LICENSE (Apache 2.0), CONTRIBUTING.md, CODE_OF_CONDUCT.md (Contributor Covenant 3.0), THIRD_PARTY_NOTICES.md and a reproducible demo mode that needs no keys." <!-- source: docs/process/catchup.md section 13, README "Minimum setup" -->
-  - Self-hosting is built and tested (README "Self-host Gemma 4 (Ollama)": the e2b and e4b models on a laptop, 1 of 5 and 3 of 5 samples passing; `gemma4:26b` not tested locally). Quote only those measured results.
+  - Add to "How we built it": "Repo has LICENSE (Apache 2.0), CONTRIBUTING.md, CODE_OF_CONDUCT.md (Contributor Covenant 3.0), THIRD_PARTY_NOTICES.md and a reproducible demo mode that needs no keys." <!-- source: docs/process/catchup.md section 13, docs/setup.md "Minimum setup" -->
+  - Self-hosting is built and tested (docs/self-host.md: the e2b and e4b models on a laptop, 1 of 5 and 3 of 5 samples passing; `gemma4:26b` not tested locally). Quote only those measured results.
   - Video: show the license files and the README setup.
 - **UI/UX** (swap for `Best UI/UX`):
   - Lead the description with "WHAT IT DOES" and the accessibility paragraph; cut "HOW IT IS BOUNDED" to one sentence.
-  - Add: one click on a sample gives a verdict; mobile-first at 375 px with camera-roll upload; verdicts are icon + word + color; 0 axe violations in English and Spanish; a manual keyboard and VoiceOver check (11 of 12 by hand, the 12th on a scripted re-check); reduced-motion support. <!-- source: README "Accessibility and design" -->
+  - Add: one click on a sample gives a verdict; mobile-first at 375 px with camera-roll upload; verdicts are icon + word + color; 0 axe violations in English and Spanish; a manual keyboard and VoiceOver check (11 of 12 by hand, the 12th on a scripted re-check); reduced-motion support. <!-- source: docs/accessibility.md -->
   - Add the "why our UI is better" user story (judges asked for it in the video): the VT student on a phone, outside the building, or comparing from 300 miles away.
   - Do not call it "not AI-looking"; show the inspection-report design and the single stamp moment instead.
 - **Google Cloud** (swap for `Best Use of Google Cloud`):
-  - Lead "How we built it" with the architecture: Cloud Run us-east4 (512 MiB, 1 CPU, `--timeout 120`, at most 3 instances, scales to zero), Secret Manager via `--set-secrets`, Firestore, Maps, Cloud Build from the Dockerfile. <!-- source: README "Deploy your own" -->
-  - Add the architecture diagram link (the Mermaid chart in README "How the AI is used").
+  - Lead "How we built it" with the architecture: Cloud Run us-east4 (512 MiB, 1 CPU, `--timeout 120`, at most 3 instances, scales to zero), Secret Manager via `--set-secrets`, Firestore, Maps, Cloud Build from the Dockerfile. <!-- source: docs/setup.md "Deploy your own" -->
+  - Add the architecture diagram link (`docs/architecture.png`, shown in README "How it works"; a Mermaid version is in `docs/code-tour.md`).
   - Be ready to explain autoscaling and rate limiting (per-client limit, 30/min on the deployed site). PLAN.md 4b lists "autoscaling settings explained in the README" and "Firestore created and verified live" as missing for this track: verify before choosing it.
   - Keep Gemma 4 mentioned as the model, but shorten the evaluation paragraph.
 
@@ -135,17 +147,17 @@ Clearlease
 A pre-sign check for renters in Virginia, DC and Maryland: price, scam signs and lease clauses, with quoted evidence.
 ```
 
-### Description (3000 chars)
+### Description (3063 chars)
 ```text
-Clearlease helps first-time renters in DC, Maryland and Virginia check a listing before they send money or sign. Paste a listing or landlord message, or add a photo of a lease, and in about 10 seconds you get three verdicts: is the price typical for that ZIP and bedroom count (HUD Fair Market Rent and Census ACS), are there rental-scam warning signs (nine checks mapped to the FTC's published red flags), and which lease clauses to question (compared with Virginia, DC and Maryland rule sheets with statute citations). Every flag quotes the exact words that triggered it.
+Clearlease helps first-time renters in Virginia, DC and Maryland check a listing before they send money or sign. Paste a listing or landlord message, or add a photo of a lease, and in about 10 seconds you get three verdicts: is the price typical for that ZIP and bedroom count (HUD Fair Market Rent and Census ACS), are there rental-scam warning signs (nine checks mapped to the FTC's published red flags), and which lease clauses to question (compared with Virginia, DC and Maryland rule sheets with statute citations). Every flag quotes the exact words that triggered it.
 
-Problem and impact: the FTC reports nearly 65,000 rental scams since 2020 with about $65 million lost, and adults 18-29 are three times more likely to lose money to one. Our persona is a Virginia Tech student comparing Blacksburg and Arlington listings from 300 miles away. We interviewed 3 people from Virginia Tech, two seniors and a recent graduate (friends of the team, so not a random sample). All 3 had seen a fake-seeming listing, and the red flags they named (price far below the area, a deposit before the lease, pressure to pay early) match checks Clearlease already runs. All 3 had run into hidden fees. On the live site all 3 called our Blacksburg sample a likely scam with the right reasons, none found anything confusing, and average trust was 3.7 of 5. One senior told us: "I think more than trusting it completely I would see it as more like a caution and be more careful". Details in docs/validation.md.
+Problem and impact: the FTC reports nearly 65,000 rental scams since 2020 with about $65 million lost, and adults 18-29 are three times more likely to lose money to one. Our persona, Jordan, is a Virginia Tech student who rents a Blacksburg sublet first and later, with a new job, compares Arlington listings from 300 miles away. We interviewed 3 people from Virginia Tech, two seniors and a recent graduate (friends of the team, so not a random sample). All 3 had seen a fake-seeming listing, and the red flags they named (price far below the area, a deposit before the lease, pressure to pay early) match checks Clearlease already runs. All 3 had run into hidden fees. On the live site all 3 called our Blacksburg sample a likely scam with the right reasons, none found anything confusing, and average trust was 3.7 of 5. One senior told us: "I think more than trusting it completely I would see it as more like a caution and be more careful". Details in docs/validation.md.
 
 Technology and AI: Gemma 4 (gemma-4-26b-a4b-it, Gemini API) reads text and lease photos into strict, quoted JSON, normally in one call per check. TypeScript rules decide every price, threshold and legal comparison; the model never does.
 
 Responsible AI: quotes must be found in the input or the flag doesn't count; prompt-injection defenses (delimited data, pinned prompt, schema validation, rule-based detector); text and photos are never stored or logged, and the browser removes emails, phone numbers, SSN-format and long ID numbers before sending; not legal advice; 0 axe-core violations in English and Spanish; full Spanish UI.
 
-Feasibility: one Cloud Run service that scales to zero. Measured Gemma cost is about $0.54 per 1,000 text checks and $0.97 per 1,000 photo checks at hosted 26B-A4B reference prices (free tier is $0 today). Open weights (Apache 2.0) let a nonprofit self-host; the same pipeline runs on Ollama (tested with the small models on a laptop). <!-- source: README "Cost (measured)" -->
+Feasibility: one Cloud Run service that scales to zero. Measured Gemma cost is about $0.54 per 1,000 text checks and $0.97 per 1,000 photo checks at hosted 26B-A4B reference prices (free tier is $0 today). Open weights (Apache 2.0) let a nonprofit self-host; the same pipeline runs on Ollama (tested with the small models on a laptop). <!-- source: docs/model.md "Cost (measured)" -->
 
 Evaluation, honestly: on our own labelled sets a keyword scan is about as good as Clearlease on ordinary listings and beat us on the 10-item holdout; Clearlease's edge is paraphrase, Spanish, screenshots and leases (15 of 15 hard-set scams with 0 false alarms vs 2 of 15 and 6 false alarms for keywords; 13 of 13 lease conflicts). Items were written by us, so this is a stress test, not field accuracy. See docs/evaluation.md.
 
@@ -196,3 +208,28 @@ Do these in order. Submit between 11:00 and 11:30 AM Sunday. The 12:30 PM deadli
 - [ ] Submitted on **codingjam.dev** (Virginia Tech chapter).
 - [ ] Screenshot both confirmation pages.
 - [ ] After submitting: **rotate the API keys** (GEMINI_API_KEY, HUD_TOKEN, CENSUS_KEY, COMMUNITY_SALT, Maps key) and update Secret Manager; only Ashwin deploys.
+
+---
+
+## 5. Where the README answers each scoring item
+
+Every item below is answered in the README text itself; the linked doc only adds detail.
+
+| Scoring item | README section that answers it | Linked detail |
+|---|---|---|
+| GDG: problem definition | "The problem" (Jordan persona, FTC and USAFacts numbers) | `docs/research/ftc-red-flags.md` |
+| GDG: measurable impact | "Evaluation" (15 of 15 vs 2 of 15, 0 vs 6 false alarms, 13 of 13 lease conflicts, bias fix 6 to 0, when measured); "Cost and deployment" (time to a verdict) | `docs/evaluation.md` |
+| GDG: stakeholder empathy | "What students told us" (2 verbatim quotes, 3/3 numbers); "Responsible AI and privacy" ("Cheap isn't a crime") | `docs/validation.md`, `docs/responsible-ai.md` |
+| GDG: AI necessity | "How it works": "Why the AI is necessary" (photos, paraphrase, negation; keyword false alarms 6 of 9) | `docs/model.md` |
+| GDG: architecture | "How it works": architecture image, "Architecture in one line", 4 bullets | `docs/code-tour.md` (Mermaid) |
+| GDG: safety and grounding | "How it works" (quote verification, rules decide, prompt-injection defense); "Responsible AI and privacy" (grounded, not legal advice, abuse guards) | `docs/responsible-ai.md` |
+| GDG: privacy | "Responsible AI and privacy" (exact redaction list, nothing stored, Firestore only on a flag, free-tier notice) | `lib/client/redact.ts`, `docs/responsible-ai.md` |
+| GDG: inclusive design (WCAG) | "Responsible AI and privacy" (axe 0 in English and Spanish, keyboard and VoiceOver 12 of 12, icon + word + color, Spanish) | `docs/accessibility.md`, `docs/spanish.md` |
+| GDG: deployment viability for nonprofits | "Cost and deployment" (scales to zero, who could run it, one key, saved-data fallbacks, deploy script, self-hosting) | `docs/setup.md`, `docs/self-host.md`, `docs/DEPLOY.md` |
+| GDG: inference cost | "Cost and deployment" ($0.54 and $0.97 per 1,000 checks, latency, free tier) | `docs/model.md` |
+| GDG: documentation: setup guide | "Run it locally" (commands, one required key, checks) | `docs/setup.md` |
+| GDG: documentation: API dependencies | "APIs and data" table | `docs/research/` |
+| GDG: documentation: open-source docs | "License" (LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, THIRD_PARTY_NOTICES); "Repository map" | `docs/process/README.md` |
+| MLH Gemma 4: exact model ID | Top of the README, "How the integration works", "APIs and data" | `lib/ai/gemma.ts` |
+| MLH Gemma 4: Gemma is core | Top of the README; "Why the AI is necessary" | `docs/model.md` |
+| MLH Gemma 4: how the integration works | "How it works": "How the Gemma integration works" (call, pinned prompt, temperature 0, JSON, image part, Zod, quote check) and "Why `gemma-4-26b-a4b-it`" | `docs/code-tour.md` |
