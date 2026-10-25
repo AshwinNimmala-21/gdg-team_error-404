@@ -1,6 +1,6 @@
 # Clearlease — plan and status
 
-Last updated: Sat Oct 24 2026, 9:15 PM ET. The MVP works locally in live and demo mode. Two laptops from now on; read "Handoff" first.
+Last updated: Sun Oct 25 2026, 3:16 AM ET. The MVP works locally in live and demo mode. Two laptops from now on; read "Handoff" first.
 
 ## Handoff — Sat Oct 24, 9:15 PM ET
 `main` is pushed and clean. The gate passed at `0a040bf`: lint, `tsc --noEmit`, 44 unit tests, and `npm run build` from a clean checkout with no `.env`. The council plan this follows is `docs/council/report.md` ("The plan: 12 items, ranked").
@@ -28,10 +28,27 @@ Last updated: Sat Oct 24 2026, 9:15 PM ET. The MVP works locally in live and dem
 - **Verdict tag restyle: stashed, not committed.** It's `stash@{0}`, "WIP verdict tag restyle prototype", and exists only on Yoshwan's laptop.
   - Files: new `components/VerdictTags.tsx`, plus changes to `components/Report.tsx` and `app/globals.css`. Screenshots are in `docs/screenshots/tags/{1,2,3}/`.
   - Three options sit behind `?tags=1|2|3`; without the parameter the stamps stay.
-  - Waiting on a pick. Then: delete the other two and `components/Stamp.tsx`, make the winner the default, and update `docs/design-principles.md`.
-- #2 verification is not done yet: 10 live sample runs in a row, with the pass count recorded here.
-- #6d Sample-aware error copy (`components/Checker.tsx`) is not done.
-- #6e Map `inert`/`aria-hidden` (`components/ListingMap.tsx`) is not done.
+  - Waiting on a pick. Then: delete the other two and `components/Stamp.tsx`, and make the winner the default.
+  - Yoshwan no longer touches `docs/`. So the `docs/design-principles.md` update and the stash's `docs/screenshots/tags/` go to Ashwin, or are left out of the commit.
+- **Decision needed: the level-0 Gemma call fails every time** (see the soak below).
+
+**Update — Sun Oct 25, 3:16 AM ET (Yoshwan)**
+- Verified already done, with no change needed:
+  - #3 saved-result fallback (6 tests).
+  - The two false claims: a lease alone now gets "Not run", and the photo wait copy says about 30 s.
+  - #6c contrast. A rendered audit of 525 text elements (empty state plus 4 samples, drawers open) found a lowest pair of 5.94:1 (amber on its tint) and no opacity on text. The README's "5.9:1 or higher" claim holds.
+  - #6d is covered by #3. A failing unchanged sample now gets its labelled saved result, not an error.
+- `0d0ff70` #8 relocation gap: "relocating / moving / transferred **to** a place" now counts as owner-away. Tests added.
+- `bde37c3` Invalid-output step-downs are now logged (kind only, no content). Tested.
+- `e8a0352` #6e: the map is `inert` + `aria-hidden` with no `role="img"`. Tab never lands inside it.
+- **#2 soak: 44 live checks** (4 samples × 11 rounds, back to back, local dev server, `gemma-4-26b-a4b-it`).
+  - 41 correct live answers and 3 labelled saved results. 0 HTTP errors, 0 wrong verdicts.
+  - Failed attempts:
+    - **400 on level 0: 44 of 44.** Every check needed 2 Gemma calls.
+    - **429: 3**, the last 3 checks of the run, at level 1. One probe a few minutes later was live, so it's a short-window rate limit, not a daily cap. The exact quota is unknown, since we log status codes only.
+    - **5xx: 0. Timeouts, network errors, invalid output: 0.**
+  - Latency (median / max): fine 10.7 / 25.3 s; scam 12.4 / 16.9 s; lease photo 33.9 / 34.3 s; injection 12.0 / 22.0 s.
+  - Implication: the 400 on level 0 doubles our requests per minute, which brings the 429 closer during judging.
 
 **Next: Ashwin**
 1. #4 Deploy with `docs/DEPLOY.md`.
