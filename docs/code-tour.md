@@ -1,6 +1,6 @@
 # Code tour: one check, five stops
 
-> Line numbers as of commit `2306aa7`; other work is in progress tonight, so line numbers may drift slightly.
+> File paths and line ranges checked against the code at commit `b064db8` (Sun Oct 25, 2026).
 
 This doc follows one check from the moment a renter clicks **Check** to the report on screen. The idea behind
 the whole thing: **Gemma 4 reads and quotes, TypeScript decides.** The model never sets a price, a score or a
@@ -19,8 +19,8 @@ Checker.tsx ──redact/resize──▶ /api/check ──▶ runCheck ──▶
 
 | What | Where |
 |---|---|
-| `check()`: validate, redact, hash contacts, send | `components/Checker.tsx:81-129` (redact at `:97`, hashes `:98-101`) |
-| `send()`: POST to `/api/check`, friendly errors | `components/Checker.tsx:62-79` |
+| `check()`: validate, redact, hash contacts, send | `components/Checker.tsx:82-132` (redact at `:98`, hashes `:100-102`) |
+| `send()`: POST to `/api/check`, friendly errors | `components/Checker.tsx:63-80` |
 | `redact()`: emails, phones, SSNs, long numbers | `lib/client/redact.ts:4-29` |
 | `prepareImage()`: 1600px max edge, JPEG 0.85 re-encode | `lib/client/image.ts:17-51` |
 
@@ -35,19 +35,21 @@ canvas and re-encoded as JPEG, which shrinks them and drops the EXIF data, GPS l
 
 | What | Where |
 |---|---|
-| Route: rate limit, Content-Length check, streamed size cap | `app/api/check/route.ts:14-36`, `:38-54` |
-| `runCheck()`: Zod-validate request, call Gemma, then rules | `lib/server/check.ts:77-139` (Gemma call `:116-130`) |
-| Pinned system prompt + `<untrusted_input>` + `escapeDelimiters` | `lib/ai/prompt.ts:3-15`, `:20-38` |
-| Step-down ladder (schema → JSON mode → plain) + retries | `lib/ai/gemma.ts:37-53`, `:91-141` |
-| Zod contract + JSON schema sent to Gemma | `lib/ai/schema.ts:3-4`, `:36-70`, `:133+` |
-| Regex injection backstop `findInjection` | `lib/rules/scam.ts:59-82` |
+| Route: rate limit, Content-Length check, streamed size cap | `app/api/check/route.ts:13-36`, `:38-65` |
+| `runCheck()`: Zod-validate request, call Gemma, then rules | `lib/server/check.ts:79-165` (Gemma call `:119-131`) |
+| Pinned system prompt + `<untrusted_input>` + `escapeDelimiters` | `lib/ai/prompt.ts:3-17`, `:23-40` |
+| Step-down ladder (schema → JSON mode → plain) + retries | `lib/ai/gemma.ts:39-65`, `:105-162`; entry point `:164-196` |
+| Zod contract + JSON schema sent to Gemma | `lib/ai/schema.ts:3-4`, `:71-111`, `:133-257` |
+| Regex injection backstop `findInjection` | `lib/rules/scam.ts:83-94` |
 
 The route reads the body as a stream and stops the moment it passes the size cap, so a huge upload is never
 buffered. The renter's text is wrapped in `<untrusted_input>` tags; any look-alike tags inside it are defanged, so
 it can't "close" the data block. The system prompt says that everything inside is data, never instructions. Gemma
-must return JSON matching our schema (temperature 0), with a quote for every fact. Gemma's JSON-schema support isn't
-documented, so on a 400 or bad output we step down one level and put the schema in the prompt instead. Every
-request starts back at the strictest level, and only 5xx/network/timeout errors are retried (twice, with backoff).
+must return JSON matching our schema (temperature 0), with a quote for every fact. The Gemini API rejected its strict
+JSON-schema mode for this model (HTTP 400 on 46 of 46 calls), so hosted checks start in JSON mode with the schema in
+the prompt, and on a 400 or bad output step down to plain text with the schema in the prompt. The step-down never
+carries over to the next request (self-hosted Ollama starts at the strict level), and only 5xx/network/timeout errors
+are retried (twice, with backoff).
 As a backup to the model, a regex also scans the raw text for "ignore previous instructions"-style phrasing.
 
 🎥 **Say this:** "The listing goes to Gemma 4 as fenced-off data. It has to fill a strict JSON schema with a quote for every fact, and a regex double-checks for prompt injection."
@@ -56,9 +58,9 @@ As a backup to the model, a regex also scans the raw text for "ignore previous i
 
 | What | Where |
 |---|---|
-| `normalize()`: case, curly quotes, dashes, whitespace | `lib/rules/quotes.ts:8-19` |
-| `findQuote()`: exact match, or "..." pieces in order | `lib/rules/quotes.ts:29-53` |
-| `numberInQuote()` / `bedroomsInQuote()` | `lib/rules/quotes.ts:56-76` |
+| `normalize()`: case, accents, curly quotes, dashes, whitespace | `lib/rules/quotes.ts:9-22` |
+| `findQuote()`: exact match, or "..." pieces in order | `lib/rules/quotes.ts:32-56` |
+| `numberInQuote()` / `bedroomsInQuote()` | `lib/rules/quotes.ts:59-85` |
 | `resolveFacts()`: overrides first, then verified facts | `lib/rules/check.ts:26-88` |
 
 This is the grounding step. A fact from Gemma only counts if its quote is actually in what the renter shared (or
@@ -73,19 +75,19 @@ that the input doesn't support. Rent, bedrooms or ZIP the renter typed in Edit a
 
 | What | Where |
 |---|---|
-| `runRules()`: wires price → scam → lease → questions | `lib/rules/check.ts:90-127` |
-| `computePrice()`: Census + HUD range, cut-offs, per-bedroom "rough" | `lib/rules/price.ts:6-20`, `:39-140` |
-| `computeScam()`: weights, cheap-rent rule, tiers | `lib/rules/scam.ts:14-24`, `:95-182` |
-| `judge()` / `depositAsClause()` / `computeLease()` | `lib/rules/lease.ts:25-84`, `:90-104`, `:106-169` |
-| Statute rule sheets (VA / DC / MD, with citations) | `lib/data/rule-sheets.ts:3-4`, `:28-205` |
+| `runRules()`: wires price → scam → lease → questions | `lib/rules/check.ts:90-133` |
+| `computePrice()`: Census + HUD range, cut-offs, per-bedroom "rough" | `lib/rules/price.ts:11-34`, `:39-140` |
+| `computeScam()`: weights, cheap-rent rule, tiers | `lib/rules/scam.ts:17-27`, `:107-196` |
+| `judge()` / `depositAsClause()` / `computeLease()` | `lib/rules/lease.ts:25-84`, `:110-124`, `:126-201` |
+| Statute rule sheets (Virginia, DC and Maryland, with citations) | `lib/data/rule-sheets.ts:3-4`, `:28-205` |
 | `buildQuestions()`: up to 6 questions to ask the landlord | `lib/rules/questions.ts:71-99` |
 
 **Price:** the usual range runs between the Census median for that bedroom count and HUD's Fair Market Rent, so
 neither source decides alone. **Bias rule:** cheap rent alone is never "Suspiciously cheap". Shared houses,
 older buildings and income-restricted units are often priced low, so "25%+ under" only adds a scam flag
-alongside another red flag (`scam.ts:103-104, 154-155`). Per-bedroom rent is compared against benchmarks divided by
+alongside another red flag (`scam.ts:115-133`, `:168`). Per-bedroom rent is compared against benchmarks divided by
 the bedroom count, and only the "far below" direction is checked; otherwise it's a neutral "Rough comparison".
-**Scam:** 9 checks, strong signs weigh 2, weaker ones 1; a score of 4+ is "Likely scam" (`scam.ts:171`). A quote
+**Scam:** 9 checks, strong signs weigh 2, weaker ones 1; a score of 4+ is "Likely scam" (`scam.ts:185`). A quote
 that can't be found is listed under "not counted" and adds nothing to the score. "Owner is relocating for work" alone doesn't count as the
 FTC's "owner is away" sign. **Lease:** each clause is judged against the state's rule sheet (deposit cap, late fee cap,
 entry notice…), with the statute citation attached. A deposit stated as a plain fact is checked too.
@@ -96,12 +98,12 @@ entry notice…), with the statute citation attached. A deposit stated as a plai
 
 | What | Where |
 |---|---|
-| Verdict board (three stamps), sections, evidence drawers | `components/Report.tsx:72-191` |
-| Status → verdict word + tone ("Suspiciously cheap" needs `suspicious`) | `lib/client/verdicts.ts:25-64` |
+| Verdict board (three stamps), sections, evidence drawers | `components/Report.tsx:72-230` |
+| Status → verdict word + tone ("Suspiciously cheap" needs `suspicious`) | `lib/client/verdicts.ts:27-67` |
 | "What Gemma read": facts, quotes, "(quote not found, not used)" | `components/GemmaRead.tsx:128-213` |
 | Quote highlighting mapped back onto the original text | `lib/client/highlight.ts:8-58` |
 | "Show evidence" drawer: label, value, quote, source link | `components/Evidence.tsx:19-55` |
-| Spanish: `LangProvider`, `useTr()`, hand-written templates | `components/Lang.tsx:32-55`, `lib/i18n.ts:243`, `lib/client/rules-es.ts:1-4`, `:341-347` |
+| Spanish: `LangProvider`, `useTr()`, hand-written templates | `components/Lang.tsx:32-55`, `lib/i18n.ts:277`, `lib/client/rules-es.ts:1-4`, `:344-350` |
 
 The report starts with three verdict stamps (price, scam, lease). Each section has a **Show evidence** drawer
 listing every benchmark, quote and source link behind it. **What Gemma read** shows each fact next to the exact

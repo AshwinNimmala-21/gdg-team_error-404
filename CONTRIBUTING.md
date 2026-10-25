@@ -1,6 +1,6 @@
 # Contributing to Clearlease
 
-Thanks for helping. Clearlease is a pre-sign check for renters in DC, Maryland and Virginia: Gemma 4 reads a listing or lease into quoted facts, and TypeScript rules decide the verdicts. Please read this page before opening a pull request. By taking part you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+Thanks for helping. Clearlease is a pre-sign check for renters in Virginia, DC and Maryland: Gemma 4 reads a listing or lease into quoted facts, and TypeScript rules decide the verdicts. Please read this page before opening a pull request. By taking part you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 **Clearlease is not legal advice, and neither is anything in this repository.**
 
@@ -14,7 +14,7 @@ cp .env.example .env   # then add your own keys
 npm run dev            # http://localhost:3000
 ```
 
-- Only `GEMINI_API_KEY` is required for live Gemma (free from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). The other keys are optional, and each one falls back to something visible. See "Minimum setup" in the [README](README.md#minimum-setup).
+- Only `GEMINI_API_KEY` is required for live Gemma (free from [aistudio.google.com/apikey](https://aistudio.google.com/apikey)). The other keys are optional, and each one falls back to something visible. See "Minimum setup" in [`docs/setup.md`](docs/setup.md#minimum-setup).
 - With no keys the app runs in **demo mode**: the 5 samples use recorded extractions, other text gets a basic keyword reader, and photos can't be read. `MOCK_AI=1` forces demo mode even when a key is set.
 
 ## Tests and checks
@@ -35,6 +35,7 @@ The scripts below need a running server. Give them its URL (default `http://loca
 | `node scripts/e2e-es.mjs [baseUrl] [--report]` | Spanish mode end to end, in a browser: every sample plus one pasted listing. Fails if the ES toggle resets or English is visible outside quotes and proper nouns. `--report` lists the strings without failing. |
 | `node scripts/a11y.mjs [baseUrl] [--lang=es]` | axe-core audit (WCAG 2.0/2.1/2.2 A and AA rules, plus best practices) on the landing page and finished reports, at 1280 px and 375 px. Also fails on any uncaught page error. `--lang=es` scans the Spanish UI. |
 | `node scripts/screenshots.mjs [baseUrl] [outDir]` | Clicks each sample at 375 px and 1280 px, checks for horizontal scroll and saves screenshots. |
+| `node scripts/readme-shots.mjs [baseUrl]` | Regenerates the two README images (`docs/screenshots/desktop-scam.png` and `phone-lease.png`) from a live run. |
 
 The browser scripts use `playwright-core` with your installed Chrome. See [`docs/accessibility.md`](docs/accessibility.md) for the manual keyboard and screen-reader checks.
 

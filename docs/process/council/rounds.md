@@ -14,7 +14,7 @@ Human-only lines (student quotes, the video, a live run of the latest code on th
 **Judges:**
 - A: GDG rubric (fable).
 - B: Gemma 4 and Open-Source AI tracks (opus).
-- C: UI/UX and WCAG, from 16 fresh screenshots in `docs/screenshots/council-r1/` (opus).
+- C: UI/UX and WCAG, from 16 fresh screenshots in `docs/process/screenshots/council-r1/` (opus).
 - D: skeptical engineer (sonnet).
 - Chairman: opus, fresh context.
 

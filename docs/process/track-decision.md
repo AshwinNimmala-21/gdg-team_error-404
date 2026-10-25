@@ -4,7 +4,7 @@ We may enter exactly one MLH track ([`docs/process/brief/event-notes.md:19`](bri
 
 State when written (Sun Oct 25, 03:30 AM):
 - App deployed on Cloud Run: `https://clearlease-477820387862.us-east4.run.app` ([`docs/process/catchup.md:19`](catchup.md)). Repo is public, LICENSE is Apache-2.0.
-- **No demo video recorded.** `docs/video-script.md` and `docs/submissions.md` are stubs.
+- **No demo video recorded.** `docs/process/video-script.md` and `docs/process/submissions.md` are stubs.
 - **`docs/validation.md` has no student answers** (`docs/validation.md:67`, "None recorded yet").
 - **Update 05:06: self-hosted Gemma (D4) is implemented and tested.** `GEMMA_PROVIDER=ollama` runs the same pipeline on a local Gemma 4 (`lib/ai/ollama.ts`, tests in `lib/ai/__tests__/ollama.test.ts`). On this laptop, `gemma4:e2b-it-qat` passed 1 of 5 strict sample checks and `gemma4:e4b-it-qat` passed 3 of 5. Both read the lease photo, and every answer was schema-valid. `gemma4:26b` was not tested (too big for this laptop). See README "Self-host Gemma 4".
 - Tonight's queue (C, A, B, D4, Finish) has not started ([`docs/process/catchup.md:197-208`](catchup.md)).

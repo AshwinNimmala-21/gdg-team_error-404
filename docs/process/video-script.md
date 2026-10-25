@@ -97,7 +97,7 @@ Sources for the numbers in the narration:
 ## 4. 30-second spoken fallback (if the live demo stalls on stage)
 
 Have a **pre-recorded screenshot ready, open full screen on the presenter laptop**: `docs/screenshots/desktop-scam.png` (the finished report for the Facebook-style scam, with the stamps and the quoted evidence). Backups in the same folder:
-- `docs/screenshots/gemma-read-text-1280.png`: the "What Gemma read" section with highlighted quotes.
+- `docs/process/screenshots/gemma-read-text-1280.png`: the "What Gemma read" section with highlighted quotes.
 - `docs/screenshots/phone-lease.png`: a lease photo read on a phone, with the clauses to fix.
 
 Open the three images in tabs before the presentation so you do not need the network. Say this while pointing at the screenshot (about 76 words):
