@@ -42,7 +42,18 @@
 - **No false "Suspiciously cheap":** 0 legitimate listings labelled that way, down from 6 before the bias fix.
 - **Time and cost to a verdict:** about 11–12 s for a listing and about 33 s for a lease photo; about $0.54 to $0.97 per 1,000 checks at hosted prices (see "Cost").
 
-**Student validation:** interviews with VT students and a 3-person usability test ("Is this listing safe?") are in progress. Answers go in [`docs/validation.md`](docs/validation.md) only from real conversations.
+**What students told us (3 interviews, Oct 25).** We talked to three people from Virginia Tech: two seniors and a recent graduate. They're friends of the team, so this is a small sample and not a random one. Full answers: [`docs/validation.md`](docs/validation.md).
+- All three had seen a fake-seeming listing. Each red flag they named matches a check Clearlease already runs: a price far below the area, a deposit asked for before the lease, and pressure to pay earlier than normal.
+- All three had run into hidden fees or charges. Two of the three understood their lease before signing.
+- On the live site, all three called the Blacksburg sample a likely scam and gave the right reasons. None found anything confusing. Their average trust was 3.7 out of 5.
+- All three said they'd treat it as a caution, not a final answer, which is how every report frames itself ("This is not legal advice").
+- Two said they were comfortable once told that phone numbers and emails are removed before the AI sees the text.
+
+> "It was in a prime locality but the price was way off for that locality"
+>
+> "I think more than trusting it completely I would see it as more like a caution and be more careful"
+>
+> — a senior we interviewed
 
 ## What it does
 
@@ -101,10 +112,14 @@ We built a labelled evaluation before changing anything, froze a keyword-only ba
 
 ## How the AI is used (and bounded)
 
+![How Clearlease works, in six steps. 1, your browser: paste a listing, landlord message or lease photo; phone numbers, emails and long ID numbers are removed and photos shrunk on the device. 2, Google Cloud Run: POST /api/check with rate limiting and size and type checks. 3, Gemini API: Gemma 4 (gemma-4-26b-a4b-it) turns text and images into JSON facts, each with its exact quote, with the input wrapped as untrusted data. 4, Cloud Run: verify, a schema check, then every quote is matched against the input and anything not found is dropped. 5, Cloud Run: rules decide; TypeScript sets every verdict (price, 9 FTC scam signs, state lease law) and the model never does. 6, your browser: the report, with three verdicts, quoted evidence, what Gemma read, questions to ask and help links, in English or Spanish. Below: the data the rules use (HUD Fair Market Rents, Census ACS rent by ZIP, VA, DC and MD lease rules, FTC rental-scam signs), the Google Cloud services in us-east4, privacy and reliability notes, and the open-weights self-hosting option with Ollama.](docs/architecture.png)
+
+The same flow as a diagram you can read in the source:
+
 ```mermaid
 flowchart LR
   U["Renter on phone or laptop"] -->|"text, photo, ZIP"| UI["Next.js page"]
-  UI -->|"redact phones/emails, shrink photo on device"| UI
+  UI -->|"redact emails, phones, ID numbers; shrink photo on device"| UI
   UI -->|"POST /api/check"| API["Cloud Run: /api/check"]
   API --> G1["Rate limit, size + type checks"]
   G1 --> AI["Gemma 4 26B A4B (Gemini API): read text + image into quoted JSON"]
@@ -122,7 +137,7 @@ flowchart LR
 **Why the AI is necessary.** Listings and leases are messy, and they arrive as screenshots and phone photos. Gemma 4 reads both (it is multimodal) and turns them into one strict JSON shape: rent, bedrooms, ZIP, payment methods, seven scam signals and lease clauses. Every field carries a **verbatim quote** from the input. It also understands negation and paraphrase ("we never take wire transfers" is *not* a red flag), which keyword rules can't: on our hard eval set a keyword scanner raised false alarms on 6 of 9 legitimate listings with disclaimers like that. Normally it's one Gemma call per check: JSON mode with the schema in the prompt, then strict Zod validation. We don't send the API's stricter schema mode, because the Gemini API rejected it for this model on 46 of 46 calls (HTTP 400, measured Oct 24–25). Transient errors are retried.
 
 **How it's bounded:**
-- **The model extracts; code decides.** No prices, scores or legal judgments come from the model. Thresholds live in [`lib/rules/`](lib/rules), covered by unit tests (123 in the whole suite at the Sun 5:20 AM gate).
+- **The model extracts; code decides.** No prices, scores or legal judgments come from the model. Thresholds live in [`lib/rules/`](lib/rules), covered by unit tests (126 in the whole suite).
 - **Grounding check.** Each quote must appear in your text, or in Gemma's own transcript of your photo. Unmatched quotes are dropped and shown as "not counted". Extracted numbers must appear inside their quote.
 - **Prompt-injection defense.** Your text is wrapped as delimited data, and the delimiters are escaped. The system prompt is pinned. Output must validate against the schema, or you get a safe error rather than a guess. (Only for the 5 built-in samples, a failed live call shows a saved answer instead, labelled "Showing a saved result".) A second, rule-based detector catches phrases like "ignore previous instructions" even if the model misses them. Sample 5 shows the attack being ignored *and* counted as a red flag.
 - **Not legal advice.** Every report says so and links to free help for the renter's state.
@@ -145,10 +160,10 @@ Hosting is one Cloud Run service that scales to zero, plus Firestore and Secret 
 
 ## Responsible AI and privacy
 
-- **Nothing about you is stored.** No accounts, no database of checks, no logs of your text. The server never logs request bodies or model output.
-- **Your device redacts before sending.** Phone numbers, emails and long ID/account numbers are removed in the browser. Photos are resized and re-encoded on the device, which strips location (EXIF/GPS) data.
+- **Your text and photos are never stored or logged.** No accounts and no database of checks. The server never logs request bodies or model output, and a photo is sent to the model for the check and then dropped.
+- **Your device redacts before sending.** The browser removes exactly four things from your text ([`lib/client/redact.ts`](lib/client/redact.ts)): email addresses, phone numbers, SSN-format numbers, and long ID or account numbers (10 or more digits). It does **not** remove names, street addresses or anything inside a photo, so the page asks you to cover names, signatures and account numbers in photos first. Photos are resized and re-encoded on the device, which strips location (EXIF/GPS) data.
 - **Honest about the model host.** Gemma 4 on the Gemini API is free tier only, and Google may use free-tier inputs to improve its products. The page says this plainly next to the button. For stricter privacy, a nonprofit can run the same open weights on its own hardware.
-- **Community counter, minimal by design.** Contacts are SHA-256 hashed *in the browser*, then keyed with a server secret (HMAC). Firestore stores only `{count, firstSeen}` under those keyed hashes: no text, images or IPs. Flags need a short-lived signed token from a real check.
+- **Community counter, minimal by design.** Firestore is written to only when someone flags a listing, and then it stores one-way fingerprints and counts: `{count, firstSeen}` under keyed hashes of the listing's contact details or street address. Contacts are SHA-256 hashed *in the browser*, then keyed with a server secret (HMAC). No text, images or IPs. Flags need a short-lived signed token from a real check.
 - **Abuse and cost guards.** A per-client rate limit (10 checks per minute by default; the deployed site uses 30 because judges share venue Wi-Fi), 12,000-character text limit, 8 MB image cap (enforced on the server too), MIME allowlist, and a streamed body size cap.
 - **Sources are cited and caveated.** Our own rules of thumb (the 25% price cut-off, off-platform contact) are labeled "Clearlease rule of thumb" in the UI.
 
@@ -189,7 +204,7 @@ Only **one key is required**: `GEMINI_API_KEY` (free from [aistudio.google.com/a
 Checked on Oct 25: a production build with only `GEMINI_API_KEY` set (the other four blanked) passed all 5 samples live (`node scripts/e2e.mjs`), showed saved figures, no counter and no map.
 
 ```bash
-npm test            # 123 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map)
+npm test            # 126 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map)
 npm run lint
 npm run build && npm start              # production server (standalone, like Cloud Run)
 node scripts/e2e.mjs http://localhost:3000            # API check of the 5 samples

@@ -7,7 +7,7 @@ These commands are for Windows PowerShell and assume you've never used gcloud. R
 **What gets deployed:**
 - **Cloud Run:** one service, `clearlease`, in `us-east4`, built from the repo's `Dockerfile` (Next.js standalone server, Node 24).
 - **Secret Manager:** holds `GEMINI_API_KEY`, `HUD_TOKEN`, `CENSUS_KEY` and `COMMUNITY_SALT`. They reach the service as env vars at runtime and are never baked into the image.
-- **Firestore (Native mode, `us-east4`):** the anonymous community flag counter. It stores keyed hashes, a count and a date, and nothing else.
+- **Firestore (Native mode, `us-east4`):** the anonymous community flag counter. It's written to only when someone flags a listing, and stores keyed hashes (one-way fingerprints), a count and a date, and nothing else.
 - **Maps settings:** `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` and `NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID` are plain runtime env vars. The server reads them per request and passes them to the map as props. That's why they don't need to exist at build time. Google documents `--set-build-env-vars` for buildpacks only, not Dockerfile builds; we checked on 2026-10-24.
 
 > `.env`/`.env.local` never leave your laptop. `.gcloudignore` and `.dockerignore` exclude them. Without that, Next.js would copy `.env` into the standalone server inside the image.
@@ -116,8 +116,8 @@ $URL
 ## 8. Smoke test
 
 ```powershell
-Start-Process $URL                                   # open the site; click the 4 samples
-node scripts/e2e.mjs $URL                            # API check of the 4 samples (PASS/FAIL per sample)
+Start-Process $URL                                   # open the site; click the 5 samples
+node scripts/e2e.mjs $URL                            # API check of the 5 samples (PASS/FAIL per sample)
 ```
 
 With the real Gemini key the samples are read live by Gemma, so the wording can differ a little from demo mode. The verdict words should still match the table in `PLAN.md` §6. The report header should say "Read by Gemma 4 (gemma-4-26b-a4b-it)".

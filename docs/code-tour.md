@@ -29,7 +29,7 @@ for placeholders like `[phone removed]`. The scam signal is still there ("text m
 number is gone. Contacts are only sent as SHA-256 hashes (for the community counter). Photos are drawn onto a
 canvas and re-encoded as JPEG, which shrinks them and drops the EXIF data, GPS location included.
 
-🎥 **Say this:** "Before anything is sent, the browser removes phone numbers and emails and strips the photo's GPS data, so the server never sees them."
+🎥 **Say this:** "Before anything is sent, the browser removes emails, phone numbers, SSN-format numbers and long ID numbers, and strips the photo's GPS data, so the server never sees them."
 
 ## Stop 2: Gemma extracts, with a strict schema and injection defenses
 

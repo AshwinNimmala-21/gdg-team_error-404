@@ -1,67 +1,90 @@
 # Student validation
 
-Two parts: short interviews (does the problem matter to students?) and a 3-person usability test (can someone find the answer fast?). Only real answers go here; no invented quotes. Use first names or roles only, and get a yes before writing down a quote.
+Two parts: short interviews (does the problem matter to students?) and a usability test on the live site (can someone find the answer fast?). Only real answers go here; nothing is invented or embellished. Participants are numbered, never named.
+
+**Who we talked to (Sun Oct 25, 2026):** 3 people from Virginia Tech: two seniors and one recent graduate. All three are friends of the team, so this is **not a random sample**, and 3 people is a small number. Read it as an early signal, not proof.
+
+**How it was recorded:**
+- **Participant 1** answered by text message. Their answers below are **verbatim**, in quotation marks.
+- **Participants 2 and 3** answered by phone. Their answers below are **Ashwin's paraphrase** of the calls, written without quotation marks. They are not their exact words.
 
 ---
 
-## Part 1: Interviews (Sat Oct 24 – Sun Oct 25, 2026)
+## The questions
 
-**Ask each person:**
+**Interview:**
 1. Have you or a friend ever seen a rental listing you thought was fake? What tipped you off, or what almost fooled you?
 2. Did you understand your lease before you signed it? Which clause or fee surprised you later?
 3. If a free tool checked price, scam risk and lease clauses in 10 seconds, would you use it before paying a deposit? What would make you not trust it?
 
-**Record one row per person.** "Would use" is their own 1–5 answer to "How likely are you to use this before paying a deposit?"
-
-| # | Who (first name or role; year; renting where) | Q1: fake listing seen? | Q2: lease surprise | Q3: would use it? what would break trust? | Would use (1–5) | Quote we may use (with their OK) |
-|---|---|---|---|---|---|---|
-| 1 | | | | | | |
-| 2 | | | | | | |
-| 3 | | | | | | |
-| 4 | | | | | | |
-| 5 | | | | | | |
-| 6 | | | | | | |
-| 7 | | | | | | |
-| 8 | | | | | | |
-
-**Summary (fill in after the interviews):**
-- People interviewed: __
-- Saw or nearly fell for a fake listing (self or friend): __ of __
-- Were surprised by a lease clause or fee: __ of __
-- Would use it before paying a deposit (4 or 5 out of 5): __ of __
-- What would make them not trust it (themes): __
-- Quotes for the README and video (2–3, with permission): __
-
----
-
-## Part 2: Usability test (3 people, about 5 minutes each)
-
-**Setup:** open the site on their phone or your laptop at the empty page. Don't explain the product. Start a timer when you finish reading the task.
-
-**Task, read aloud exactly:** "A friend sent you this listing and wants to know: is this listing safe? Use this site to find out." Then click (or have them click) nothing; let them find the "Blacksburg summer sublet" sample themselves, or paste the listing text from `public/samples/blacksburg-sublet.txt` if they're stuck after 30 seconds (note that you helped).
-
-**Measure:**
-- **Time to verdict:** seconds from the end of the task until they say the scam verdict out loud ("likely scam", "not safe", etc.). Stop at 120 s.
-- **Correct?** Did they say it's likely a scam?
-- **Why?** Ask: "What made you decide that?" Note whether they mention a quoted warning sign (Zelle before viewing, can't show it, pressure).
-- **Confusion:** anything they hesitated on, misread, or asked about. Write their words.
-- **Trust:** "How much would you trust this, 1 to 5? Why?"
-- **Gemma section:** after the task, ask "What does the 'What Gemma read' section tell you?" Note if they understand that the AI only read the text and the rules made the verdict.
-
-| # | Who (first name or role; device) | Time to verdict (s) | Correct verdict? | Reason they gave | What confused them (their words) | Trust (1–5) and why | Understood "What Gemma read"? | Helped? |
-|---|---|---|---|---|---|---|---|---|
-| 1 | | | | | | | | |
-| 2 | | | | | | | | |
-| 3 | | | | | | | | |
-
-**Summary (fill in after the tests):**
-- Median time to verdict: __ s
-- Correct verdict: __ of 3
-- Cited a quoted warning sign as their reason: __ of 3
-- Top confusion: __
-- What we changed because of it (if anything): __
+**Usability test:** on the live site, with the "Blacksburg summer sublet" sample: "A friend sent you this listing and wants to know: is this listing safe? Use this site to find out." Then: what did it tell you and why, what confused you, and how much would you trust it (1–5)?
 
 ---
 
 ## Responses
-_None recorded yet. Answers are added only from real conversations._
+
+### Participant 1 (senior)
+Friend. Text message, Sun Oct 25, about 9:55 AM. **Verbatim.**
+
+- Seen a fake-seeming listing? "Yes"
+- What tipped you off? "It was in a prime locality but the price was way off for that locality"
+- Understood your lease before signing? "Yes it was easier as it was through the company rather than individual"
+- Any clause or fee surprise you later? "There were a lot of hidden charges under the application"
+- What would make you not trust the tool? "I think more than trusting it completely I would see it as more like a caution and be more careful"
+- Usability (live site, Blacksburg sample; self-reported, not timed by us):
+  - Verdict and time: "No, not safe. Almost gave answer in under a min"
+  - What it told him: "It said it was not safe and likely a scam. Because of the pricing and the payments required before signing"
+  - Confusing: "Nothing"
+  - Trust: 3.5 / 5
+
+### Participant 2 (recent graduate, about 1.5 years ago)
+Friend. Phone call, Sun Oct 25, about 10 AM. **Paraphrase, not exact words.**
+
+- Has seen a fake-seeming listing: yes. The red flag was being asked to send the deposit before the lease.
+- Understood her lease before signing: yes, but it came with hidden charges.
+- Trust: would use it with caution. She was comfortable with it once told that phone numbers and emails are removed before the AI sees the text.
+- Usability (live site, Blacksburg sample): said it was not safe / likely a scam and gave the reasons. Nothing confusing. Trust 4 / 5. Time not recorded.
+
+### Participant 3 (senior)
+Friend. Phone call, Sun Oct 25, about 10 AM. **Paraphrase, not exact words.**
+
+- Has seen a fake-seeming listing: yes, while finding housing for a co-op. The red flag was being asked to pay earlier than normal.
+- Understood his lease before signing: no. It also came with hidden charges.
+- Trust: same as Participant 2 (would use it with caution; comfortable once told that phone numbers and emails are removed before the AI sees the text).
+- Usability (live site, Blacksburg sample): said it was not safe / likely a scam, with the reasons. Nothing confusing. Trust 3.5 / 5. Time not recorded.
+
+---
+
+## Summary
+
+3 friends from Virginia Tech, not a random sample.
+
+**The problem is real for them:**
+- **3 of 3 had seen a fake-seeming listing.** Each red flag they named matches a check Clearlease already runs:
+
+  | What tipped them off | Clearlease check |
+  |---|---|
+  | Price far below the area ("prime locality but the price was way off") | Price check (far below the local range, flagged when another warning sign is present) |
+  | Deposit before the lease | "Asks for money before you've seen the place or signed a lease" |
+  | Asked to pay earlier than normal | "Pushes you to decide or pay quickly" |
+
+- **3 of 3 ran into hidden fees or charges.** Clearlease already extracts application fees.
+- **2 of 3 understood their lease before signing.**
+
+**The usability test worked:**
+- **3 of 3** called the Blacksburg sample a likely scam, with correct reasons.
+- **0 of 3** found anything confusing.
+- **Mean trust 3.7 / 5** (3.5, 4 and 3.5).
+- Only Participant 1 gave a time, self-reported: "under a min". We did not time anyone.
+
+**How they would use it:** all three said they'd treat it as a caution, not a final answer. That matches how Clearlease presents itself: every report says "This is not legal advice" and links to free help.
+
+**Privacy drives trust.** Participants 2 and 3 were comfortable using it once told that contact details are removed before the AI sees the text. Exactly what the browser removes before sending (`lib/client/redact.ts`):
+- email addresses
+- phone numbers
+- SSN-format numbers (123-45-6789)
+- long ID or account numbers (10 or more digits)
+
+It does **not** remove names, street addresses, or anything inside a photo. The page asks users to cover names, signatures and account numbers in photos before adding them.
+
+**What we did not test:** whether people understood the "What Gemma read" section, or the lease-photo and Spanish flows.

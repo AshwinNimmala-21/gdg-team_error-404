@@ -22,7 +22,7 @@
 - Plain verbs, sentence case, written for a stressed renter.
 - Buttons say exactly what happens ("Check this listing").
 - Errors say what happened and what to do next.
-- The empty state invites the first action and offers the three sample inputs.
+- The empty state invites the first action and offers the five sample inputs.
 
 ## Quality floor
 - Responsive down to 375px with no horizontal scroll. Image upload from the camera roll works.
