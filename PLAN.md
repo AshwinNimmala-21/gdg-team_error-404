@@ -63,7 +63,7 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 5b. Student-market pricing: per-bedroom/per-person vs whole-unit benchmark ÷ bedrooms (labelled approximation) + sublet line; `scripts/eval/student.jsonl` before/after (`0baae36`)
 - [x] 5c. Manual a11y: 12/12 pass (K1 re-checked on clean prod build, no change needed). Per-bedroom: only "far below" checked, else neutral "Rough comparison" (`c6b410a`). Lease: deposit-as-fact cap check + blanket repairs rule, 13/13 (`fbc6667`)
 - [x] 6. `scripts/deploy.sh`, README minimum setup, Ollama self-host section (labelled untested unless tested)
-- [ ] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
+- [x] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
 - [ ] 8. Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip
 - [ ] Finish a) eval run "after" incl. holdout, README before/after table; b) README pass; c) STOP: ready to deploy
 
