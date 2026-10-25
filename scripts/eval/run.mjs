@@ -13,6 +13,8 @@ const kindOnly = (args.find((a) => a.startsWith("--kind=")) ?? "").slice(7); // 
 const [run = "adhoc", base = "http://localhost:3000"] = args.filter((a) => !a.startsWith("--"));
 const items = readFileSync(set === "easy" ? "scripts/eval/dataset.jsonl" : `scripts/eval/${set}.jsonl`, "utf8").trim().split("\n").map((l) => JSON.parse(l)).filter((it) => !kindOnly || it.kind === kindOnly);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// --pace=N waits N seconds between items, to stay under a free-tier rate limit (default 1.5 s).
+const paceMs = Number((args.find((a) => a.startsWith("--pace=")) ?? "--pace=1.5").slice(7)) * 1000;
 
 // ---- Keyword-only baseline: flags a listing if any scam keyword appears. No model, no rules, no price data.
 // Frozen after run "before"; never edit (see the file's note).
@@ -48,12 +50,15 @@ for (const it of items) {
     row.subletLine = /sublets often list below market/i.test(j.price.detail ?? "");
     row.scam = j.scam.status;
     row.flags = j.scam.flags.map((f) => f.id);
+    row.kinds = j.read.kinds;
+    row.rent = j.read.rent;
+    row.question = j.inputType === "question"; // "what we can check" state instead of verdicts (Task A)
     row.conflicts = j.lease.findings.filter((f) => f.severity === "conflict" && f.evidence[0]?.counted).map((f) => f.type);
     if (it.kind === "lease") row.expect = it.expectConflicts;
   }
   rows.push(row);
   process.stderr.write(`${it.holdout && !showHoldout ? "." : `${it.id} ${row.error ?? `${row.scam} ${row.priceWord}`}\n`}`);
-  await sleep(1500);
+  await sleep(paceMs);
 }
 process.stderr.write("\n");
 
@@ -78,7 +83,7 @@ function scores(set, isPositive) {
 }
 const pct = (x) => (Number.isNaN(x) ? "n/a" : `${Math.round(x * 100)}%`);
 function table(label, set) {
-  const ok = set.filter((r) => !r.error && r.kind === "listing");
+  const ok = set.filter((r) => !r.error && (r.kind === "listing" || r.kind === "message"));
   const systems = [
     ["Clearlease: \"Likely scam\"", (r) => r.scam === "likely"],
     ["Clearlease: any red flag (Some or Likely)", (r) => r.scam === "likely" || r.scam === "some"],
@@ -125,6 +130,22 @@ if (set !== "easy") {
 }
 if (set !== "easy") {} else if (showHoldout) out.push("", table("Holdout (never inspected while making changes)", rows.filter((r) => r.holdout)));
 else out.push("", `Holdout: ${rows.filter((r) => r.holdout).length} items run and saved unread to scripts/eval/results/${run}-holdout.json.`);
+if (set === "messy") {
+  const byId = Object.fromEntries(items.map((it) => [it.id, it]));
+  const qs = rows.filter((r) => r.label === "question");
+  const rentItems = rows.filter((r) => byId[r.id].expectRent !== undefined);
+  out.push(
+    "",
+    `Questions answered with the "what we can check" state: ${qs.filter((r) => r.question).length} of ${qs.length}. ` +
+      `Rent read correctly: ${rentItems.filter((r) => r.rent === byId[r.id].expectRent).length} of ${rentItems.length}. ` +
+      `Listings or messages shown as a question by mistake: ${rows.filter((r) => r.label !== "question" && r.question).length}.`,
+    "",
+    "| Item | Category | Label | Shown as | Scam | Rent read (expected) |",
+    "|---|---|---|---|---|---|",
+  );
+  for (const r of rows)
+    out.push(`| ${r.id} | ${r.category} | ${r.label} | ${r.error ?? (r.question ? "question" : "report")} | ${r.scam ?? ""}${r.flags?.length ? ` (${r.flags.length})` : ""} | ${r.rent ?? "none"}${byId[r.id].expectRent !== undefined ? ` (${byId[r.id].expectRent})` : ""} |`);
+}
 if (set === "student") {
   out.push("", "| Item | Category | Label | Price verdict | Scam | Sublet line shown |", "|---|---|---|---|---|---|");
   for (const r of rows) out.push(`| ${r.id} | ${r.category} | ${r.label} | ${r.suspicious ? "Suspiciously cheap" : r.priceWord ?? r.error} | ${r.scam ?? ""} | ${r.subletLine ? "yes" : "no"} |`);

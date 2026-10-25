@@ -2,7 +2,10 @@ import type { Extraction, SignalId } from "@/lib/ai/schema";
 import { DC_OAG_ALERT, FTC_SCAMS } from "@/lib/data/help";
 import type { Evidence, PriceCheck, ScamCheck, ScamFlag, ScamFlagId, SourceRef } from "@/lib/types";
 import { money } from "./price";
-import { findQuote, type Corpus } from "./quotes";
+import { findQuote, foldAccents, type Corpus } from "./quotes";
+
+// People type Spanish without accents ("fuera del pais"), so Spanish patterns are matched with accents folded on both sides.
+const folded = (re: RegExp) => new RegExp(foldAccents(re.source), re.flags);
 
 const FTC: SourceRef = { name: "FTC: Rental listing scams", url: FTC_SCAMS };
 const FTC_SPOTLIGHT: SourceRef = {
@@ -32,11 +35,14 @@ const AWAY_ES =
 const AWAY =
   /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|far away|(another|a different) (city|state|country)|(relocat\w*|mov(e|ed|es|ing)|transferr\w*) to|(can'?t|cannot|unable to|not able to|won'?t be able to) (meet|show|be (there|here|around))|not (in|around)|(mail|send|ship|drop)\w* (you )?(the )?keys?)\b/i;
 
-/** The sentence around a quote in the user's text (or the photo transcript), or null if it can't be found. */
+const RELOCATING_ES_F = folded(RELOCATING_ES);
+const AWAY_ES_F = folded(AWAY_ES);
+
+/** The sentence around a quote in the user's text (or the photo transcript), accents folded, or null if it can't be found. */
 function sentenceAround(quote: string, sources: string[]): string | null {
-  const q = quote.replace(/\s+/g, " ").trim().toLowerCase();
+  const q = foldAccents(quote.replace(/\s+/g, " ").trim().toLowerCase());
   for (const src of sources) {
-    const s = src.replace(/\s+/g, " ");
+    const s = foldAccents(src.replace(/\s+/g, " "));
     const i = s.toLowerCase().indexOf(q);
     if (i < 0) continue;
     const start = Math.max(...[".", "!", "?"].map((c) => s.lastIndexOf(c, i - 1))) + 1;
@@ -48,9 +54,9 @@ function sentenceAround(quote: string, sources: string[]): string | null {
 
 /** True when the whole sentence only says the owner is moving, with nothing about being away or unavailable. */
 export function isOnlyRelocating(quote: string | null, sources: string[]): boolean {
-  if (!quote || !(RELOCATING.test(quote) || RELOCATING_ES.test(quote))) return false;
+  if (!quote || !(RELOCATING.test(quote) || RELOCATING_ES_F.test(foldAccents(quote)))) return false;
   const sentence = sentenceAround(quote, sources);
-  return sentence !== null && !AWAY.test(sentence) && !AWAY_ES.test(sentence); // fail closed: an unlocatable quote still counts
+  return sentence !== null && !AWAY.test(sentence) && !AWAY_ES_F.test(sentence); // fail closed: an unlocatable quote still counts
 }
 
 const FTC_METHODS = new Set(["wire", "gift_card", "crypto"]);
@@ -68,14 +74,16 @@ const INJECTION_PATTERNS = [
   /(ia|asistente|modelo|verificador|revisor)\p{L}*[,:]?.{0,80}(rep[oó]rtel[oa]|m[aá]rquel[oa]|clasif[ií]quel[oa]|calif[ií]quel[oa]) como/iu,
 ];
 
+const INJECTION_PATTERNS_F = INJECTION_PATTERNS.map(folded);
+
 export function findInjection(text: string): string | null {
-  for (const p of INJECTION_PATTERNS) {
-    const m = p.exec(text);
+  // Match on accent-folded text, then return the original line (folding never adds or removes line breaks).
+  const plain = foldAccents(text);
+  for (const p of INJECTION_PATTERNS_F) {
+    const m = p.exec(plain);
     if (m) {
-      const start = text.lastIndexOf("\n", m.index) + 1;
-      const endNl = text.indexOf("\n", m.index);
-      const line = text.slice(start, endNl === -1 ? undefined : endNl).trim();
-      return line.slice(0, 240);
+      const lineNo = plain.slice(0, m.index).split("\n").length - 1;
+      return text.split("\n")[lineNo].trim().slice(0, 240);
     }
   }
   return null;

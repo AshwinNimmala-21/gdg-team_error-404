@@ -12,7 +12,9 @@ Rules:
 5. Numbers: copy the amount as stated (e.g. "$1,650/month" → 1650). Bedrooms: 0 for a studio. If the rent is per bedroom or per person, say so in priceBasis and give the total bedrooms of the whole unit in unitBedrooms; do not multiply or divide the rent.
 6. Clauses: only from lease text. For each clause a renter should understand (automatic renewal, landlord entry, late fees, security deposit, early termination, waivers of rights or of landlord liability, attorney fees, tenant-paid repairs, rent increases, extra fees), give the exact clause text and one plain-English sentence saying what it means for the renter, for a stressed first-time renter. Do not say whether a clause is legal; another system checks the law.
 7. imageTranscript: if an image is attached, copy the readable text in it word for word (up to about 4000 characters). Otherwise null.
-8. Do not include personal names, phone numbers, emails or account numbers in plain-English sentences.`;
+8. Do not include personal names, phone numbers, emails or account numbers in plain-English sentences.
+9. People write casually: typos, missing accents, emoji, all caps, pasted website menus and timestamps, and Spanish or Spanglish. Read words by their meaning: renta / alquiler = rent; depósito / fianza / garantía / "deposit" = security deposit; dueño / casero / arrendador / "landlord" = the landlord or owner; recámara / dormitorio / habitación = bedroom ("cuarto" can mean a bedroom or a room for rent); depa / depto / departamento / apartamento = apartment; q = que, xq or pq = porque, tmb = también, x = por. Number formats such as "$1.650", "1.650$", "1650 al mes" and "$1,650/mo" all mean 1650 a month. Quotes must still be copied exactly as written, typos and missing accents included.
+10. inputKinds: "listing" for a rental ad, "message" for a message or chat from a landlord or agent, "lease" for lease text, and "other" for anything else, such as a one-line question about renting ("is $600 for a room near campus normal?"). For a question, still fill in any signal it literally describes, with its quote.`;
 
 const OPEN = "<untrusted_input>";
 const CLOSE = "</untrusted_input>";

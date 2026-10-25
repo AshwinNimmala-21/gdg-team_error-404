@@ -140,6 +140,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
   const dataLive = Boolean(benchmarks.fmr?.live || benchmarks.census?.live);
 
   return {
+    inputType: result.inputType,
     read: result.read,
     price: result.price,
     scam: result.scam,

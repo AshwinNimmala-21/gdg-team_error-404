@@ -5,10 +5,13 @@ export interface Corpus {
   image: string;
 }
 
+/** "depósito" → "deposito", "dueño" → "dueno": people often type Spanish without accents, and models add them back. */
+export function foldAccents(s: string): string {
+  return s.normalize("NFD").replace(/\p{M}+/gu, "").normalize("NFC");
+}
+
 export function normalize(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize("NFKC")
+  return foldAccents(s.toLowerCase().normalize("NFKC"))
     .replace(/[‘’‚‛′`]/g, "'")
     .replace(/[“”„‟″]/g, '"')
     .replace(/[‐-―−]/g, "-")
@@ -55,8 +58,14 @@ export function findQuote(quote: string | null | undefined, corpus: Corpus): "te
 /** True when the digits of `n` (e.g. 1650, "1,650", "$1.650") appear in the quote. */
 export function numberInQuote(n: number | null, quote: string | null): boolean {
   if (n === null || !quote) return false;
-  const digits = quote.replace(/(\d)[,.](?=\d{3}\b)/g, "$1");
-  return new RegExp(`(^|[^\\d])${String(n).replace(".", "\\.")}([^\\d]|$)`).test(digits);
+  // Thousands separators: "1,650", "$1.650", "1.650$", and the no-break spaces some Spanish keyboards insert ("1 650").
+  const digits = quote.replace(/(\d)[,.  ](?=\d{3}\b)/g, "$1");
+  if (new RegExp(`(^|[^\\d])${String(n).replace(".", "\\.")}([^\\d]|$)`).test(digits)) return true;
+  // Thousands shorthand: "$1.6k", "2k", "1,65k".
+  for (const m of quote.matchAll(/(\d+(?:[.,]\d+)?)\s?k\b/gi)) {
+    if (Math.round(parseFloat(m[1].replace(",", ".")) * 1000) === n) return true;
+  }
+  return false;
 }
 
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six"];

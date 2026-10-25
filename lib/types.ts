@@ -137,6 +137,8 @@ export interface CheckResult {
     /** Set when the rent is per bedroom or per person (then `bedrooms` is the whole unit). */
     priceBasis?: "per_bedroom" | "per_person" | null;
   };
+  /** "question": a question about renting, not a listing, message or lease. The UI shows what we can check instead of verdicts. */
+  inputType: "check" | "question";
   price: PriceCheck;
   scam: ScamCheck;
   lease: LeaseCheck;

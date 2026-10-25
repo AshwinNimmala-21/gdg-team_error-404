@@ -238,3 +238,34 @@ The holdout "before" numbers were computed from `scripts/eval/results/before-hol
 - Clearlease's advantage shows on the hard set (paraphrased payments, misspellings, Spanish, anti-scam disclaimers, screenshots) and on leases, which a keyword scan can't judge at all.
 - "Likely scam" is the verdict to trust: it raised 0 false alarms in every set. It missed 1 easy scam and 1 holdout scam that still got "Some red flags".
 - Each run is a single pass of a live model; reruns can move a flag or two (for example, the Blacksburg sample has shown 6 or 7 of 9 flags).
+
+## Messy real-world input (`scripts/eval/messy.jsonl`), added Sun Oct 25 (Task A)
+A judge will paste something messy. 20 synthetic, labelled items, written before any fix and not tuned afterwards:
+- 5 one-line questions (e.g. "landlord wants zelle before i see it, is that ok"), 2 of them in Spanish or Spanglish.
+- English listings with emoji and caps, typos, pasted marketplace and Craigslist menus with timestamps, a chat log pasted as text, and a rendered chat screenshot (`scripts/eval/messy-images/m12.jpg`).
+- Spanish as people type it: no accents ("deposito", "dueno"), abbreviations (q, xq, tmb), regional words (renta/alquiler, fianza/garantía, arrendador), Spanglish ("el landlord quiere el deposit por Zelle"), and the number formats "$1.650", "850$" and "1650 al mes".
+
+Labels: 7 scam, 8 legit, 5 question. **Correction:** m06 (a partial listing with no price or ZIP) was mislabelled "question" by our generator in the "before" run. It was relabelled "legit" before the "after" run; it got a normal report both times.
+
+**Fixes (general, not per item):**
+1. A question isn't given three empty verdicts. When Gemma tags the input "other", and there's no verified rent+ZIP, no lease clause and no injection, the page says what Clearlease checks and what to paste. If the question itself describes FTC warning signs, it lists them with the user's words quoted and the matching questions. All of it is our rule text, never model-written advice. (`lib/rules/check.ts` `inputType`, `components/QuestionHelp.tsx`.)
+2. Quote verification ignores accents ("depósito" = "deposito"). The Spanish relocation and injection checks match accent-folded text, so "fuera del pais" still counts as "owner away". (`lib/rules/quotes.ts` `foldAccents`, `lib/rules/scam.ts`.)
+3. Rent verification also accepts "$1.6k"/"2k" and no-break-space thousands separators. "$1.650", "1.650$" and "1650 al mes" already worked.
+4. The extraction prompt lists the Spanish/Spanglish vocabulary and number formats, and says a one-line question is inputKind "other" (`lib/ai/prompt.ts` rules 9–10).
+
+**Results (live `gemma-4-26b-a4b-it`, paced 20 s apart; full tables in `scripts/eval/results/messy-before.md` and `messy-after.md`):**
+
+| | Before | After |
+|---|---|---|
+| Questions answered with "what we can check" instead of verdicts | 0 of 5 | **4 of 5** |
+| Listings or messages wrongly shown as a question | 0 | 0 |
+| Clearlease, any red flag: precision / recall / false alarms | 100% / 100% / 0 | 100% / 100% / 0 |
+| Keyword baseline (frozen): precision / recall / false alarms | 83% / 71% / 1 | 83% / 71% / 1 |
+| Rent read correctly (11 items with a stated rent) | 11 of 11 | 11 of 11 |
+
+Honest reading:
+- Scam detection and rent reading were already right on this set before the fixes, so fix 3 has no measured effect here. It covers formats this set doesn't contain.
+- The question state is the measured gain.
+- The one question that still gets a report, m05 ("my lease says landlord can enter anytime w/o notice is that legal in VA"), was read as lease text because it quotes a clause. That's defensible, and we didn't tune for it.
+- The baseline misses the chat screenshot (it can't read images), the abbreviations item and the all-caps listing that says "WE NEVER ASK FOR WIRE TRANSFERS" (a false alarm).
+- 20 items is small, and every item is synthetic.

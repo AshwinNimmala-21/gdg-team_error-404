@@ -9,6 +9,7 @@ import type { CheckError, CheckRequest, CheckResult, Overrides, SampleId } from 
 import type { MapsConfig } from "@/lib/server/maps-config";
 import { CameraIcon } from "./Icons";
 import { useLang, useTr } from "./Lang";
+import { QuestionHelp } from "./QuestionHelp";
 import { Report } from "./Report";
 
 // Titles and notes live in lib/i18n.ts (samples), keyed by id. In Spanish mode the text samples load from
@@ -123,7 +124,9 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
       setResult(r);
       setStatus({ kind: "done" });
       setAnnounce(
-        `${r.meta.mode === "saved" ? t.announceSaved : ""}${t.announceReady(priceVerdict(r.price, lang).word, scamVerdict(r.scam, lang).word, leaseVerdict(r.lease, lang).word)}`,
+        r.inputType === "question"
+          ? t.announceQuestion
+          : `${r.meta.mode === "saved" ? t.announceSaved : ""}${t.announceReady(priceVerdict(r.price, lang).word, scamVerdict(r.scam, lang).word, leaseVerdict(r.lease, lang).word)}`,
       );
     }
   }
@@ -323,7 +326,10 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
             </button>
           </div>
         )}
-        {status.kind === "done" && result && (
+        {status.kind === "done" && result && result.inputType === "question" && (
+          <QuestionHelp ref={reportRef} result={result} onPaste={() => textRef.current?.focus()} />
+        )}
+        {status.kind === "done" && result && result.inputType !== "question" && (
           <Report
             ref={reportRef}
             result={result}

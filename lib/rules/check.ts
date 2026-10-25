@@ -105,8 +105,13 @@ export function runRules(args: {
   const lease = computeLease(x, corpus, jurisdiction, facts.rent);
   const questions = buildQuestions(price, scam, lease, lang);
   const ai = scam.flags.find((f) => f.id === "aiInstructions");
+  // A question about renting ("is $600 for a room normal?") gets "what we can check" instead of three empty verdicts.
+  // Only when nothing checkable was found, so a real listing the model mislabels still gets its report.
+  const checkable = x.inputKinds.some((k) => k === "listing" || k === "message" || k === "lease");
+  const question = !checkable && !(facts.rent !== null && facts.zip !== null) && x.clauses.length === 0 && !ai;
 
   return {
+    inputType: question ? "question" : "check",
     read: {
       rent: facts.rent,
       bedrooms: facts.bedrooms,
