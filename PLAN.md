@@ -58,7 +58,7 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 2. Price bias fix: cheap alone = "Below usual range: verify before paying"; "Suspiciously cheap" only with another scam signal; tests; README paragraph
 - [x] 3. "What Gemma read" section: extracted facts, quotes highlighted in source text/transcript, photo thumbnail
 - [x] 4. Blacksburg sample (24060 sublet, Zelle before viewing) first, lease photo second; README persona Blacksburg-first
-- [x] 5. Accessibility (automated part done; 0 axe violations, contrast measured, map crash fixed + regression test). **Waiting on Ashwin's manual keyboard/VoiceOver check**, results go in docs/accessibility.md. Accessibility: axe-core scan (landing + report, 1280/375), fix violations, measured contrast, `docs/accessibility.md` → STOP for Ashwin's keyboard/VoiceOver check
+- [x] 5. Accessibility: axe 0 violations (8 scans, EN and ES), measured contrast, map crash fixed + regression test, manual keyboard/VoiceOver 12/12 (see 5c)
 - [x] 5a. Map: 24060 shows downtown Blacksburg + VT campus, zoom 14, no pin (`c4047e6`)
 - [x] 5b. Student-market pricing: per-bedroom/per-person vs whole-unit benchmark ÷ bedrooms (labelled approximation) + sublet line; `scripts/eval/student.jsonl` before/after (`0baae36`)
 - [x] 5c. Manual a11y: 12/12 pass (K1 re-checked on clean prod build, no change needed). Per-bedroom: only "far below" checked, else neutral "Rough comparison" (`c6b410a`). Lease: deposit-as-fact cap check + blanket repairs rule, 13/13 (`fbc6667`)
@@ -66,7 +66,6 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 7. `docs/validation.md` interview + 3-person usability template (no invented answers)
 - [x] 8. Spanish toggle (started 12:33 AM, kept at ~12:55 AM): EN/ES switch, Gemma writes clause explanations in Spanish, hand-translated questions + labels + verdicts + short rule sentences, `<html lang>` switches, axe 0 violations in ES. Not translated: price detail, legal reasons, evidence. Spanish not reviewed by a native-speaking advocate.
 - [ ] OPEN (needs Ashwin's call): Google Maps `IntersectionObserver` error after a rejected Maps key (only on non-allowed referrers like localhost:3100; page keeps working). Two fixes failed. Options: (a) leave + document (done), (b) one shared APIProvider at page level so a rejected key is remembered, (c) hide the map entirely after the first auth failure via window.gm_authFailure.
-- [ ] 8 (old line) Spanish toggle, only if 1–7 done before 1:30 AM, 90-min box, else skip
 - [ ] Finish a) eval run "after" incl. holdout, README before/after table; b) README pass; c) STOP: ready to deploy
 
 ## Status
