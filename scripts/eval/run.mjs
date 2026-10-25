@@ -1,13 +1,16 @@
 // Offline evaluation: Clearlease (/api/check) vs a keyword-only baseline on scripts/eval/dataset.jsonl.
-// Usage: node scripts/eval/run.mjs <runName> [baseUrl] [--holdout]
+// Usage: node scripts/eval/run.mjs <runName> [baseUrl] [--holdout] [--set=easy|hard]
+//   --set=hard uses scripts/eval/hard.jsonl (adversarial items, incl. screenshots). The baseline only sees `text`,
+//   so for screenshot items it sees nothing, like grep on an image.
 //   Without --holdout, holdout items are still run, but their results go to a separate file and are not printed.
 //   Local runs need a raised limit: RATE_LIMIT_PER_MIN=1000 npm run dev   (never set this on Cloud Run).
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const args = process.argv.slice(2);
 const showHoldout = args.includes("--holdout");
+const set = (args.find((a) => a.startsWith("--set=")) ?? "--set=easy").slice(6);
 const [run = "adhoc", base = "http://localhost:3000"] = args.filter((a) => !a.startsWith("--"));
-const items = readFileSync("scripts/eval/dataset.jsonl", "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const items = readFileSync(set === "hard" ? "scripts/eval/hard.jsonl" : "scripts/eval/dataset.jsonl", "utf8").trim().split("\n").map((l) => JSON.parse(l));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- Keyword-only baseline: flags a listing if any scam keyword appears. No model, no rules, no price data.
@@ -15,10 +18,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const { keywords: KEYWORDS } = JSON.parse(readFileSync("scripts/eval/baseline-keywords.json", "utf8"));
 const keywordHits = (text) => KEYWORDS.filter((k) => text.toLowerCase().includes(k));
 
-async function check(text) {
+async function check(text, imagePath) {
+  const body = { text };
+  if (imagePath) body.image = { mimeType: "image/jpeg", data: readFileSync(imagePath).toString("base64") };
   for (let attempt = 0; attempt < 3; attempt++) {
     const t0 = Date.now();
-    const res = await fetch(`${base}/api/check`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text }) });
+    const res = await fetch(`${base}/api/check`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
     const j = await res.json().catch(() => ({}));
     if (res.ok) return { ok: true, ms: Date.now() - t0, j };
     if (res.status === 429 || res.status >= 500) { await sleep(5000 * (attempt + 1)); continue; }
@@ -29,8 +34,8 @@ async function check(text) {
 
 const rows = [];
 for (const it of items) {
-  const r = await check(it.text);
-  const row = { id: it.id, kind: it.kind, label: it.label, holdout: it.holdout, keywords: keywordHits(it.text) };
+  const r = await check(it.text, it.image);
+  const row = { id: it.id, kind: it.kind, label: it.label, category: it.category, holdout: Boolean(it.holdout), keywords: keywordHits(it.text) };
   if (!r.ok) row.error = r.error;
   else {
     const { j } = r;
@@ -50,8 +55,9 @@ for (const it of items) {
 process.stderr.write("\n");
 
 mkdirSync("scripts/eval/results", { recursive: true });
-writeFileSync(`scripts/eval/results/${run}.json`, JSON.stringify(rows.filter((r) => !r.holdout), null, 1));
-writeFileSync(`scripts/eval/results/${run}-holdout.json`, JSON.stringify(rows.filter((r) => r.holdout), null, 1));
+const tag = set === "hard" ? `${run}-hard` : run;
+writeFileSync(`scripts/eval/results/${tag}.json`, JSON.stringify(rows.filter((r) => !r.holdout), null, 1));
+if (set !== "hard") writeFileSync(`scripts/eval/results/${run}-holdout.json`, JSON.stringify(rows.filter((r) => r.holdout), null, 1));
 
 // ---- Metrics
 function scores(set, isPositive) {
@@ -101,10 +107,18 @@ function leaseTable(set) {
 }
 
 const dev = rows.filter((r) => !r.holdout);
-const out = [`### Run "${run}" (${new Date().toISOString().slice(0, 16)}Z, ${base})`, "", table("Development set", dev), "", leaseTable(dev)];
+const out = [`### Run "${run}", ${set} set (${new Date().toISOString().slice(0, 16)}Z, ${base})`, "", table("Development set", dev), "", leaseTable(dev)];
 const modes = [...new Set(rows.map((r) => r.mode).filter(Boolean))];
 const ms = dev.filter((r) => r.ms).map((r) => r.ms).sort((a, b) => a - b);
 out.push("", `Modes: ${modes.join(", ")}. Median latency: ${ms.length ? (ms[ms.length >> 1] / 1000).toFixed(1) : "?"} s.`);
-if (showHoldout) out.push("", table("Holdout (never inspected while making changes)", rows.filter((r) => r.holdout)));
+if (set === "hard") {
+  out.push("", "| Category | Items | Clearlease correct (any red flag = scam) | Baseline correct (any keyword = scam) |", "|---|---|---|---|");
+  for (const cat of [...new Set(rows.map((r) => r.category))]) {
+    const c = rows.filter((r) => r.category === cat && !r.error);
+    const right = (f) => c.filter((r) => f(r) === (r.label === "scam")).length;
+    out.push(`| ${cat} | ${c.length} | ${right((r) => r.scam === "likely" || r.scam === "some")} | ${right((r) => r.keywords.length > 0)} |`);
+  }
+}
+if (set === "hard") {} else if (showHoldout) out.push("", table("Holdout (never inspected while making changes)", rows.filter((r) => r.holdout)));
 else out.push("", `Holdout: ${rows.filter((r) => r.holdout).length} items run and saved unread to scripts/eval/results/${run}-holdout.json.`);
 console.log(out.join("\n"));

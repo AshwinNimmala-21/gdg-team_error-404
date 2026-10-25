@@ -1,0 +1,467 @@
+[
+ {
+  "id": "h01",
+  "kind": "listing",
+  "label": "scam",
+  "category": "payment-obfuscated",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11497,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "pressure",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h02",
+  "kind": "listing",
+  "label": "scam",
+  "category": "payment-obfuscated",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 13897,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h03",
+  "kind": "listing",
+  "label": "scam",
+  "category": "payment-obfuscated",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12319,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h04",
+  "kind": "listing",
+  "label": "scam",
+  "category": "payment-obfuscated",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11044,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h05",
+  "kind": "listing",
+  "label": "scam",
+  "category": "payment-obfuscated",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12379,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h06",
+  "kind": "listing",
+  "label": "scam",
+  "category": "obfuscated-spelling",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11558,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h07",
+  "kind": "listing",
+  "label": "scam",
+  "category": "obfuscated-spelling",
+  "holdout": false,
+  "keywords": [
+   "deployed"
+  ],
+  "mode": "live",
+  "ms": 11186,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h08",
+  "kind": "listing",
+  "label": "scam",
+  "category": "obfuscated-spelling",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10773,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "noInPersonViewing",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h09",
+  "kind": "listing",
+  "label": "scam",
+  "category": "spanish",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11670,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h10",
+  "kind": "listing",
+  "label": "scam",
+  "category": "spanish",
+  "holdout": false,
+  "keywords": [
+   "zelle"
+  ],
+  "mode": "live",
+  "ms": 11500,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h11",
+  "kind": "listing",
+  "label": "scam",
+  "category": "spanish",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 10899,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h12",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [
+   "wire",
+   "gift card",
+   "zelle",
+   "venmo",
+   "cash app"
+  ],
+  "mode": "live",
+  "ms": 32540,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h13",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [
+   "overseas"
+  ],
+  "mode": "live",
+  "ms": 11226,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h14",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [
+   "out of the country",
+   "whatsapp"
+  ],
+  "mode": "live",
+  "ms": 9853,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h15",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [
+   "zelle"
+  ],
+  "mode": "live",
+  "ms": 9616,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h16",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [
+   "zelle"
+  ],
+  "mode": "live",
+  "ms": 12108,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h17",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 9598,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h18",
+  "kind": "listing",
+  "label": "legit",
+  "category": "legit-negation",
+  "holdout": false,
+  "keywords": [
+   "venmo"
+  ],
+  "mode": "live",
+  "ms": 10158,
+  "price": "below",
+  "priceWord": "below",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h19",
+  "kind": "listing",
+  "label": "scam",
+  "category": "screenshot",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 35904,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h20",
+  "kind": "listing",
+  "label": "scam",
+  "category": "screenshot",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 15985,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "landlordAway",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h21",
+  "kind": "listing",
+  "label": "legit",
+  "category": "screenshot",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 14770,
+  "price": "typical",
+  "priceWord": "typical",
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "h22",
+  "kind": "listing",
+  "label": "scam",
+  "category": "screenshot",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 15429,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h23",
+  "kind": "listing",
+  "label": "legit",
+  "category": "screenshot",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 14584,
+  "price": "below",
+  "priceWord": "far-below",
+  "scam": "some",
+  "flags": [
+   "priceFarBelow"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "h24",
+  "kind": "listing",
+  "label": "scam",
+  "category": "screenshot",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16712,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ }
+]

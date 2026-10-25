@@ -15,6 +15,17 @@ How well does Clearlease separate rental scams from legitimate listings, and doe
 - **Holdout:** 10 listings (5 scams, 5 legitimate) were marked `holdout: true` when the dataset was written, before any run. Their results are saved unread to `scripts/eval/results/<run>-holdout.json` and only reported in the final "after" run. Caveat: the same team wrote the holdout and the development items, so it guards against tuning to specific items, not against our own blind spots.
 - **No tuning to the dataset.** Prompts and rules were not changed to fix specific dataset items. Changes between runs come from the product decisions listed in each run.
 
+## Hard set (`scripts/eval/hard.jsonl`), added after the first run
+The easy set turned out to be too easy and partly circular: the same author wrote the items and the baseline's keywords, and a keyword scan nearly matched Clearlease. So:
+- **The baseline was frozen first.** Its 33 keywords live in `scripts/eval/baseline-keywords.json` and are never edited.
+- **24 hard items** (15 scams, 9 legitimate), each with a `category` and `source`, based on documented scam behavior:
+  - `payment-obfuscated` (5): "send it through the app, I'll text you the name", a CashApp $tag, "PP F&F" (PayPal tells buyers to refuse Friends and Family for purchases and excludes rental property from Buyer Protection), Apple Cash, "my roommate will send you a request".
+  - `obfuscated-spelling` (3): "Z.e.l.l.e", "0verseas", "keyz", "W.U.", "w!re", "Gift crds".
+  - `spanish` (3): Spanish-language scams built from the FTC's red flags.
+  - `legit-negation` (7): legitimate listings with anti-scam disclaimers ("we never accept wire transfers, Zelle, Venmo…", "not overseas", "nobody here will ask you to Zelle"), including one in Spanish.
+  - `screenshot` (6): the text is only inside an image (chat or group-post screenshots rendered by `scripts/eval/render-hard-images.mjs`, generic styling, no real site's branding). The baseline gets no text for these, just as grep can't read a picture.
+- **Honest limits:** the same person (with Claude Code) wrote these items, knowing how both systems work, and chose categories that target known keyword weaknesses. Treat this set as a stress test of the failure modes we care about, not a random sample of real listings. Sources are cited per item; all 24 items are synthetic.
+
 ## Method (`scripts/eval/run.mjs`)
 - Each item's text goes to `POST /api/check` on a local server with live Gemma 4 (`gemma-4-26b-a4b-it`) and live HUD/Census data, one at a time, 1.5 s apart. Local runs raise the rate limit (`RATE_LIMIT_PER_MIN=1000 npm run dev`); the deployed service keeps its limit.
 - **A positive** is a scam verdict. We report two thresholds: "Likely scam" only, and any red flag ("Some red flags" or "Likely scam").
@@ -62,3 +73,32 @@ What "before" tells us:
 - Clearlease's "Likely scam" verdict never fired on a legitimate listing (100% precision), but missed one scam at that threshold.
 - Clearlease's softer "Some red flags" tier is where the false alarms live: 4 of the 5 come from price alone (a shared room, a LIHTC unit, a room share and an inclusionary-zoning unit), and one from "units go fast". Cheap rent alone being treated as a scam sign is the bias step 2 fixes.
 - Lease reading missed the $3,000 deposit (3× rent, Virginia caps at 2×) in x01 and the "tenant pays all repairs" clause in x04.
+
+
+### Run "before", hard set (2026-10-25T02:45Z, http://localhost:3000)
+
+**Hard set** (15 scam / 9 legit; errors: 0)
+
+| System | Precision | Recall | False alarms on legit listings |
+|---|---|---|---|
+| Clearlease: "Likely scam" | 100% | 100% | 0 of 9 |
+| Clearlease: any red flag (Some or Likely) | 94% | 100% | 1 of 9 |
+| Keyword baseline: any keyword | 25% | 13% | 6 of 9 |
+
+Legit listings priced "far below" (would read "Suspiciously cheap"): h23.
+Missed scams (no red flag): none. False alarms: h23 (priceFarBelow).
+
+Modes: live. Median latency: 11.7 s.
+
+| Category | Items | Clearlease correct (any red flag = scam) | Baseline correct (any keyword = scam) |
+|---|---|---|---|
+| payment-obfuscated | 5 | 5 | 0 |
+| obfuscated-spelling | 3 | 3 | 1 |
+| spanish | 3 | 3 | 1 |
+| legit-negation | 7 | 7 | 1 |
+| screenshot | 6 | 5 | 2 |
+
+What the hard set tells us (reported as measured):
+- **On this set the baseline does not match Clearlease.** Keywords catch 2 of 15 scams (13% recall) and raise 6 false alarms out of 9 legitimate listings (precision 25%): disclaimers like "we never accept Zelle" trip it, and paraphrased payment requests, misspellings, Spanish and screenshots slip past it.
+- Clearlease caught all 15 scams at "Likely scam". Its one false alarm (h23, a $425 room in a shared Blacksburg house, shown in a screenshot) came from price alone, the same bias as in the easy set.
+- Because of the limits above, the fair summary is: on ordinary listings a keyword scan is a strong baseline; Clearlease's advantage shows on paraphrase, negation, other languages and images.
