@@ -67,6 +67,13 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
 - [x] 8. Spanish toggle (started 12:33 AM, kept at ~12:55 AM): EN/ES switch, Gemma writes clause explanations in Spanish, hand-translated questions + labels + verdicts + short rule sentences, `<html lang>` switches, axe 0 violations in ES. Not translated: price detail, legal reasons, evidence. Spanish not reviewed by a native-speaking advocate.
 - [x] DECIDED (Ashwin, Sun ~1:30 AM): option (a), leave it and document it. Google Maps `IntersectionObserver` error after a rejected Maps key (only on non-allowed referrers like localhost:3100; page keeps working). Two fixes failed. Options: (a) leave + document (done), (b) one shared APIProvider at page level so a rejected key is remembered, (c) hide the map entirely after the first auth failure via window.gm_authFailure.
 - [x] Finish a) eval "after" incl. holdout (holdout: keyword baseline 100/100/0 beats Clearlease any-flag 83/100/1; hard set Clearlease 100/100/0 vs keyword 25/13/6; leases 13/13; legit "Suspiciously cheap" 6→0), b) README pass (Gemma-at-a-glance, Evaluation section, stale numbers fixed), c) ready to deploy from `dev` (Ashwin runs `scripts/deploy.sh` or DEPLOY.md)
+- [x] 9. Spanish end to end (Sun ~2:50 AM, `6d95c34`): toggle never reset (reproduced on live); all rule text via hand-written templates (`lib/client/rules-es.ts`), Spanish samples, "Texto original:" quotes, ES e2e 6/6, axe 0 in ES/EN, eval 0 verdict diffs
+- [x] D1–D3 (`9d22833`): Gemma 4 Apache-2.0 verified + download links; CONTRIBUTING, CODE_OF_CONDUCT (Covenant 3.0), THIRD_PARTY_NOTICES (no incompatible licenses; LGPL sharp-libvips only in built image); docs/code-tour.md
+- [ ] HANDED OVER to Yoshwan's laptop (Sun ~3:00 AM): Task C (+ Census API notice), Task A, Task B, D4, Finish. Instructions verbatim in catchup.md §15; status table in §14.
+
+### Morning questions
+- Add the Census API notice ("This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.") to the report footer? Suggested in Task C.
+- MLH track: score Gemma 4, Open-Source AI, Google Cloud, UI/UX in the morning (lean Gemma 4).
 
 ## Status
 - [x] Phase 0: safety rails, validation questions (`docs/validation.md`; **answers still needed**)
