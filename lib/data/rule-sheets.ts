@@ -20,6 +20,8 @@ export interface RuleSheet {
   autoRenewalMaxNoticeDays: number | null;
   attorneyFeesProhibited: boolean;
   maintenanceWaiverProhibited: boolean;
+  /** A clause putting ALL repairs on the tenant regardless of cause conflicts with state law (verified per state). */
+  blanketRepairsProhibited: boolean;
   laws: Partial<Record<ClauseType, LawRef>>;
 }
 
@@ -34,6 +36,10 @@ export const RULE_SHEETS: Record<Jurisdiction, RuleSheet> = {
     autoRenewalMaxNoticeDays: null,
     attorneyFeesProhibited: true,
     maintenanceWaiverProhibited: false,
+    // Verified Oct 25 on law.lis.virginia.gov: § 55.1-1220(A)(2),(4) landlord must make all repairs and maintain
+    // electrical, plumbing and heating; § 55.1-1208(C) no repair/maintenance fees unless the tenant caused it.
+    // § 55.1-1220(D) still allows a written good-faith agreement for *specified* repairs, so only blanket clauses conflict.
+    blanketRepairsProhibited: true,
     laws: {
       security_deposit: {
         rule: "A landlord can't demand a security deposit of more than two months' rent.",
@@ -71,9 +77,9 @@ export const RULE_SHEETS: Record<Jurisdiction, RuleSheet> = {
         url: VA("1235"),
       },
       repairs_on_tenant: {
-        rule: "Unless you caused the problem, a landlord can't charge you a fee for maintenance or repair of the unit.",
-        citation: "Va. Code § 55.1-1208(C)",
-        url: VA("1208"),
+        rule: "The landlord must make repairs and keep electrical, plumbing and heating systems working, and can't charge you for maintenance or repairs you didn't cause. A written good-faith agreement for specific repairs is allowed.",
+        citation: "Va. Code §§ 55.1-1220(A), 55.1-1208(C)",
+        url: VA("1220"),
       },
       rent_increase: {
         rule: "Landlords with more than four units must give written notice of a rent increase at least 60 days before the lease ends.",
@@ -97,6 +103,7 @@ export const RULE_SHEETS: Record<Jurisdiction, RuleSheet> = {
     autoRenewalMaxNoticeDays: 30,
     attorneyFeesProhibited: true,
     maintenanceWaiverProhibited: true,
+    blanketRepairsProhibited: true,
     laws: {
       security_deposit: {
         rule: "A security deposit can't be more than one month's rent.",
@@ -160,6 +167,8 @@ export const RULE_SHEETS: Record<Jurisdiction, RuleSheet> = {
     autoRenewalMaxNoticeDays: null,
     attorneyFeesProhibited: false,
     maintenanceWaiverProhibited: false,
+    // No Maryland statute found (Oct 25) that voids a repair-shifting clause; § 8-211 is rent escrow. Stays "ask".
+    blanketRepairsProhibited: false,
     laws: {
       security_deposit: {
         rule: "A security deposit can't be more than one month's rent (a narrow exception allows two months for some utility-assistance tenants).",

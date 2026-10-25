@@ -3,7 +3,7 @@
 How well does Clearlease separate rental scams from legitimate listings, and does it beat a plain keyword scanner? This page records every run so the numbers can be checked and reproduced.
 
 ## Dataset (`scripts/eval/dataset.jsonl`)
-- **47 items:** 22 rental scams, 20 legitimate listings and 5 lease excerpts with known problem clauses (one is a clean control).
+- **50 items:** 22 rental scams, 20 legitimate listings and 8 lease excerpts with known problem clauses (5 from the start, one a clean control; 3 added after the lease fix, see below).
 - **Sources.** Every item has a `source` field.
   - 3 scams are **reconstructions** of real, publicly reported cases: a University of Illinois police report of a Facebook sublet Zelle scam, a CBS Detroit report of a Zelle sublease where the "landlord" offered to mail the keys, and a WDBJ7 report of a Roanoke-area renter who toured a house and still lost $4,700 over Zelle. None of those sources publishes the listing text, so we wrote listings that match the facts each report describes. The `note` field says so.
   - The other 44 items are **synthetic**, written by us during the hackathon. They are not real listings.
@@ -123,3 +123,28 @@ What changed:
 - **First version, then revised.** The first version also checked the "above" direction, and two Blacksburg student rentals ($650 per bedroom, $575 per person) read "Above usual range": the usual range for one bedroom's share of a Blacksburg 4-bedroom is $438–$512 (Census median ÷ 4 to HUD FMR ÷ 4). Area averages divided by bedrooms understate near-campus student rents, so that verdict wasn't trustworthy. Now per-bedroom and per-person prices are only checked in the "far below" direction. Otherwise the report shows a neutral **Rough comparison** with: "Rough comparison only: per-bedroom rents near campus often run above an even split of area averages. Compare 2–3 nearby listings and ask what's included."
 - **Sublets and short-term rentals** (st04, st05) now carry "Summer sublets often list below market; price alone isn't a red flag here." Neither escalates.
 - **Scams priced per bedroom or per person** (st06, st07) still read "Likely scam" from their non-price signs.
+
+## Lease fix, motivated by the "before" misses (Oct 25, about 12:30 AM)
+Run "before" found two lease misses: x01's $3,000 deposit on $1,000 rent (3×, over Virginia's 2-month cap) and x04's "Tenant is responsible for all repairs … regardless of cause". **Those misses motivated this fix.** We fixed the causes in general, not those items:
+- **Deposit stated as a fact.** Gemma had read the deposit and the rent correctly, but as listing facts, not as a lease clause, and the cap check only looked at clauses. Now, in a lease, a deposit amount whose quote is verified is checked against the state cap even when no deposit clause was extracted.
+- **Blanket repair clauses.** A clause putting *all* repairs on the tenant, whatever the cause, is now a conflict in Virginia and DC. A clause making the tenant pay for damage they cause stays an "ask".
+- **Caps and statutes checked against official sources before coding:**
+  - Virginia: deposit cap 2 months' rent, Va. Code § 55.1-1226(A). Repairs: § 55.1-1220(A)(2) and (4) (landlord makes all repairs and maintains electrical, plumbing and heating), § 55.1-1208(C) (no repair or maintenance fees unless the tenant caused it). § 55.1-1220(D) allows a written good-faith agreement for specified repairs, which is why only blanket clauses conflict. Source: law.lis.virginia.gov.
+  - Maryland: deposit cap **1 month's rent**, Md. Code, Real Prop. § 8-203(b)(1), with a narrow 2-month exception for tenants on utility assistance (§ 8-203(b)(2)). Source: mgaleg.maryland.gov. No Maryland statute was found that voids a repair-shifting clause (§ 8-211 is rent escrow), so in Maryland a blanket repair clause stays an "ask".
+  - DC: deposit cap 1 month's rent, 14 DCMR § 308.2, as cited by the DC Rental Housing Commission and the Office of the Tenant Advocate. The existing DC rule for maintenance waivers is unchanged.
+- **Three new lease items** (x06 DC, x07 Maryland control, x08 Virginia) were written *after* the fix, to test it on text it wasn't built around.
+
+Run "after-leasefix" (all 8 leases, live Gemma): **clause-conflict recall 13 of 13, 0 unexpected conflicts** (the original 5 were at 7 of 9 in "before").
+
+| Lease | Expected conflicts | Found conflicts |
+|---|---|---|
+| x01 | security_deposit, landlord_entry, waiver_of_rights | landlord_entry, waiver_of_rights, security_deposit |
+| x02 | landlord_entry, attorney_fees | landlord_entry, attorney_fees |
+| x03 | security_deposit, late_fee | security_deposit, late_fee |
+| x04 | late_fee, repairs_on_tenant | late_fee, repairs_on_tenant |
+| x05 | none | none |
+| x06 (new, DC) | security_deposit, landlord_entry | security_deposit, landlord_entry |
+| x07 (new, MD control) | none | none |
+| x08 (new, VA) | security_deposit, repairs_on_tenant | repairs_on_tenant, security_deposit |
+
+Caveat: 8 leases written by us is a small set. It shows the fixes work on new wording, not that lease reading is solved.

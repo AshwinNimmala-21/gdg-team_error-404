@@ -9,8 +9,9 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 const args = process.argv.slice(2);
 const showHoldout = args.includes("--holdout");
 const set = (args.find((a) => a.startsWith("--set=")) ?? "--set=easy").slice(6);
+const kindOnly = (args.find((a) => a.startsWith("--kind=")) ?? "").slice(7); // e.g. --kind=lease
 const [run = "adhoc", base = "http://localhost:3000"] = args.filter((a) => !a.startsWith("--"));
-const items = readFileSync(set === "easy" ? "scripts/eval/dataset.jsonl" : `scripts/eval/${set}.jsonl`, "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const items = readFileSync(set === "easy" ? "scripts/eval/dataset.jsonl" : `scripts/eval/${set}.jsonl`, "utf8").trim().split("\n").map((l) => JSON.parse(l)).filter((it) => !kindOnly || it.kind === kindOnly);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- Keyword-only baseline: flags a listing if any scam keyword appears. No model, no rules, no price data.

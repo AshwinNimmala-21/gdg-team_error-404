@@ -2,7 +2,7 @@ import type { Extraction } from "@/lib/ai/schema";
 import { RULE_SHEETS, type RuleSheet } from "@/lib/data/rule-sheets";
 import type { ClauseFinding, ClauseType, Jurisdiction, LeaseCheck } from "@/lib/types";
 import { money } from "./price";
-import { findQuote, type Corpus } from "./quotes";
+import { findQuote, numberInQuote, type Corpus } from "./quotes";
 
 type Clause = Extraction["clauses"][number];
 type Severity = ClauseFinding["severity"];
@@ -70,12 +70,37 @@ function judge(c: Clause, sheet: RuleSheet | null, rent: number | null): { sever
         why: c.noticeDays !== null ? `Put a reminder in your calendar: you must give ${c.noticeDays} days' notice or you're locked in again.` : "Ask how and when you have to give notice if you don't want to renew.",
       };
     case "repairs_on_tenant":
-      return sheet.maintenanceWaiverProhibited
-        ? { severity: "conflict", why: `${where} doesn't let a lease shift the landlord's basic maintenance duties to you.` }
-        : { severity: "ask", why: "Ask which repairs you'd pay for. Damage you cause is normal; routine upkeep usually isn't." };
+      if (sheet.maintenanceWaiverProhibited)
+        return { severity: "conflict", why: `${where} doesn't let a lease shift the landlord's basic maintenance duties to you.` };
+      if (sheet.blanketRepairsProhibited && BLANKET_REPAIRS.test(c.quote))
+        return {
+          severity: "conflict",
+          why: `This puts all repairs on you, whatever the cause. ${where} makes the landlord responsible for repairs and basic systems, and doesn't let a landlord charge you for repairs you didn't cause.`,
+        };
+      return { severity: "ask", why: "Ask which repairs you'd pay for. Damage you cause is normal; routine upkeep usually isn't." };
     default:
       return { severity: "ask", why: "Ask the landlord to explain this in writing before you sign." };
   }
+}
+
+// A repair clause that covers everything, not just damage the tenant causes.
+const BLANKET_REPAIRS = /\b(all|any and all|every)\s+(repairs?|maintenance)\b|regardless of (the )?(cause|fault|who)|whether or not (caused|the tenant)/i;
+
+/** Lease text often states the deposit as a plain fact ("Security deposit: $3,000") rather than a clause. Check it anyway. */
+function depositAsClause(x: Extraction, corpus: Corpus): Clause | null {
+  if (x.clauses.some((c) => c.type === "security_deposit")) return null;
+  const d = x.listing.deposit;
+  if (d.amount === null || !findQuote(d.quote, corpus) || !numberInQuote(d.amount, d.quote)) return null;
+  return {
+    type: "security_deposit",
+    quote: d.quote!,
+    plain: `The lease asks for a ${money(d.amount)} security deposit.`,
+    noticeHours: null,
+    noticeDays: null,
+    graceDays: null,
+    amount: d.amount,
+    percent: null,
+  };
 }
 
 export function computeLease(x: Extraction, corpus: Corpus, jurisdiction: Jurisdiction | null, rent: number | null): LeaseCheck {
@@ -92,7 +117,9 @@ export function computeLease(x: Extraction, corpus: Corpus, jurisdiction: Jurisd
     };
   }
 
-  const findings: ClauseFinding[] = x.clauses.map((c) => {
+  const deposit = depositAsClause(x, corpus);
+  const clauses = deposit ? [...x.clauses, deposit] : x.clauses;
+  const findings: ClauseFinding[] = clauses.map((c) => {
     const where = findQuote(c.quote, corpus);
     const { severity, why } = judge(c, sheet, rent);
     const law = sheet?.laws[c.type] ?? null;

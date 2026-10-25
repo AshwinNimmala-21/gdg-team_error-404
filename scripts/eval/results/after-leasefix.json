@@ -1,0 +1,176 @@
+[
+ {
+  "id": "x01",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16317,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "landlord_entry",
+   "waiver_of_rights",
+   "security_deposit"
+  ],
+  "expect": [
+   "security_deposit",
+   "landlord_entry",
+   "waiver_of_rights"
+  ]
+ },
+ {
+  "id": "x02",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16455,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "landlord_entry",
+   "attorney_fees"
+  ],
+  "expect": [
+   "landlord_entry",
+   "attorney_fees"
+  ]
+ },
+ {
+  "id": "x03",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16523,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "security_deposit",
+   "late_fee"
+  ],
+  "expect": [
+   "security_deposit",
+   "late_fee"
+  ]
+ },
+ {
+  "id": "x04",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16393,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "late_fee",
+   "repairs_on_tenant"
+  ],
+  "expect": [
+   "late_fee",
+   "repairs_on_tenant"
+  ]
+ },
+ {
+  "id": "x05",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 19159,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [],
+  "expect": []
+ },
+ {
+  "id": "x06",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16607,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "security_deposit",
+   "landlord_entry"
+  ],
+  "expect": [
+   "security_deposit",
+   "landlord_entry"
+  ]
+ },
+ {
+  "id": "x07",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16724,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [],
+  "expect": []
+ },
+ {
+  "id": "x08",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 13848,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "repairs_on_tenant",
+   "security_deposit"
+  ],
+  "expect": [
+   "security_deposit",
+   "repairs_on_tenant"
+  ]
+ }
+]
