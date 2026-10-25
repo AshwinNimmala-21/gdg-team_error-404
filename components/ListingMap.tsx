@@ -9,7 +9,7 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
   return (
     <figure className="mt-4">
       <APIProvider apiKey={config.apiKey}>
-        <ZipMap zip={zip} mapId={config.mapId} label={`Map of the area around ZIP ${zip}${place ? `, ${place}` : ""}`} />
+        <ZipMap zip={zip} mapId={config.mapId} />
       </APIProvider>
       <figcaption className="mt-1 text-[13px] text-ink-soft">
         Approximate area: ZIP {zip}
@@ -19,7 +19,7 @@ export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: st
   );
 }
 
-function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: string }) {
+function ZipMap({ zip, mapId }: { zip: string; mapId: string }) {
   const geocoding = useMapsLibrary("geocoding");
   const [center, setCenter] = useState<{ zip: string; at: google.maps.LatLngLiteral | null } | null>(null);
 
@@ -37,8 +37,10 @@ function ZipMap({ zip, mapId, label }: { zip: string; mapId: string; label: stri
 
   const at = center?.zip === zip ? center.at : undefined;
   if (at === null) return <p className="text-[14px] text-ink-soft">The map couldn&apos;t load for this ZIP code.</p>;
+  // Decorative: the figcaption is the text alternative. Google's map has its own focusable parts,
+  // so it's taken out of the tab order and the accessibility tree rather than wrapped in role="img".
   return (
-    <div role="img" aria-label={label} className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
+    <div aria-hidden inert className="h-52 overflow-hidden rounded-xs border border-rule bg-paper">
       {at && (
         <Map mapId={mapId} defaultCenter={at} defaultZoom={13} gestureHandling="cooperative" disableDefaultUI clickableIcons={false}>
           <AdvancedMarker position={at} title={`ZIP ${zip}`} />
