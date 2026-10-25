@@ -93,9 +93,9 @@ describe("Ollama through the same retry ladder", () => {
     await result;
     expect(f.bodies.map((b) => b.response_format?.type ?? "none")).toEqual(["json_schema", "json_object"]);
   });
-  it("does not retry a 429", async () => {
-    const { f, result } = run([429]);
+  it("retries a 429 once, then reports busy", async () => {
+    const { f, result } = run([429, 429]);
     await expect(result).rejects.toMatchObject({ code: "model_busy" });
-    expect(f.bodies).toHaveLength(1);
+    expect(f.bodies).toHaveLength(2);
   });
 });

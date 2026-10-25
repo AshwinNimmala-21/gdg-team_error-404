@@ -1,6 +1,6 @@
 import { ApiError } from "@google/genai";
 import { describe, expect, it } from "vitest";
-import { generateWithRetries, type Generate, type Level } from "@/lib/ai/gemma";
+import { GEMINI_START_LEVEL, generateWithRetries, type Generate, type Level } from "@/lib/ai/gemma";
 import { SAMPLE_EXTRACTIONS } from "@/lib/ai/mock";
 
 const OK = { text: JSON.stringify(SAMPLE_EXTRACTIONS["fine-arlington"]), usageMetadata: undefined };
@@ -58,10 +58,20 @@ describe("generateWithRetries", () => {
     expect(second.levels).toEqual([0]);
   });
 
-  it("does not retry a 429 or another 4xx", async () => {
-    const busy = scripted([429, "ok"]);
+  it("can start at a lower level (the hosted path starts at 1; level 0 is rejected for Gemma 4 there)", async () => {
+    const s1 = scripted(["ok"]);
+    await generateWithRetries(s1.generate, { attemptMs: 1_000, sleep: noSleep, startLevel: GEMINI_START_LEVEL });
+    expect(s1.levels).toEqual([1]);
+    expect(GEMINI_START_LEVEL).toBe(1);
+  });
+
+  it("waits and retries a 429 once, then reports busy; never retries another 4xx", async () => {
+    const once = scripted([429, "ok"]);
+    await expect(run(once.generate)).resolves.toHaveProperty("extraction");
+    expect(once.levels).toEqual([0, 0]);
+    const busy = scripted([429, 429, "ok"]);
     await expect(run(busy.generate)).rejects.toMatchObject({ code: "model_busy" });
-    expect(busy.levels).toHaveLength(1);
+    expect(busy.levels).toHaveLength(2);
     const denied = scripted([403, "ok"]);
     await expect(run(denied.generate)).rejects.toMatchObject({ code: "model_failed" });
     expect(denied.levels).toHaveLength(1);

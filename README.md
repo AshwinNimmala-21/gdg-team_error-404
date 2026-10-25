@@ -7,7 +7,7 @@
 **AI model: Gemma 4, `gemma-4-26b-a4b-it`** (open weights, [Apache 2.0](https://ai.google.dev/gemma/apache_2)), called through the Gemini API. It reads messy listings, landlord messages and lease *photos* into structured, quoted facts. Every number, threshold and verdict is computed in TypeScript.
 
 **Gemma 4 at a glance**
-- **Core, not decoration:** every check is one Gemma 4 call that turns text or a photo into a strict JSON extraction, each fact with a verbatim quote. Without Gemma there's nothing to check.
+- **Core, not decoration:** every check is normally one Gemma 4 call (retries only on transient errors) that turns text or a photo into a strict JSON extraction, each fact with a verbatim quote. Without Gemma there's nothing to check.
 - **Multimodal:** lease photos and chat screenshots are read directly (image input), with a transcript we use to verify every quote.
 - **Visible in the product:** each report has a "What Gemma read" section showing the extracted facts and highlighting the exact words in your text or photo. The header shows the model ID and latency.
 - **Measured:** on a hard eval set we wrote as a stress test (paraphrased payment requests, misspellings, Spanish, anti-scam disclaimers, screenshots), Clearlease caught 15 of 15 scams with 0 false alarms, while a keyword scanner caught 2 and raised 6 false alarms. On ordinary listings a keyword scan does about as well, and we say so ([`docs/evaluation.md`](docs/evaluation.md)).
@@ -110,12 +110,12 @@ flowchart LR
   SM["Secret Manager"] -.->|"API keys at runtime"| API
 ```
 
-**Why the AI is necessary.** Listings and leases are messy, and they arrive as screenshots and phone photos. Gemma 4 reads both (it is multimodal) and turns them into one strict JSON shape: rent, bedrooms, ZIP, payment methods, seven scam signals and lease clauses. Every field carries a **verbatim quote** from the input. It also understands negation and paraphrase ("we never take wire transfers" is *not* a red flag), which keyword rules can't: on our hard eval set a keyword scanner raised false alarms on 6 of 9 legitimate listings with disclaimers like that. We use one Gemma call per check.
+**Why the AI is necessary.** Listings and leases are messy, and they arrive as screenshots and phone photos. Gemma 4 reads both (it is multimodal) and turns them into one strict JSON shape: rent, bedrooms, ZIP, payment methods, seven scam signals and lease clauses. Every field carries a **verbatim quote** from the input. It also understands negation and paraphrase ("we never take wire transfers" is *not* a red flag), which keyword rules can't: on our hard eval set a keyword scanner raised false alarms on 6 of 9 legitimate listings with disclaimers like that. Normally it's one Gemma call per check: JSON mode with the schema in the prompt, then strict Zod validation. We don't send the API's stricter schema mode, because the Gemini API rejected it for this model on 46 of 46 calls (HTTP 400, measured Oct 24–25). Transient errors are retried.
 
 **How it's bounded:**
-- **The model extracts; code decides.** No prices, scores or legal judgments come from the model. Thresholds live in [`lib/rules/`](lib/rules), covered by 81 unit tests.
+- **The model extracts; code decides.** No prices, scores or legal judgments come from the model. Thresholds live in [`lib/rules/`](lib/rules), covered by unit tests (123 in the whole suite at the Sun 5:20 AM gate).
 - **Grounding check.** Each quote must appear in your text, or in Gemma's own transcript of your photo. Unmatched quotes are dropped and shown as "not counted". Extracted numbers must appear inside their quote.
-- **Prompt-injection defense.** Your text is wrapped as delimited data, and the delimiters are escaped. The system prompt is pinned. Output must validate against the schema, or you get a safe error rather than a guess. A second, rule-based detector catches phrases like "ignore previous instructions" even if the model misses them. Sample 5 shows the attack being ignored *and* counted as a red flag.
+- **Prompt-injection defense.** Your text is wrapped as delimited data, and the delimiters are escaped. The system prompt is pinned. Output must validate against the schema, or you get a safe error rather than a guess. (Only for the 5 built-in samples, a failed live call shows a saved answer instead, labelled "Showing a saved result".) A second, rule-based detector catches phrases like "ignore previous instructions" even if the model misses them. Sample 5 shows the attack being ignored *and* counted as a red flag.
 - **Not legal advice.** Every report says so and links to free help for the renter's state.
 
 **Why `gemma-4-26b-a4b-it`.** It's a mixture-of-experts model with about 3.8B parameters active per token (of 25.2B total). That makes it fast and cheap enough for a free tool, and a nonprofit can self-host the open weights.
@@ -147,7 +147,7 @@ Hosting is one Cloud Run service that scales to zero, plus Firestore and Secret 
 
 - Built mobile-first for a renter standing outside the building. Tested at 320, 375 and 1280 px with no horizontal scroll, and photo upload works from the camera roll.
 - **Automated audit: 0 axe-core violations** (WCAG 2.0/2.1/2.2 A and AA rules) on the landing page and three finished reports, at 1280 px and 375 px, with every evidence drawer open, in English and in Spanish. Details and how to rerun: [`docs/accessibility.md`](docs/accessibility.md).
-- **Manual check: 12 of 12 pass.** A keyboard-only walkthrough (skip link, tab order, focus to the report, drawers, edit and Escape, lease photo) and a VoiceOver walkthrough (report-ready announcement, headings, warning-sign wording, quote markers, map as one item, form errors), done by a teammate on macOS.
+- **Manual check: 11 of 12 pass by hand, and the 12th by a scripted re-check.** The skip-link check failed by hand only because the test URL ended in `#main` with the dev overlay open; a scripted re-check of the production build passed. A keyboard-only walkthrough (skip link, tab order, focus to the report, drawers, edit and Escape, lease photo) and a VoiceOver walkthrough (report-ready announcement, headings, warning-sign wording, quote markers, map as one item, form errors), done by a teammate on macOS.
 - Verdicts are never color-only: icon + word + color. **Text contrast is 5.71:1 or higher on every pair (measured)**: body text 16.45:1, secondary text 7.48:1, links 7.63:1, highlighted quotes 13.29:1, and the lowest is green text on its tint. Form-field borders are 6.60–7.48:1. Color values are in [`docs/design-principles.md`](docs/design-principles.md).
 - Keyboard: visible focus ring, logical tab order, native `<details>` for evidence, Escape closes the editor, and focus moves to the report when it's ready.
 - Screen readers: `aria-live` announcements, field-level errors (`aria-invalid`), a skip link, and a summary of all three verdicts.
@@ -180,7 +180,7 @@ Only **one key is required**: `GEMINI_API_KEY` (free from [aistudio.google.com/a
 Checked on Oct 25: a production build with only `GEMINI_API_KEY` set (the other four blanked) passed all 5 samples live (`node scripts/e2e.mjs`), showed saved figures, no counter and no map.
 
 ```bash
-npm test            # 75 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map)
+npm test            # 123 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map)
 npm run lint
 npm run build && npm start              # production server (standalone, like Cloud Run)
 node scripts/e2e.mjs http://localhost:3000            # API check of the 5 samples

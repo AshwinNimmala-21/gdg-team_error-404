@@ -2,7 +2,7 @@ import type { Extraction } from "@/lib/ai/schema";
 import { RULE_SHEETS, type RuleSheet } from "@/lib/data/rule-sheets";
 import type { ClauseFinding, ClauseType, Jurisdiction, LeaseCheck } from "@/lib/types";
 import { money } from "./price";
-import { findQuote, numberInQuote, type Corpus } from "./quotes";
+import { findQuote, foldAccents, numberInQuote, type Corpus } from "./quotes";
 
 type Clause = Extraction["clauses"][number];
 type Severity = ClauseFinding["severity"];
@@ -83,6 +83,26 @@ function judge(c: Clause, sheet: RuleSheet | null, rent: number | null): { sever
   }
 }
 
+// "No notice" is the one number a clause states in words: "at any time, without prior notice" means 0 hours.
+const NO_NOTICE = /without (any |prior |advance )?notice|no (prior |advance )?notice|at any time|anytime|sin (previo )?aviso|en cualquier momento/i;
+
+/**
+ * Grounding for clause numbers: a notice period, fee or percentage only counts if its digits are in the clause's own
+ * quote (0 hours also counts when the quote says there's no notice). Otherwise it's dropped, and the rule asks instead.
+ */
+function groundNumbers(c: Clause): Clause {
+  const keep = (n: number | null, zeroOk = false) => (n === null ? null : n === 0 && zeroOk ? 0 : numberInQuote(n, c.quote) ? n : null);
+  const noNotice = NO_NOTICE.test(foldAccents(c.quote));
+  return {
+    ...c,
+    noticeHours: keep(c.noticeHours, noNotice),
+    noticeDays: keep(c.noticeDays, noNotice),
+    graceDays: keep(c.graceDays),
+    amount: keep(c.amount),
+    percent: keep(c.percent),
+  };
+}
+
 // A repair clause that covers everything, not just damage the tenant causes.
 const BLANKET_REPAIRS = /\b(all|any and all|every)\s+(repairs?|maintenance)\b|regardless of (the )?(cause|fault|who)|whether or not (caused|the tenant)/i;
 
@@ -119,8 +139,9 @@ export function computeLease(x: Extraction, corpus: Corpus, jurisdiction: Jurisd
 
   const deposit = depositAsClause(x, corpus);
   const clauses = deposit ? [...x.clauses, deposit] : x.clauses;
-  const findings: ClauseFinding[] = clauses.map((c) => {
-    const where = findQuote(c.quote, corpus);
+  const findings: ClauseFinding[] = clauses.map((raw) => {
+    const where = findQuote(raw.quote, corpus);
+    const c = groundNumbers(raw);
     const { severity, why } = judge(c, sheet, rent);
     const law = sheet?.laws[c.type] ?? null;
     const t = TITLES[c.type];

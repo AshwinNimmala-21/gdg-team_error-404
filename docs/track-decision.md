@@ -27,7 +27,7 @@ State when written (Sun Oct 25, 03:30 AM):
 
 **Evidence**
 - Exact model ID in the README: `gemma-4-26b-a4b-it` ([`README.md:7`](../README.md)), in code ([`lib/ai/gemma.ts:12`](../lib/ai/gemma.ts)) and in the report header ("Read by Gemma 4", [`lib/i18n.ts:93`](../lib/i18n.ts)).
-- Core, not a side add-on: every check is one Gemma call that turns text or a photo into strict JSON with a verbatim quote per fact ([`README.md:10-11`](../README.md)). Without it the app has no input.
+- Core, not a side add-on: every check is normally one Gemma call that turns text or a photo into strict JSON with a verbatim quote per fact ([`README.md:10-11`](../README.md)). Without it the app has no input.
 - Multimodal: lease photos and chat screenshots are read directly; 6 screenshot items are in the hard eval set ([`docs/evaluation.md`](evaluation.md)).
 - Integration is visible in the product: a "What Gemma read" section highlights verified quotes in the user's text or photo ([`catchup.md:76-82`](../catchup.md)).
 - Bounded use: schema + Zod, quote verification, injection defense, model never computes prices or legality ([`README.md:115-118`](../README.md)).

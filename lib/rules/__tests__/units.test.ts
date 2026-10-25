@@ -76,23 +76,36 @@ describe("price bands", () => {
 describe("lease rules by jurisdiction", () => {
   const leaseWith = (clauses: object[]) =>
     ExtractionSchema.parse({ ...SAMPLE_EXTRACTIONS["lease-photo"], imageTranscript: "x", clauses });
-  const corpus = makeCorpus("q1 entry clause text. q2 deposit clause text. q3 late fee clause text.", null);
+  const corpus = makeCorpus("Landlord may enter with 24 hours notice. Tenant pays a $4,000 security deposit. Rent paid late incurs a late fee of 8% of the rent. Landlord may enter at any time, without prior notice. Landlord may enter after giving notice.", null);
   const c = (type: string, quote: string, extra: object = {}) => ({ type, quote, plain: "p", ...extra });
 
   it("DC: 24 hours' entry notice is not enough (48 required)", () => {
-    const r = computeLease(leaseWith([c("landlord_entry", "q1 entry clause text", { noticeHours: 24 })]), corpus, "DC", 2000);
+    const r = computeLease(leaseWith([c("landlord_entry", "Landlord may enter with 24 hours notice", { noticeHours: 24 })]), corpus, "DC", 2000);
     expect(r.findings[0].severity).toBe("conflict");
     expect(r.status).toBe("fix");
   });
   it("MD: two months' deposit is over the 1-month cap; VA allows it", () => {
-    const x = leaseWith([c("security_deposit", "q2 deposit clause text", { amount: 4000 })]);
+    const x = leaseWith([c("security_deposit", "Tenant pays a $4,000 security deposit", { amount: 4000 })]);
     expect(computeLease(x, corpus, "MD", 2000).findings[0].severity).toBe("conflict");
     expect(computeLease(x, corpus, "VA", 2000).findings[0].severity).toBe("standard");
   });
   it("late fees: 8% is fine in VA (10% cap) but not in DC (5%)", () => {
-    const x = leaseWith([c("late_fee", "q3 late fee clause text", { percent: 8 })]);
+    const x = leaseWith([c("late_fee", "Rent paid late incurs a late fee of 8% of the rent", { percent: 8 })]);
     expect(computeLease(x, corpus, "VA", 2000).findings[0].severity).toBe("standard");
     expect(computeLease(x, corpus, "DC", 2000).findings[0].severity).toBe("conflict");
+  });
+  it("a clause number only counts if its digits are in the clause's quote", () => {
+    // The model says 72 hours, but the quote doesn't say so: the rule asks instead of passing it as "standard".
+    const r = computeLease(leaseWith([c("landlord_entry", "Landlord may enter after giving notice", { noticeHours: 72 })]), corpus, "DC", 2000);
+    expect(r.findings[0].severity).toBe("ask");
+    // A made-up 0 is dropped too; "without prior notice" really is 0 hours and stays a conflict.
+    const made = computeLease(leaseWith([c("landlord_entry", "Landlord may enter with 24 hours notice", { noticeHours: 0 })]), corpus, "VA", 2000);
+    expect(made.findings[0].severity).not.toBe("conflict");
+    const none = computeLease(leaseWith([c("landlord_entry", "Landlord may enter at any time, without prior notice", { noticeHours: 0 })]), corpus, "VA", 2000);
+    expect(none.findings[0].severity).toBe("conflict");
+    // A fee the quote doesn't state can't decide a deposit-cap conflict.
+    const fee = computeLease(leaseWith([c("security_deposit", "Landlord may enter after giving notice", { amount: 9000 })]), corpus, "MD", 2000);
+    expect(fee.findings[0].severity).toBe("ask");
   });
   it("clauses with unverifiable quotes are shown but not counted", () => {
     const r = computeLease(leaseWith([c("waiver_of_rights", "made up clause")]), corpus, "VA", 2000);
@@ -100,7 +113,7 @@ describe("lease rules by jurisdiction", () => {
     expect(r.status).toBe("standard");
   });
   it("no ZIP: everything becomes a question", () => {
-    const r = computeLease(leaseWith([c("waiver_of_rights", "q1 entry clause text")]), corpus, null, null);
+    const r = computeLease(leaseWith([c("waiver_of_rights", "Landlord may enter after giving notice")]), corpus, null, null);
     expect(r.status).toBe("ask");
   });
 });

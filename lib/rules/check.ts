@@ -108,7 +108,8 @@ export function runRules(args: {
   // A question about renting ("is $600 for a room normal?") gets "what we can check" instead of three empty verdicts.
   // Only when nothing checkable was found, so a real listing the model mislabels still gets its report.
   const checkable = x.inputKinds.some((k) => k === "listing" || k === "message" || k === "lease");
-  const question = !checkable && !(facts.rent !== null && facts.zip !== null) && x.clauses.length === 0 && !ai;
+  // A message the rules rate "Likely scam" always gets the full report, whatever the model called it.
+  const question = !checkable && !(facts.rent !== null && facts.zip !== null) && x.clauses.length === 0 && !ai && scam.status !== "likely";
 
   return {
     inputType: question ? "question" : "check",

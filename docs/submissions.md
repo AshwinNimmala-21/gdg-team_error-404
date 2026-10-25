@@ -42,13 +42,13 @@ EVALUATION, HONESTLY
 We built a labelled evaluation and froze a keyword-only baseline before changing the product, with a 10-item holdout we didn't open until the end. All runs use live Gemma 4; all items were written by us (3 are reconstructions of published cases), so this is a stress test, not field accuracy. On ordinary listings a keyword scan is about as good as Clearlease, and on our 10-item holdout the keyword baseline beat us (100% precision and recall with 0 false alarms, against our 83% / 100% with 1 false alarm). Clearlease's edge shows on paraphrased payment requests, misspellings, Spanish, anti-scam disclaimers and screenshots: on our 24-item hard set it flagged 15 of 15 scams with 0 false alarms, while the keyword scan caught 2 and raised 6 false alarms on 9 legitimate listings. Lease checks found 13 of 13 expected conflicts across 8 leases. "Likely scam" never fired on a legitimate listing in any set. Full method and every run: docs/evaluation.md.
 
 ACCESSIBILITY, SPANISH AND PRIVACY
-0 axe-core violations in English and Spanish on the landing page and three finished reports at 375 and 1280 px, plus a 12 of 12 manual keyboard and VoiceOver check. Verdicts are never color-only. The UI is fully available in Spanish with hand-written rule text (no machine translation), and quotes stay in the original language so they can be verified. Nothing about the user is stored: phones, emails and long ID numbers are redacted in the browser, photos are re-encoded on the device (stripping GPS), the server never logs request text, and the page says plainly that the free Gemini API tier may use inputs to improve Google's products. Gemma 4's open weights (Apache 2.0) mean a nonprofit could self-host; we have not built or tested that path.
+0 axe-core violations in English and Spanish on the landing page and three finished reports at 375 and 1280 px, plus a manual keyboard and VoiceOver check (11 of 12 by hand; the 12th, the skip link, passed on a scripted re-check of the production build). Verdicts are never color-only. The UI is fully available in Spanish with hand-written rule text (no machine translation), and quotes stay in the original language so they can be verified. Nothing about the user is stored: phones, emails and long ID numbers are redacted in the browser, photos are re-encoded on the device (stripping GPS), the server never logs request text, and the page says plainly that the free Gemini API tier may use inputs to improve Google's products. Gemma 4's open weights (Apache 2.0) mean a nonprofit could self-host; we have not built or tested that path.
 ```
 
 ### How we built it / tech used (1087 chars)
 ```text
 Frontend and API: Next.js 16 (App Router), TypeScript, Tailwind CSS v4. One page and one POST /api/check route handler; all model and data calls are server-side.
-AI: Gemma 4 (gemma-4-26b-a4b-it) through the Gemini API with @google/genai, using a pinned system prompt and a JSON response schema, validated with Zod. Temperature 0, one call per check.
+AI: Gemma 4 (gemma-4-26b-a4b-it) through the Gemini API with @google/genai, using a pinned system prompt and JSON mode with the schema in the prompt, validated with Zod. Temperature 0, normally one call per check (transient errors are retried).
 Rules: pure TypeScript in lib/rules (price, scam, lease, questions, quote verification), covered by Vitest unit tests. VA, DC and MD rule sheets cite statutes.
 Data: HUD Fair Market Rent API (FY2027) and Census ACS 5-year API (median gross rent by ZIP and bedrooms), each with a saved fallback labelled in the UI.
 Google Cloud: Cloud Run (us-east4, scales to zero) deployed from a multi-stage Dockerfile, Secret Manager for API keys, Firestore for an anonymous flag counter that stores only keyed hashes and counts, and the Maps JavaScript and Geocoding APIs for a map of the ZIP area.
@@ -69,7 +69,7 @@ The free Gemini tier gave intermittent 400/500 errors and photo reads take about
 The model never decides anything: every flag is a verbatim quote that our code verified against the input, and the report shows exactly which words Gemma read.
 A prompt-injection demo that is ignored and counted as a red flag.
 An honest evaluation: a frozen baseline, a holdout we didn't tune on, and a write-up that says where a keyword scan is as good as we are.
-Spanish end to end, 0 axe violations in both languages, and a 12 of 12 manual keyboard and screen-reader pass.
+Spanish end to end, 0 axe violations in both languages, and a manual keyboard and VoiceOver check (11 of 12 by hand; the 12th, the skip link, passed on a scripted re-check of the production build).
 A live Cloud Run deployment with no accounts and nothing about the user stored.
 ```
 
@@ -141,7 +141,7 @@ Clearlease helps first-time renters in DC, Maryland and Virginia check a listing
 
 Problem and impact: the FTC reports nearly 65,000 rental scams since 2020 with about $65 million lost, and adults 18-29 are three times more likely to lose money to one. Our persona is a Virginia Tech student comparing Blacksburg and Arlington listings from 300 miles away. We have not yet collected student interview answers; the interview and usability-test templates are in docs/validation.md.
 
-Technology and AI: Gemma 4 (gemma-4-26b-a4b-it, Gemini API) reads text and lease photos into strict, quoted JSON in one call per check. TypeScript rules decide every price, threshold and legal comparison; the model never does.
+Technology and AI: Gemma 4 (gemma-4-26b-a4b-it, Gemini API) reads text and lease photos into strict, quoted JSON, normally in one call per check. TypeScript rules decide every price, threshold and legal comparison; the model never does.
 
 Responsible AI: quotes must be found in the input or the flag doesn't count; prompt-injection defenses (delimited data, pinned prompt, schema validation, rule-based detector); nothing about the user is stored and sensitive data is redacted in the browser; not legal advice; 0 axe-core violations in English and Spanish; full Spanish UI.
 
@@ -186,7 +186,7 @@ Do these in order. Submit between 11:00 and 11:30 AM Sunday. The 12:30 PM deadli
 - [ ] Repo is **public**: open <https://github.com/AshwinNimmala-21/gdg-team_error-404> in a private/incognito window.
 - [ ] `LICENSE` present at the repo root (it is: Apache 2.0) and shows in the GitHub sidebar.
 - [ ] README states the exact model ID `gemma-4-26b-a4b-it` (it does, near the top) and the live URL.
-- [ ] README numbers still match the repo (the README mentions both 75 and 81 unit tests; catchup.md reports 92 at the last gate: fix or remove before submitting).
+- [ ] README numbers still match the repo (unit-test count, eval tables) after the final gate.
 - [ ] Demo video is **2:00 or shorter**, recorded from a live (not "Showing a saved result") run, and set to public or unlisted. Open the link in a private window. Paste into `[[VIDEO URL]]` everywhere.
 - [ ] Live URL responds: open <https://clearlease-477820387862.us-east4.run.app>, click a sample, and run `node scripts/e2e.mjs https://clearlease-477820387862.us-east4.run.app` (re-run once if a result says "saved").
 - [ ] Student quotes or usability results added to README and `docs/validation.md` only if real; otherwise the descriptions above already say they are not collected yet. If you have real results, edit the "Problem and impact" paragraph; do not invent any.
