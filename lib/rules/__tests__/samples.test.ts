@@ -106,6 +106,12 @@ describe("demo samples (saved data, recorded extractions)", () => {
     expect(only("Owner is relocating for work", "Owner is relocating for work overseas and will mail you the keys. Rent $900.")).toBe(false);
     expect(only("I relocated", "I relocated to Texas for my job, so I can't show it.")).toBe(false);
     expect(only("moving for work", "I'm moving for work to another state.")).toBe(false);
+    // Moving *to* a named place means the owner is away, in any tense.
+    expect(only("Owner is relocating to London for work.")).toBe(false);
+    expect(only("I was transferred", "I was transferred to Germany, so contact me by email.")).toBe(false);
+    expect(only("We are moving to Florida for a new job.")).toBe(false);
+    // The quote can come from Gemma's transcript of a photo.
+    expect(isOnlyRelocating("Owner is relocating for work", ["", "Owner is relocating for work."])).toBe(true);
     // Fail closed: a quote we can't find in the input still counts.
     expect(only("Owner is relocating for work", "nothing like that here")).toBe(false);
     expect(isOnlyRelocating(null, ["x"])).toBe(false);

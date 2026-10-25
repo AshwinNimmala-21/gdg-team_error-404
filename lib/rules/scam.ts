@@ -26,7 +26,7 @@ const SIGNAL_RULES: Record<Exclude<SignalId, "riskyPayment">, { label: string; w
 // The FTC sign is an owner who is away and can't meet you. Moving for work, on its own, is ordinary.
 const RELOCATING = /\b(relocat\w*|moving|transferr\w*|new job)\b/i;
 const AWAY =
-  /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|far away|(another|a different) (city|state|country)|(relocated|moved) to|(can'?t|cannot|unable to|not able to|won'?t be able to) (meet|show|be (there|here|around))|not (in|around)|(mail|send|ship|drop)\w* (you )?(the )?keys?)\b/i;
+  /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|far away|(another|a different) (city|state|country)|(relocat\w*|mov(e|ed|es|ing)|transferr\w*) to|(can'?t|cannot|unable to|not able to|won'?t be able to) (meet|show|be (there|here|around))|not (in|around)|(mail|send|ship|drop)\w* (you )?(the )?keys?)\b/i;
 
 /** The sentence around a quote in the user's text (or the photo transcript), or null if it can't be found. */
 function sentenceAround(quote: string, sources: string[]): string | null {
