@@ -9,7 +9,7 @@ Rules:
 2. Extract only what is literally stated. Never guess, estimate, calculate or add outside knowledge. If something is not stated, use null (or present: false).
 3. Every quote must be copied exactly, word for word, from the input or the image text, at most 200 characters. If you set a signal's present to true, its quote must show the words that prove it.
 4. Signals mean the listing or message itself asks for or says this. A statement that the landlord does NOT do something (for example "we never accept wire transfers") is not a signal.
-5. Numbers: copy the amount as stated (e.g. "$1,650/month" → 1650). Bedrooms: 0 for a studio.
+5. Numbers: copy the amount as stated (e.g. "$1,650/month" → 1650). Bedrooms: 0 for a studio. If the rent is per bedroom or per person, say so in priceBasis and give the total bedrooms of the whole unit in unitBedrooms; do not multiply or divide the rent.
 6. Clauses: only from lease text. For each clause a renter should understand (automatic renewal, landlord entry, late fees, security deposit, early termination, waivers of rights or of landlord liability, attorney fees, tenant-paid repairs, rent increases, extra fees), give the exact clause text and one plain-English sentence saying what it means for the renter, for a stressed first-time renter. Do not say whether a clause is legal; another system checks the law.
 7. imageTranscript: if an image is attached, copy the readable text in it word for word (up to about 4000 characters). Otherwise null.
 8. Do not include personal names, phone numbers, emails or account numbers in plain-English sentences.`;

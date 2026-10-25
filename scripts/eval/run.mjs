@@ -10,7 +10,7 @@ const args = process.argv.slice(2);
 const showHoldout = args.includes("--holdout");
 const set = (args.find((a) => a.startsWith("--set=")) ?? "--set=easy").slice(6);
 const [run = "adhoc", base = "http://localhost:3000"] = args.filter((a) => !a.startsWith("--"));
-const items = readFileSync(set === "hard" ? "scripts/eval/hard.jsonl" : "scripts/eval/dataset.jsonl", "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const items = readFileSync(set === "easy" ? "scripts/eval/dataset.jsonl" : `scripts/eval/${set}.jsonl`, "utf8").trim().split("\n").map((l) => JSON.parse(l));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---- Keyword-only baseline: flags a listing if any scam keyword appears. No model, no rules, no price data.
@@ -44,6 +44,7 @@ for (const it of items) {
     row.price = j.price.status;
     row.priceWord = j.price.status === "below" ? (j.price.farBelow ? "far-below" : "below") : j.price.status;
     row.suspicious = j.price.suspicious;
+    row.subletLine = /sublets often list below market/i.test(j.price.detail ?? "");
     row.scam = j.scam.status;
     row.flags = j.scam.flags.map((f) => f.id);
     row.conflicts = j.lease.findings.filter((f) => f.severity === "conflict" && f.evidence[0]?.counted).map((f) => f.type);
@@ -56,9 +57,9 @@ for (const it of items) {
 process.stderr.write("\n");
 
 mkdirSync("scripts/eval/results", { recursive: true });
-const tag = set === "hard" ? `${run}-hard` : run;
+const tag = set === "easy" ? run : `${run}-${set}`;
 writeFileSync(`scripts/eval/results/${tag}.json`, JSON.stringify(rows.filter((r) => !r.holdout), null, 1));
-if (set !== "hard") writeFileSync(`scripts/eval/results/${run}-holdout.json`, JSON.stringify(rows.filter((r) => r.holdout), null, 1));
+if (set === "easy") writeFileSync(`scripts/eval/results/${run}-holdout.json`, JSON.stringify(rows.filter((r) => r.holdout), null, 1));
 
 // ---- Metrics
 function scores(set, isPositive) {
@@ -113,7 +114,7 @@ const out = [`### Run "${run}", ${set} set (${new Date().toISOString().slice(0, 
 const modes = [...new Set(rows.map((r) => r.mode).filter(Boolean))];
 const ms = dev.filter((r) => r.ms).map((r) => r.ms).sort((a, b) => a - b);
 out.push("", `Modes: ${modes.join(", ")}. Median latency: ${ms.length ? (ms[ms.length >> 1] / 1000).toFixed(1) : "?"} s.`);
-if (set === "hard") {
+if (set !== "easy") {
   out.push("", "| Category | Items | Clearlease correct (any red flag = scam) | Baseline correct (any keyword = scam) |", "|---|---|---|---|");
   for (const cat of [...new Set(rows.map((r) => r.category))]) {
     const c = rows.filter((r) => r.category === cat && !r.error);
@@ -121,6 +122,10 @@ if (set === "hard") {
     out.push(`| ${cat} | ${c.length} | ${right((r) => r.scam === "likely" || r.scam === "some")} | ${right((r) => r.keywords.length > 0)} |`);
   }
 }
-if (set === "hard") {} else if (showHoldout) out.push("", table("Holdout (never inspected while making changes)", rows.filter((r) => r.holdout)));
+if (set !== "easy") {} else if (showHoldout) out.push("", table("Holdout (never inspected while making changes)", rows.filter((r) => r.holdout)));
 else out.push("", `Holdout: ${rows.filter((r) => r.holdout).length} items run and saved unread to scripts/eval/results/${run}-holdout.json.`);
+if (set === "student") {
+  out.push("", "| Item | Category | Label | Price verdict | Scam | Sublet line shown |", "|---|---|---|---|---|---|");
+  for (const r of rows) out.push(`| ${r.id} | ${r.category} | ${r.label} | ${r.suspicious ? "Suspiciously cheap" : r.priceWord ?? r.error} | ${r.scam ?? ""} | ${r.subletLine ? "yes" : "no"} |`);
+}
 console.log(out.join("\n"));

@@ -102,3 +102,23 @@ What the hard set tells us (reported as measured):
 - **On this set the baseline does not match Clearlease.** Keywords catch 2 of 15 scams (13% recall) and raise 6 false alarms out of 9 legitimate listings (precision 25%): disclaimers like "we never accept Zelle" trip it, and paraphrased payment requests, misspellings, Spanish and screenshots slip past it.
 - Clearlease caught all 15 scams at "Likely scam". Its one false alarm (h23, a $425 room in a shared Blacksburg house, shown in a screenshot) came from price alone, the same bias as in the easy set.
 - Because of the limits above, the fair summary is: on ordinary listings a keyword scan is a strong baseline; Clearlease's advantage shows on paraphrase, negation, other languages and images.
+
+
+## Student-market set (`scripts/eval/student.jsonl`), added Oct 24 for per-bedroom pricing and sublets
+8 synthetic items: per-bedroom and per-person student rentals (Blacksburg, Arlington, Baltimore), two legitimate sublets or short-term rentals, and two scams priced per bedroom or per person. "Before" ran on the code before this change, "after" on the code with it. (Before step 2, a "far below" price read "Suspiciously cheap" on its own; here "before" already includes step 2.)
+
+| Item | What it is | Label | Price verdict before | Price verdict after | Sublet line after | Scam verdict after |
+|---|---|---|---|---|---|---|
+| st01 | per-bedroom | legit | Below usual range: verify before paying | Above usual range | no | none_found |
+| st02 | per-person | legit | Below usual range: verify before paying | Above usual range | no | none_found |
+| st03 | per-bedroom | legit | Below usual range: verify before paying | Typical | no | none_found |
+| st04 | summer-sublet | legit | Below usual range: verify before paying | Below usual range: verify before paying | yes | none_found |
+| st05 | short-term | legit | Below usual range: verify before paying | Below usual range: verify before paying | yes | none_found |
+| st06 | per-bedroom | scam | Not enough info | Suspiciously cheap | yes | likely |
+| st07 | per-person | scam | Suspiciously cheap | Suspiciously cheap | no | likely |
+| st08 | per-bedroom | legit | Below usual range: verify before paying | Typical | no | none_found |
+
+What changed:
+- **Per-bedroom and per-person rent** (st01–st03, st08) is now compared with the whole unit's benchmark divided by its bedroom count, labelled in the report as an approximation. None of the legitimate ones reads "far below" any more. Two Blacksburg student rentals ($650 per bedroom, $575 per person) now read "Above usual range". That's what the approximation says: the usual range for one bedroom's share of a Blacksburg 4-bedroom is $438–$512 (Census median ÷ 4 to HUD FMR ÷ 4), and furnished student apartments price above an even split. The report says "Ask what's included", not "scam".
+- **Sublets and short-term rentals** (st04, st05) now carry "Summer sublets often list below market; price alone isn't a red flag here." Neither escalates.
+- **Scams priced per bedroom or per person** (st06, st07) still read "Likely scam" from their non-price signs.

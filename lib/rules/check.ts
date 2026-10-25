@@ -15,6 +15,10 @@ export interface ResolvedFacts {
   zip: string | null;
   rentEvidence?: Evidence;
   bedroomsEvidence?: Evidence;
+  /** Rent is per bedroom or per person in a unit of `bedrooms` bedrooms (verified quotes). */
+  perUnit?: { basis: "per_bedroom" | "per_person"; evidence: Evidence };
+  /** Sublet, summer or short-term rental (verified quote). */
+  shortTerm?: Evidence;
   notes: string[];
 }
 
@@ -48,6 +52,31 @@ export function resolveFacts(x: Extraction, corpus: Corpus, overrides: Overrides
     } else notes.push("We couldn't confirm the number of bedrooms, so we left it out.");
   }
 
+  // Per-bedroom / per-person rent: compare against the whole unit's benchmark, so the bedroom count we use is the unit's.
+  let perUnit: ResolvedFacts["perUnit"];
+  const basis = x.listing.priceBasis;
+  if ((basis.value === "per_bedroom" || basis.value === "per_person") && findQuote(basis.quote, corpus)) {
+    const ub = x.listing.unitBedrooms;
+    const ubWhere = findQuote(ub.quote, corpus);
+    if (overrides.bedrooms === undefined && ub.count !== null && ub.count >= 2 && ubWhere && bedroomsInQuote(ub.count, ub.quote)) {
+      bedrooms = ub.count;
+      bedroomsEvidence = { label: "Size of the whole unit we read", quote: ub.quote!, quoteFrom: ubWhere, value: bedLabel(ub.count), counted: true };
+    }
+    if (bedrooms !== null && bedrooms >= 2)
+      perUnit = {
+        basis: basis.value,
+        evidence: {
+          label: basis.value === "per_bedroom" ? "Rent is per bedroom" : "Rent is per person",
+          quote: basis.quote!,
+          quoteFrom: findQuote(basis.quote, corpus)!,
+          counted: true,
+        },
+      };
+  }
+  const st = x.listing.shortTerm;
+  const stWhere = st.present ? findQuote(st.quote, corpus) : null;
+  const shortTerm: Evidence | undefined = stWhere ? { label: "Sublet or short-term rental", quote: st.quote!, quoteFrom: stWhere, counted: true } : undefined;
+
   let zip: string | null = overrides.zip ?? (formZip || null);
   if (!zip && x.listing.zip.value) {
     const where = findQuote(x.listing.zip.quote, corpus);
@@ -55,7 +84,7 @@ export function resolveFacts(x: Extraction, corpus: Corpus, overrides: Overrides
     else notes.push("We couldn't confirm the ZIP code, so we left it out.");
   }
 
-  return { rent, bedrooms, zip, rentEvidence, bedroomsEvidence, notes };
+  return { rent, bedrooms, zip, rentEvidence, bedroomsEvidence, perUnit, shortTerm, notes };
 }
 
 export function runRules(args: {
@@ -84,6 +113,7 @@ export function runRules(args: {
       kinds: x.inputKinds,
       jurisdiction,
       areaName: benchmarks.area?.place ?? null,
+      priceBasis: facts.perUnit?.basis ?? null,
     },
     price,
     scam,

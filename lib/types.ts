@@ -131,6 +131,8 @@ export interface CheckResult {
     kinds: InputKind[];
     jurisdiction: Jurisdiction | null;
     areaName: string | null;
+    /** Set when the rent is per bedroom or per person (then `bedrooms` is the whole unit). */
+    priceBasis?: "per_bedroom" | "per_person" | null;
   };
   price: PriceCheck;
   scam: ScamCheck;

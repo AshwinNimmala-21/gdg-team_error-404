@@ -53,8 +53,8 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-dashed border-rule py-3">
         <span className="text-[13px] font-semibold">We read:</span>
         <dl className="flex flex-wrap gap-x-5 gap-y-1">
-          {item("Rent", read.rent !== null ? `${money(read.rent)}/mo` : null)}
-          {item("Size", read.bedrooms !== null ? size(read.bedrooms) : null)}
+          {item("Rent", read.rent !== null ? `${money(read.rent)}/mo${read.priceBasis === "per_bedroom" ? " per bedroom" : read.priceBasis === "per_person" ? " per person" : ""}` : null)}
+          {item("Size", read.bedrooms !== null ? `${size(read.bedrooms)}${read.priceBasis ? " (whole unit)" : ""}` : null)}
           {item("ZIP", read.zip ? `${read.zip}${read.areaName ? ` (${read.areaName})` : ""}` : null)}
         </dl>
         <button

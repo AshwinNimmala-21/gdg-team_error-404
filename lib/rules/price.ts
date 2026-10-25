@@ -25,7 +25,11 @@ export interface PriceInput {
   zip: string | null;
   rentEvidence?: Evidence;
   bedroomsEvidence?: Evidence;
+  perUnit?: { basis: "per_bedroom" | "per_person"; evidence: Evidence };
+  shortTerm?: Evidence;
 }
+
+export const SUBLET_LINE = "Summer sublets often list below market; price alone isn't a red flag here.";
 
 export const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 export const bedLabel = (n: number) => (n === 0 ? "studio" : `${n}-bedroom`);
@@ -41,24 +45,30 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
   const evidence: Evidence[] = [];
   if (input.rentEvidence) evidence.push(input.rentEvidence);
   if (input.bedroomsEvidence) evidence.push(input.bedroomsEvidence);
+  if (input.perUnit) evidence.push(input.perUnit.evidence);
+  if (input.shortTerm) evidence.push(input.shortTerm);
+  // Per-bedroom rent vs. whole-unit benchmarks: divide by the bedroom count. An approximation (shared kitchens,
+  // bathrooms and living rooms aren't split evenly), and labelled as one.
+  const share = input.perUnit && bedrooms !== null && bedrooms >= 2 ? bedrooms : 1;
+  const per = share > 1 ? `; ÷ ${share} bedrooms = ${input.perUnit!.basis === "per_person" ? "per-person" : "per-bedroom"} share (approximation)` : "";
 
   const saved = (live: boolean) => (live ? "" : " (saved figure)");
   const refs: { amount: number; name: string }[] = [];
   if (b.censusBedroom && bedrooms !== null) {
-    refs.push({ amount: b.censusBedroom.amount, name: `Census median for a ${bedLabel(bedrooms)} in ${b.censusBedroom.geography}` });
+    refs.push({ amount: b.censusBedroom.amount / share, name: `Census median for a ${bedLabel(bedrooms)} in ${b.censusBedroom.geography}${share > 1 ? `, ÷ ${share}` : ""}` });
     evidence.push({
       label: `Census median rent for a ${bedLabel(bedrooms)}`,
-      value: `${money(b.censusBedroom.amount)} a month in ${b.censusBedroom.geography}, ${b.censusBedroom.vintage}${saved(b.censusBedroom.live)}`,
+      value: `${money(b.censusBedroom.amount)} a month in ${b.censusBedroom.geography}, ${b.censusBedroom.vintage}${saved(b.censusBedroom.live)}${per ? `${per}: ${money(b.censusBedroom.amount / share)}` : ""}`,
       counted: true,
       source: CENSUS_BEDROOM_SOURCE,
     });
   }
   if (b.fmr && b.fmrArea && bedrooms !== null) {
     const where = b.fmr.level === "zip" ? `ZIP ${zip}` : b.fmrArea.shortName;
-    refs.push({ amount: b.fmr.amount, name: `HUD ${b.fmr.year} benchmark, ${where}` });
+    refs.push({ amount: b.fmr.amount / share, name: `HUD ${b.fmr.year} benchmark, ${where}${share > 1 ? `, ÷ ${share}` : ""}` });
     evidence.push({
       label: "HUD benchmark rent (Fair Market Rent)",
-      value: `${money(b.fmr.amount)} a month for a ${bedLabel(bedrooms)}, ${where}, ${b.fmr.year}${saved(b.fmr.live)}`,
+      value: `${money(b.fmr.amount)} a month for a ${bedLabel(bedrooms)}, ${where}, ${b.fmr.year}${saved(b.fmr.live)}${per ? `${per}: ${money(b.fmr.amount / share)}` : ""}`,
       counted: true,
       source: HUD_SOURCE,
     });
@@ -83,7 +93,8 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
   const ratio = rent / lowRef.amount;
   const status: PriceCheck["status"] = ratio < BELOW_RATIO ? "below" : rent / highRef.amount > ABOVE_RATIO ? "above" : "typical";
   const farBelow = ratio <= FAR_BELOW_RATIO;
-  const unit = `a ${bedLabel(bedrooms)} in ${zip ? `ZIP ${zip}` : "this area"}`;
+  const place = zip ? `ZIP ${zip}` : "this area";
+  const unit = share > 1 ? `one ${input.perUnit!.basis === "per_person" ? "person's" : "bedroom's"} share of a ${bedLabel(bedrooms)} in ${place}` : `a ${bedLabel(bedrooms)} in ${place}`;
 
   const rangeLine =
     lowRef === highRef
@@ -96,7 +107,9 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
       : status === "above"
         ? `${Math.round((rent / highRef.amount - 1) * 100)}% above the usual range for ${unit}`
         : `Within the usual range for ${unit}`;
-  const detail = `${rangeLine} ${
+  const approx = share > 1 ? ` Per-${input.perUnit!.basis === "per_person" ? "person" : "bedroom"} figures are the whole-unit benchmarks divided by ${share}, an approximation.` : "";
+  const sublet = input.shortTerm && status === "below" ? ` ${SUBLET_LINE}` : "";
+  const detail = `${rangeLine}${approx}${sublet} ${
     status === "below"
       ? farBelow
         ? FAR_BELOW_ALONE

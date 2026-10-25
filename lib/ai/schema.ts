@@ -15,6 +15,7 @@ export const PAYMENT_METHODS = [
   "other",
 ] as const;
 export const INPUT_KINDS = ["listing", "lease", "message", "other"] as const;
+export const PRICE_BASES = ["whole_unit", "per_bedroom", "per_person"] as const;
 export const CLAUSE_TYPES = [
   "auto_renewal",
   "landlord_entry",
@@ -85,6 +86,14 @@ export const ExtractionSchema = z.object({
       .default({ value: null, quote: null }),
     deposit: z.object({ amount: looseNumber, quote }),
     applicationFee: z.object({ amount: looseNumber, quote }),
+    // Student-market fields (added Oct 24). Defaults keep older saved extractions valid.
+    priceBasis: z
+      .object({ value: z.enum(PRICE_BASES).nullable().catch(null), quote })
+      .default({ value: null, quote: null }),
+    unitBedrooms: z
+      .object({ count: looseNumber.pipe(z.number().int().max(12).nullable().catch(null)), quote })
+      .default({ count: null, quote: null }),
+    shortTerm: signal.default({ present: false, quote: null }),
   }),
   signals: z.object({
     payBeforeViewing: signal,
@@ -166,8 +175,23 @@ export const EXTRACTION_JSON_SCHEMA = {
           properties: { amount: nullable("number", "Application or holding fee in US dollars as stated."), quote: quoteJson },
           required: ["amount", "quote"],
         },
+        priceBasis: {
+          type: "object",
+          description:
+            "What the rent pays for, only if stated: per_bedroom ('$650 per bedroom', 'per room', 'rent by the bed'), per_person ('$575 per person'), or whole_unit. null if not stated.",
+          properties: { value: { anyOf: [{ type: "string", enum: [...PRICE_BASES] }, { type: "null" }] }, quote: quoteJson },
+          required: ["value", "quote"],
+        },
+        unitBedrooms: {
+          type: "object",
+          description:
+            "Total bedrooms in the whole apartment or house, as stated (e.g. 'room in a 4-bedroom' → 4). null if not stated.",
+          properties: { count: nullable("integer", "Total bedrooms in the unit."), quote: quoteJson },
+          required: ["count", "quote"],
+        },
+        shortTerm: signalJson("The rental is a sublet, sublease, lease takeover, summer rental or a stay shorter than 12 months, as stated."),
       },
-      required: ["rent", "bedrooms", "zip", "address", "deposit", "applicationFee"],
+      required: ["rent", "bedrooms", "zip", "address", "deposit", "applicationFee", "priceBasis", "unitBedrooms", "shortTerm"],
     },
     signals: {
       type: "object",

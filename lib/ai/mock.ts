@@ -8,17 +8,10 @@ import type { Extraction } from "./schema";
 
 const no = { present: false, quote: null };
 
-const base = (over: Partial<Extraction>): Extraction => ({
+type ListingIn = Omit<Extraction["listing"], "priceBasis" | "unitBedrooms" | "shortTerm"> & Partial<Extraction["listing"]>;
+const base = ({ listing, ...over }: Partial<Omit<Extraction, "listing">> & { listing?: ListingIn }): Extraction => ({
   inputKinds: ["listing"],
   imageTranscript: null,
-  listing: {
-    rent: { amount: null, quote: null },
-    bedrooms: { count: null, quote: null },
-    zip: { value: null, quote: null },
-    address: { value: null, quote: null },
-    deposit: { amount: null, quote: null },
-    applicationFee: { amount: null, quote: null },
-  },
   signals: {
     payBeforeViewing: no,
     riskyPayment: { ...no, methods: [] },
@@ -31,6 +24,19 @@ const base = (over: Partial<Extraction>): Extraction => ({
   clauses: [],
   aiInstructions: no,
   ...over,
+  listing: {
+    priceBasis: { value: null, quote: null },
+    unitBedrooms: { count: null, quote: null },
+    shortTerm: no,
+    ...(listing ?? {
+      rent: { amount: null, quote: null },
+      bedrooms: { count: null, quote: null },
+      zip: { value: null, quote: null },
+      address: { value: null, quote: null },
+      deposit: { amount: null, quote: null },
+      applicationFee: { amount: null, quote: null },
+    }),
+  },
 });
 
 export const LEASE_TRANSCRIPT = `FICTIONAL SAMPLE FOR DEMONSTRATION ONLY
