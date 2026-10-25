@@ -10,6 +10,8 @@ export function priceVerdict(p: PriceCheck): Verdict {
   switch (p.status) {
     case "typical":
       return { word: "Typical", tone: "ok" };
+    case "rough":
+      return { word: "Rough comparison", tone: "nil" };
     case "above":
       return { word: "Above usual range", tone: "warn" };
     case "below":

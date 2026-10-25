@@ -55,8 +55,23 @@ The audit found a production-only crash: run a text sample, then the lease-photo
 - **Unit test:** `lib/client/__tests__/geocode.test.ts` covers `undefined`, a synchronous throw, a rejection and empty answers. Run against the old logic, it fails with the exact production error. With the fix it passes.
 - **Browser check:** `scripts/a11y.mjs` fails on any uncaught page error during the text → photo → text sequence.
 
-## Manual checks (to do by a person)
-Automated tools catch roughly a third to a half of accessibility problems. The keyboard-only and VoiceOver walkthrough is in the "Manual checklist" section below; results go there once done.
+## Manual checks
+Automated tools catch only part of what matters, so a person also did a keyboard-only and VoiceOver walkthrough. Results are below: 12 of 12 checks pass (K1 after a re-check).
 
 ## Manual checklist results
-_Not run yet._
+Run by Ashwin on Sat Oct 24, about 11:55 PM ET, on a MacBook with Safari/Chrome and VoiceOver (Cmd+F5), against `http://localhost:3000` (dev server).
+
+| # | Check | Result |
+|---|---|---|
+| K1 | First Tab lands on a visible "Skip to…" link | **Pass, after re-check.** In the manual run the first Tab skipped the link, but the URL was `localhost:3000/#main` (so the browser started tabbing from the `#main` target, after the link) and the Next.js dev-tools button was on screen. Re-checked by script on a clean load of the production build (no `#main`, no dev overlay): the first Tab lands on "Skip to the checker", visible, with a 3 px solid focus outline, at 1280 px and 375 px. Not a product issue; no change made. |
+| K2 | Tab order through the form, focus always visible | Pass |
+| K3 | Running a sample moves focus to "Your pre-sign report" | Pass |
+| K4 | Evidence and quote drawers open and close with Enter/Space | Pass |
+| K5 | Edit facts, save, Escape closes the editor with sensible focus | Pass |
+| K6 | Lease-photo sample fully usable by keyboard, no traps | Pass |
+| V1 | "Report ready" summary of all three verdicts is announced | Pass |
+| V2 | Headings rotor lists sections in a sensible order | Pass |
+| V3 | Scam flags say "(strong warning sign)" or "(warning sign)" | Pass |
+| V4 | "Quote start" and "quote end" around highlighted quotes are clear | Pass |
+| V5 | Map is one item ("Approximate area…"), no trap in map controls | Pass: read as one item; Tab moves past it |
+| V6 | Empty submit: error is read and focus goes to the text box | Pass |

@@ -41,7 +41,8 @@ export interface Evidence {
 export type Jurisdiction = "VA" | "DC" | "MD";
 
 export interface PriceCheck {
-  status: "below" | "typical" | "above" | "unknown";
+  /** "rough": per-bedroom/per-person rent that isn't far below; only that direction is checked. */
+  status: "below" | "typical" | "above" | "rough" | "unknown";
   headline: string;
   detail: string;
   rent: number | null;

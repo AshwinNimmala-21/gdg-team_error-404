@@ -4,7 +4,7 @@ import { priceVerdict } from "@/lib/client/verdicts";
 import { savedBenchmarks } from "@/lib/data/benchmarks";
 import type { Extraction } from "@/lib/types";
 import { resolveFacts, runRules } from "../check";
-import { SUBLET_LINE } from "../price";
+import { ROUGH_LINE, SUBLET_LINE } from "../price";
 import { makeCorpus } from "../quotes";
 
 const fine = SAMPLE_EXTRACTIONS["fine-arlington"];
@@ -44,6 +44,25 @@ describe("per-bedroom and per-person rent", () => {
     expect(r.price.detail).toMatch(/divided by 4, an approximation/);
     expect(r.price.evidence.some((e) => e.label === "Rent is per bedroom" && e.counted)).toBe(true);
     expect(r.price.evidence.some((e) => /÷ 4 bedrooms = per-bedroom share \(approximation\)/.test(e.value ?? ""))).toBe(true);
+  });
+
+  it("never says 'Above usual range' for per-bedroom rent: it shows the neutral rough-comparison line instead", () => {
+    const r = check(TEXT, room); // $650 vs $438–$512 per bedroom would have been "above"
+    expect(r.price.status).toBe("rough");
+    expect(priceVerdict(r.price)).toEqual({ word: "Rough comparison", tone: "nil" });
+    expect(r.price.headline).toMatch(/^Rough comparison only for one bedroom's share/);
+    expect(r.price.detail).toContain(ROUGH_LINE);
+    expect(r.price.headline).not.toMatch(/above/);
+    expect(r.questions.some((q) => /What's included/.test(q.text) && /rough/.test(q.why))).toBe(true);
+    expect(r.questions.map((q) => q.why).join(" ")).not.toMatch(/above HUD/);
+  });
+
+  it("still flags per-bedroom rent that is far below the divided benchmark", () => {
+    const t = TEXT.replace("$650 per bedroom per month", "$250 per bedroom per month");
+    const r = check(t, { ...room, rent: { amount: 250, quote: "$250 per bedroom" }, priceBasis: { value: "per_bedroom", quote: "$250 per bedroom per month" } });
+    expect(r.price.status).toBe("below");
+    expect(r.price.farBelow).toBe(true);
+    expect(priceVerdict(r.price).word).toBe("Below usual range: verify before paying");
   });
 
   it("without the per-bedroom basis, the same $650 is compared with a whole unit (the old behaviour)", () => {

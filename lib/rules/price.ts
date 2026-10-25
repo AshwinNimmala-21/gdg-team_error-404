@@ -29,6 +29,8 @@ export interface PriceInput {
   shortTerm?: Evidence;
 }
 
+export const ROUGH_LINE =
+  "Rough comparison only: per-bedroom rents near campus often run above an even split of area averages. Compare 2–3 nearby listings and ask what's included.";
 export const SUBLET_LINE = "Summer sublets often list below market; price alone isn't a red flag here.";
 
 export const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
@@ -91,8 +93,19 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
   const lowRef = refs.reduce((a, r) => (r.amount < a.amount ? r : a));
   const highRef = refs.reduce((a, r) => (r.amount > a.amount ? r : a));
   const ratio = rent / lowRef.amount;
-  const status: PriceCheck["status"] = ratio < BELOW_RATIO ? "below" : rent / highRef.amount > ABOVE_RATIO ? "above" : "typical";
   const farBelow = ratio <= FAR_BELOW_RATIO;
+  // Per-bedroom/per-person: area benchmarks ÷ bedrooms understate near-campus student rents, so only the
+  // "far below" direction is checked. Anything else is a neutral "rough comparison", never "above" or "typical".
+  const status: PriceCheck["status"] =
+    share > 1
+      ? farBelow
+        ? "below"
+        : "rough"
+      : ratio < BELOW_RATIO
+        ? "below"
+        : rent / highRef.amount > ABOVE_RATIO
+          ? "above"
+          : "typical";
   const place = zip ? `ZIP ${zip}` : "this area";
   const unit = share > 1 ? `one ${input.perUnit!.basis === "per_person" ? "person's" : "bedroom's"} share of a ${bedLabel(bedrooms)} in ${place}` : `a ${bedLabel(bedrooms)} in ${place}`;
 
@@ -106,7 +119,9 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
       ? `${Math.round((1 - ratio) * 100)}% below the usual range for ${unit}`
       : status === "above"
         ? `${Math.round((rent / highRef.amount - 1) * 100)}% above the usual range for ${unit}`
-        : `Within the usual range for ${unit}`;
+        : status === "rough"
+          ? `Rough comparison only for ${unit}`
+          : `Within the usual range for ${unit}`;
   const approx = share > 1 ? ` Per-${input.perUnit!.basis === "per_person" ? "person" : "bedroom"} figures are the whole-unit benchmarks divided by ${share}, an approximation.` : "";
   const sublet = input.shortTerm && status === "below" ? ` ${SUBLET_LINE}` : "";
   const detail = `${rangeLine}${approx}${sublet} ${
@@ -116,7 +131,9 @@ export function computePrice(input: PriceInput, b: Benchmarks): PriceCheck {
         : "Cheaper than most places like it. That can be a real deal, but see the unit before you pay anything."
       : status === "above"
         ? "Ask what's included (utilities, parking, amenities) and compare a few similar listings nearby."
-        : "Both figures include utilities, so a listing without utilities can sit a bit lower and still be normal."
+        : status === "rough"
+          ? ROUGH_LINE
+          : "Both figures include utilities, so a listing without utilities can sit a bit lower and still be normal."
   }`;
 
   return { ...base, status, ratio, range: { low: lowRef.amount, high: highRef.amount }, farBelow, suspicious: false, headline, detail };

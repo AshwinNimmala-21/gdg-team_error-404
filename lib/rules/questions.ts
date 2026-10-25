@@ -80,6 +80,11 @@ export function buildQuestions(price: PriceCheck, scam: ScamCheck, lease: LeaseC
     add({ text: "Can I read the full lease before I pay a deposit?", why: "Don't pay a security deposit until a lease is signed (DC Attorney General)." });
   if (price.status === "above")
     add({ text: "What's included in the rent: utilities, parking, amenities?", why: "It's well above HUD's local benchmark." });
+  if (price.status === "rough")
+    add({
+      text: "What's included in the rent: utilities, furniture, parking, internet?",
+      why: "Per-bedroom prices only allow a rough comparison with area averages, so compare 2–3 nearby listings.",
+    });
   add({
     text: "If you search the address online, does the same unit show up with a different price, owner or as for sale?",
     why: "Same place with different contacts, or listed for sale, is a big red flag (FTC).",
