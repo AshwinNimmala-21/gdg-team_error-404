@@ -18,7 +18,7 @@ Written by Ashwin with Claude Code. **This is the single handoff document.** You
 ## 1. Deploy (done before the overnight sprint)
 - Ashwin deployed to Cloud Run with `docs/DEPLOY.md`. Live URL: `https://clearlease-477820387862.us-east4.run.app`. `node scripts/e2e.mjs <URL>` passed 4/4 live at the time.
 - `docs/DEPLOY.md`: added `RATE_LIMIT_PER_MIN=30` to `--set-env-vars` (judges share venue Wi-Fi). Your `--timeout 120` was already there; the merge kept your wording.
-- README: live URL near the top. `docs/submissions.md` and `docs/video-script.md` were created as stubs (URL + headings only; the drafts are still to do).
+- README: live URL near the top. `docs/process/submissions.md` and `docs/process/video-script.md` were created as stubs (URL + headings only; the drafts are still to do).
 - gcloud is now installed on Ashwin's Mac (`brew install --cask gcloud-cli`).
 
 ## 2. Evaluation (new): `scripts/eval/`, `docs/evaluation.md`
@@ -149,7 +149,7 @@ Motivated by two misses in the first eval run; the causes were fixed in general,
 
 ## 11. Still to do (people, not code)
 - **Student interviews and the 3-person usability test** in `docs/validation.md` (stakeholder empathy, 5 points). Put 2 quotes in the README and 1 in the video.
-- **Video script** (`docs/video-script.md`) and **submission text** (`docs/submissions.md`, MLH Gemma 4 track + codingjam.dev), both still stubs.
+- **Video script** (`docs/process/video-script.md`) and **submission text** (`docs/process/submissions.md`, MLH Gemma 4 track + codingjam.dev), both still stubs.
 - A native Spanish speaker should skim the ES UI before the demo.
 
 ---

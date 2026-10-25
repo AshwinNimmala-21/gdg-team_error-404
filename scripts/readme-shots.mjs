@@ -1,4 +1,4 @@
-// README screenshots: desktop scam report + phone lease report. Usage: node scripts/dev/readme-shots.mjs [baseUrl]
+// README screenshots: desktop scam report + phone lease report. Usage: node scripts/readme-shots.mjs [baseUrl]
 import { chromium } from "playwright-core";
 const base = process.argv[2] ?? "http://localhost:3000";
 const browser = await chromium.launch({ channel: "chrome" });

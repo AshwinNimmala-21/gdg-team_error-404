@@ -16,7 +16,7 @@ Last updated: Sun Oct 25 2026, 3:16 AM ET. The MVP works locally in live and dem
 - Both edit `PLAN.md`. Run `git pull --rebase` before editing it, keep commits small, and never force-push.
 
 **Done since 4:50 PM (all on `main`)**
-- Council report and live review screenshots: `docs/process/council/report.md`, `docs/screenshots/council-review/`.
+- Council report and live review screenshots: `docs/process/council/report.md`, `docs/process/screenshots/council-review/`.
 - #1 The repo is public (checked with `gh repo view`).
 - #2 Gemma reliability, in `lib/ai/gemma.ts`: per-attempt timeouts, two retries with backoff on 5xx, network errors and timeouts, and a non-sticky step-down (`d928832`).
 - #3 A labelled saved result for the 4 built-in samples when the live model still fails (`11799f7`).
@@ -204,7 +204,7 @@ Made by Claude under the "no STOPs until MVP" instruction. Each one is a recomme
   - Flags need a 30-minute signed token from /api/check.
   - Address ids come only from a fresh model read whose value appears in the input (from the security review).
 - A26 **UX round 1 verdict words:** "Suspiciously cheap", "Below usual range", "Above usual range", and "Fix before signing" for the lease. The critic found "Below market" read as a bargain. This overrides the R1.1 wording.
-- A28 **Design pass 2** (see `docs/design-principles.md`; before/after shots in `docs/screenshots/design-pass/`):
+- A28 **Design pass 2** (see `docs/design-principles.md`; before/after shots in `docs/process/screenshots/design-pass/`):
   - The three verdicts became one stamped verdict board at the top of the report: the single bold element, also the section navigation.
   - Sections use quiet tone tags; lease clauses are grouped by action.
   - Removed: numbered gutters, numbered samples, mono data labels.

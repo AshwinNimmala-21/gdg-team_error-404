@@ -46,7 +46,7 @@ Details: `docs/process/council/rounds.md`.
 
 | Commit | What |
 |---|---|
-| `4698968` | `docs/video-script.md` (2:00 shot list, narration, 30 s fallback), `docs/submissions.md` (MLH Gemma 4 + codingjam), `docs/process/track-decision.md` |
+| `4698968` | `docs/process/video-script.md` (2:00 shot list, narration, 30 s fallback), `docs/process/submissions.md` (MLH Gemma 4 + codingjam), `docs/process/track-decision.md` |
 | `67b026a` | Merged `main` (map `inert`, soak record) |
 | `9588eaf` | Task C: "Read by Gemma 4" links to "What Gemma read"; "Copy these questions"; tagline "Virginia, DC and Maryland"; **Census API notice** (verbatim, ES translation beside it); EN/ES toggle accessible name fixed |
 | `a5d46c5` | Task A: question state, accent-insensitive quotes, "1.6k" rents, Spanish/Spanglish prompt vocabulary, `scripts/eval/messy.jsonl` |
@@ -76,7 +76,7 @@ Details: `docs/process/council/rounds.md`.
 - **Student interviews (3–5) and the 3-person usability test**, with real quotes and permission, into `docs/validation.md`. Then the README quotes and video line N1.
 - **Native Spanish speaker** skims ES mode (README says "not reviewed").
 - **Redeploy `dev` to Cloud Run** and run live e2e on the URL.
-- **Record the 2-minute video** on the live URL (`docs/video-script.md`): never a "Showing a saved result" take; show the model ID twice.
+- **Record the 2-minute video** on the live URL (`docs/process/video-script.md`): never a "Showing a saved result" take; show the model ID twice.
 - **Merge `dev` → `main`**, then submit on both sites; rotate API keys after.
 
 ## Timed checklist (starts 8:45; we're 30 min behind the plan)
@@ -85,8 +85,8 @@ Details: `docs/process/council/rounds.md`.
 |---|---|---|
 | 8:45–9:15 | Deploy `dev` (commands below); live e2e on the URL | Interviews / usability test with students at the venue (5 people if possible) |
 | 9:15–9:30 | Merge `dev` → `main`, push (freeze at 9:30) | Paste quotes into `docs/validation.md` + 2 into README; commit to `dev`, then merge again |
-| 9:30–10:30 | Record the video (live URL, `docs/video-script.md`) | Narrate; check the takes have no "saved result" |
-| 10:30–10:50 | Edit, upload unlisted, test the link in a private window | Fill `docs/submissions.md` placeholders (video URL, student count) |
+| 9:30–10:30 | Record the video (live URL, `docs/process/video-script.md`) | Narrate; check the takes have no "saved result" |
+| 10:30–10:50 | Edit, upload unlisted, test the link in a private window | Fill `docs/process/submissions.md` placeholders (video URL, student count) |
 | 10:50–11:00 | Submit MLH OrganizerHQ (one track: Gemma 4) | Submit codingjam.dev (VT chapter) |
 | After | Rotate the API keys | — |
 

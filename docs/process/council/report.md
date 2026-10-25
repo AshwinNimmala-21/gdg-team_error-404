@@ -9,7 +9,7 @@ Sat Oct 24 2026, 6 PM. Covers the 12 hours until Sun 6 AM. Feature freeze is Sun
 - **Stage 2:** each member ranked the other three answers, relabelled W/X/Y/Z at random.
 - **Stage 3:** the chairman synthesized the result and re-checked every claim the plan depends on.
 
-The review was read-only. The only files written are this report and `docs/screenshots/council-review/`. No code was changed, nothing was committed, and nothing was sent to `/api/flag`.
+The review was read-only. The only files written are this report and `docs/process/screenshots/council-review/`. No code was changed, nothing was committed, and nothing was sent to `/api/flag`.
 
 | Member | Model | Role |
 |---|---|---|
@@ -30,7 +30,7 @@ None of these is a feature problem. Fix logistics and reliability tonight, gathe
 
 ## Evidence the chairman collected
 
-**Screenshots:** live mode, `gemma-4-26b-a4b-it`, live HUD and Census data. Each sample was run on a fresh page. The files are in `docs/screenshots/council-review/`.
+**Screenshots:** live mode, `gemma-4-26b-a4b-it`, live HUD and Census data. Each sample was run on a fresh page. The files are in `docs/process/screenshots/council-review/`.
 
 | Sample | 375 px | 1280 px | Stamps (Price · Scam · Lease) |
 |---|---|---|---|
@@ -349,7 +349,7 @@ Leave out the map and the community counter. They take time and invite questions
 
 **Track:** stay on **Gemma 4**. Integration is core and multimodal, schema-bound and guarded against injection. Items 4 and 5 make it hard to beat. Fall back to UI/UX only if live calls are still flaky after item 2.
 
-Key files: `lib/ai/gemma.ts` (no transient retry, around lines 95–109), `docs/validation.md` (empty), `README.md` (lines 1–5 pitch, line 30 "validation in progress"), `docs/screenshots/council-review/1280-sample4.png` ("relocating for work" counted as the "owner away" flag).
+Key files: `lib/ai/gemma.ts` (no transient retry, around lines 95–109), `docs/validation.md` (empty), `README.md` (lines 1–5 pitch, line 30 "validation in progress"), `docs/process/screenshots/council-review/1280-sample4.png` ("relocating for work" counted as the "owner away" flag).
 
 ### Member C (sonnet): skeptical engineer and security reviewer
 
@@ -608,7 +608,7 @@ Reviewers saw only the labels W, X, Y and Z.
 
 | Rank | Answer | Accuracy | Impact | Reasoning |
 |---|---|---|---|---|
-| 1 | **W** | 8 | 8 | The only one that puts validation first and includes a shot-by-shot video script; the "relocating for work" over-flag is real (`docs/screenshots/council-review/1280-sample4.png`, "Says the owner is out of town or overseas"). Misses the private repo and buries deploy at #3. |
+| 1 | **W** | 8 | 8 | The only one that puts validation first and includes a shot-by-shot video script; the "relocating for work" over-flag is real (`docs/process/screenshots/council-review/1280-sample4.png`, "Says the owner is out of town or overseas"). Misses the private repo and buries deploy at #3. |
 | 2 | **Z** | 9 | 6 | Most accurate code reading: `workingLevel` permanent downgrade (`lib/ai/gemma.ts:22,88`), one shared 45 s `AbortSignal` across step-downs (`gemma.ts:8,74`), no same-level retry (`gemma.ts:100-108`) all verified by me. But it's an engineering audit, not a win plan: no validation, no video, no public repo, no README. |
 | 3 | **X** | 8 | 4 | Careful UI audit with verified claims (`components/Stamp.tsx:23` `opacity-90`, `components/Report.tsx:230` `opacity-80`, `components/Checker.tsx:100` "about 10 seconds" even for photos, `components/ListingMap.tsx:41` `role="img"`, third stamp wrapping onto its own row in `1280-sample2.png`). Its top 10 is entirely polish; following it alone leaves the team unsubmittable. |
 
