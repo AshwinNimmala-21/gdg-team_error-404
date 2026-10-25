@@ -25,6 +25,10 @@ const SIGNAL_RULES: Record<Exclude<SignalId, "riskyPayment">, { label: string; w
 
 // The FTC sign is an owner who is away and can't meet you. Moving for work, on its own, is ordinary.
 const RELOCATING = /\b(relocat\w*|moving|transferr\w*|new job)\b/i;
+// Spanish equivalents (Spanish-language listings). Unicode-aware, since \b doesn't handle accented letters.
+const RELOCATING_ES = /(se muda\p{L}*|me mudo|mudanza|traslad\p{L}*|reubicad\p{L}*|nuevo (trabajo|empleo))/iu;
+const AWAY_ES =
+  /(en el extranjero|fuera del país|fuera de la ciudad|fuera del estado|desplegad\p{L}*|ejército|militar|misión|de viaje|lejos|no (puedo|podemos|podré|puede) (reunirme|mostrar\p{L}*|enseñar\p{L}*|estar)|(envío|mando|mandaré|enviaré|enviamos|enviarle|mandarle) (le |las )?llaves|llaves por correo|(se muda|me mudo) (a|al|para) )/iu;
 const AWAY =
   /\b(overseas|abroad|out of (town|the country|state)|deployed|deployment|military|mission|travel\w*|far away|(another|a different) (city|state|country)|(relocat\w*|mov(e|ed|es|ing)|transferr\w*) to|(can'?t|cannot|unable to|not able to|won'?t be able to) (meet|show|be (there|here|around))|not (in|around)|(mail|send|ship|drop)\w* (you )?(the )?keys?)\b/i;
 
@@ -44,9 +48,9 @@ function sentenceAround(quote: string, sources: string[]): string | null {
 
 /** True when the whole sentence only says the owner is moving, with nothing about being away or unavailable. */
 export function isOnlyRelocating(quote: string | null, sources: string[]): boolean {
-  if (!quote || !RELOCATING.test(quote)) return false;
+  if (!quote || !(RELOCATING.test(quote) || RELOCATING_ES.test(quote))) return false;
   const sentence = sentenceAround(quote, sources);
-  return sentence !== null && !AWAY.test(sentence); // fail closed: an unlocatable quote still counts
+  return sentence !== null && !AWAY.test(sentence) && !AWAY_ES.test(sentence); // fail closed: an unlocatable quote still counts
 }
 
 const FTC_METHODS = new Set(["wire", "gift_card", "crypto"]);
@@ -59,6 +63,9 @@ const INJECTION_PATTERNS = [
   /(ai|assistant|model|chatbot|scanner|reviewer)s?[,:]? .{0,60}(mark|report|classify|rate|label) (this|the) (listing|post|ad)/i,
   /you are now (a|an|in) /i,
   /system prompt/i,
+  // Spanish phrasing
+  /ignor\p{L}* (todas |cualquier )?(las )?(instrucciones|indicaciones|reglas) (anteriores|previas)/iu,
+  /(ia|asistente|modelo|verificador|revisor)\p{L}*[,:]?.{0,80}(rep[oó]rtel[oa]|m[aá]rquel[oa]|clasif[ií]quel[oa]|calif[ií]quel[oa]) como/iu,
 ];
 
 export function findInjection(text: string): string | null {

@@ -8,8 +8,7 @@ import { Community } from "./Community";
 import { EvidenceDrawer, Quote } from "./Evidence";
 import { FactsBar } from "./FactsBar";
 import { GemmaRead } from "./GemmaRead";
-import { useLang } from "./Lang";
-import { ruleToSpanish } from "@/lib/client/rules-es";
+import { useLang, useTr } from "./Lang";
 import { ToneIcon } from "./Icons";
 import { ListingMap } from "./ListingMap";
 import { InkFilter, Stamp } from "./Stamp";
@@ -75,7 +74,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
   const price = priceVerdict(r.price, lang);
   const scam = scamVerdict(r.scam, lang);
   const lease = leaseVerdict(r.lease, lang);
-  const tr = (x: string) => (lang === "es" ? ruleToSpanish(x) : x);
+  const tr = useTr();
 
   return (
     <article
@@ -129,7 +128,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
         {r.meta.notes.length > 0 && (
           <ul className="mt-3 list-disc pl-5 text-[14px] text-ink-soft">
             {r.meta.notes.map((n) => (
-              <li key={n}>{n}</li>
+              <li key={n}>{tr(n)}</li>
             ))}
           </ul>
         )}
@@ -137,7 +136,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
       </header>
 
       <Section id="s1" title={t.priceH} verdict={price}>
-        <Lead headline={tr(r.price.headline)} detail={r.price.detail} />
+        <Lead headline={tr(r.price.headline)} detail={tr(r.price.detail)} />
         {maps && r.read.zip && <ListingMap config={maps} zip={r.read.zip} place={r.read.areaName} />}
         <EvidenceDrawer items={r.price.evidence} label={t.showEvidence} />
       </Section>
@@ -156,7 +155,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
                   </p>
                   {f.evidence[0]?.quote && <Quote text={f.evidence[0].quote} from={f.evidence[0].quoteFrom} />}
                   {!f.evidence[0]?.quote && f.evidence[0]?.value && (
-                    <p className="mt-1 text-[15px] text-ink-soft">{f.id === "priceFarBelow" ? t.seePrice : f.evidence[0].value}</p>
+                    <p className="mt-1 text-[15px] text-ink-soft">{f.id === "priceFarBelow" ? t.seePrice : tr(f.evidence[0].value)}</p>
                   )}
                 </div>
               </li>
@@ -215,7 +214,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
           {r.help.map((h) => (
             <li key={h.url}>
               <a className="text-pen underline underline-offset-2 hover:text-pen-dark" href={h.url} target="_blank" rel="noreferrer">
-                {h.label}
+                {tr(h.label)}
               </a>
             </li>
           ))}
@@ -267,16 +266,17 @@ function LeaseGroups({ findings }: { findings: ClauseFinding[] }) {
 }
 
 function ClauseItem({ f }: { f: ClauseFinding }) {
-  const { lang } = useLang();
+  const tr = useTr();
   return (
     <li>
-      <p className="font-bold">{lang === "es" ? ruleToSpanish(f.title) : f.title}</p>
-      <p className="mt-0.5 max-w-[68ch] text-[15px] leading-relaxed">{f.plain}</p>
+      <p className="font-bold">{tr(f.title)}</p>
+      {/* Gemma writes `plain` in the chosen language; our own deposit template goes through tr(). */}
+      <p className="mt-0.5 max-w-[68ch] text-[15px] leading-relaxed">{tr(f.plain)}</p>
       <Quote text={f.evidence[0].quote ?? ""} from={f.evidence[0].quoteFrom} />
-      <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-ink-soft">{f.why}</p>
+      <p className="mt-2 max-w-[68ch] text-[15px] leading-relaxed text-ink-soft">{tr(f.why)}</p>
       {f.law && (
         <p className="mt-1 max-w-[68ch] text-[14px] leading-relaxed">
-          <span className="text-ink-soft">{f.law.rule} </span>
+          <span className="text-ink-soft">{tr(f.law.rule)} </span>
           <a className="text-pen underline underline-offset-2 hover:text-pen-dark" href={f.law.url} target="_blank" rel="noreferrer">
             {f.law.citation}
           </a>

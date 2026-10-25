@@ -60,11 +60,17 @@ export function numberInQuote(n: number | null, quote: string | null): boolean {
 }
 
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six"];
+// Spanish listings: "una recámara", "dos recámaras", "estudio".
+const NUMBER_WORDS_ES = ["cero", "una?|uno", "dos", "tres", "cuatro", "cinco", "seis"];
 
-/** Bedrooms can be written "1BR", "one-bedroom" or "studio". */
+/** Bedrooms can be written "1BR", "one-bedroom", "studio", or in Spanish "una recámara" / "estudio". */
 export function bedroomsInQuote(n: number | null, quote: string | null): boolean {
   if (n === null || !quote) return false;
   const q = quote.toLowerCase();
-  if (n === 0 && /studio|efficiency/.test(q)) return true;
-  return numberInQuote(n, quote) || (NUMBER_WORDS[n] !== undefined && new RegExp(`\\b${NUMBER_WORDS[n]}\\b`).test(q));
+  if (n === 0 && /studio|efficiency|estudio/.test(q)) return true;
+  return (
+    numberInQuote(n, quote) ||
+    (NUMBER_WORDS[n] !== undefined && new RegExp(`\\b${NUMBER_WORDS[n]}\\b`).test(q)) ||
+    (NUMBER_WORDS_ES[n] !== undefined && new RegExp(`(^|[^\\p{L}])(${NUMBER_WORDS_ES[n]})(?![\\p{L}])`, "u").test(q))
+  );
 }

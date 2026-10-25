@@ -11,14 +11,21 @@ import type { MapsConfig } from "@/lib/server/maps-config";
 export function ListingMap({ config, zip, place }: { config: MapsConfig; zip: string; place: string | null }) {
   const { lang } = useLang();
   const view = mapViewFor(zip);
-  const area = view ? `${view.label} (ZIP ${zip})` : `ZIP ${zip}${place ? ` (${place})` : ""}`;
+  const area =
+    lang === "es"
+      ? view
+        ? `${view.labelEs} (código postal ${zip})`
+        : `código postal ${zip}${place ? ` (${place})` : ""}`
+      : view
+        ? `${view.label} (ZIP ${zip})`
+        : `ZIP ${zip}${place ? ` (${place})` : ""}`;
   return (
     <figure className="mt-4">
       <APIProvider apiKey={config.apiKey}>
         {view ? (
-          <AreaMap view={view} mapId={config.mapId} label={`Map of ${area}`} />
+          <AreaMap view={view} mapId={config.mapId} label={lang === "es" ? `Mapa de ${area}` : `Map of ${area}`} />
         ) : (
-          <ZipMap zip={zip} mapId={config.mapId} label={`Map of the area around ZIP ${zip}${place ? `, ${place}` : ""}`} />
+          <ZipMap zip={zip} mapId={config.mapId} label={lang === "es" ? `Mapa de la zona del código postal ${zip}${place ? `, ${place}` : ""}` : `Map of the area around ZIP ${zip}${place ? `, ${place}` : ""}`} />
         )}
       </APIProvider>
       <figcaption className="mt-1 text-[13px] text-ink-soft">

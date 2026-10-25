@@ -6,10 +6,10 @@ import type { Extraction } from "./schema";
 // keyword extractor so the page still works without a key. Every quote still goes through the
 // same verification and rules as live mode.
 
-const no = { present: false, quote: null };
+export const no = { present: false, quote: null };
 
 type ListingIn = Omit<Extraction["listing"], "priceBasis" | "unitBedrooms" | "shortTerm"> & Partial<Extraction["listing"]>;
-const base = ({ listing, ...over }: Partial<Omit<Extraction, "listing">> & { listing?: ListingIn }): Extraction => ({
+export const base = ({ listing, ...over }: Partial<Omit<Extraction, "listing">> & { listing?: ListingIn }): Extraction => ({
   inputKinds: ["listing"],
   imageTranscript: null,
   signals: {

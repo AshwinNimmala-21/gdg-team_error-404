@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { DICTS, type Dict, type Lang } from "@/lib/i18n";
+import { ruleToSpanish } from "@/lib/client/rules-es";
 
 const Ctx = createContext<{ lang: Lang; t: Dict; setLang: (l: Lang) => void }>({ lang: "en", t: DICTS.en, setLang: () => {} });
 
@@ -46,6 +47,12 @@ export function LangProvider({ children }: { children: ReactNode }) {
 }
 
 export const useLang = () => useContext(Ctx);
+
+/** Translate a sentence produced by the rules or the server (hand-written templates in lib/client/rules-es.ts). */
+export function useTr() {
+  const { lang } = useContext(Ctx);
+  return (s: string) => (lang === "es" ? ruleToSpanish(s) : s);
+}
 
 /** A static UI string from the dictionary, for server components. */
 export function T({ k }: { k: { [K in keyof Dict]: Dict[K] extends string ? K : never }[keyof Dict] }) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { useLang } from "./Lang";
+import { useLang, useTr } from "./Lang";
 import type { CheckResult, Overrides } from "@/lib/types";
 
 const money = (n: number) => `$${n.toLocaleString("en-US")}`;
@@ -9,6 +9,7 @@ const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 /** "We read: …" with an inline editor. Saving reruns the rules only (no model call). */
 export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; onSave: (o: Overrides) => void; busy: boolean }) {
   const { t } = useLang();
+  const tr = useTr();
   const [editing, setEditing] = useState(false);
   const [rent, setRent] = useState(read.rent?.toString() ?? "");
   const [beds, setBeds] = useState(read.bedrooms?.toString() ?? "");
@@ -103,7 +104,7 @@ export function FactsBar({ read, onSave, busy }: { read: CheckResult["read"]; on
       </div>
       {error && (
         <p id={`${id}-err`} role="alert" className="mt-2 text-[14px] font-semibold text-stop">
-          {error}
+          {tr(error)}
         </p>
       )}
       <div className="mt-3 flex gap-3">

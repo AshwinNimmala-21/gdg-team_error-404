@@ -1,12 +1,14 @@
 import type { Evidence } from "@/lib/types";
 import { Caret } from "./Icons";
-import { useLang } from "./Lang";
+import { useLang, useTr } from "./Lang";
 
 export function Quote({ text, from }: { text: string; from?: "text" | "image" }) {
   const { t } = useLang();
   return (
     <figure className="mt-1">
-      <blockquote className="border-l-[3px] border-rule bg-paper/60 py-1 pr-2 pl-3 font-mono text-[13.5px] leading-relaxed break-words text-ink">
+      {/* Quotes stay in the original language so they can be checked against the input. */}
+      {t.original && <p className="text-[12px] font-semibold text-ink-soft">{t.original}</p>}
+      <blockquote data-quote className="border-l-[3px] border-rule bg-paper/60 py-1 pr-2 pl-3 font-mono text-[13.5px] leading-relaxed break-words text-ink">
         “{text}”
       </blockquote>
       {from === "image" && <figcaption className="mt-0.5 text-[13px] text-ink-soft">{t.fromPhoto}</figcaption>}
@@ -16,16 +18,17 @@ export function Quote({ text, from }: { text: string; from?: "text" | "image" })
 
 export function EvidenceItem({ e }: { e: Evidence }) {
   const { t } = useLang();
+  const tr = useTr();
   return (
     <li className="py-2.5">
-      <p className={`text-[15px] font-semibold ${e.counted ? "text-ink" : "text-ink-soft"}`}>{e.label}</p>
-      {e.value && <p className="text-[15px] text-ink">{e.value}</p>}
+      <p className={`text-[15px] font-semibold ${e.counted ? "text-ink" : "text-ink-soft"}`}>{tr(e.label)}</p>
+      {e.value && <p className="text-[15px] text-ink">{tr(e.value)}</p>}
       {e.quote && <Quote text={e.quote} from={e.quoteFrom} />}
       {e.source && (
         <p className="mt-1 text-[13px]">
           {t.source}{" "}
           <a className="text-pen underline underline-offset-2 hover:text-pen-dark" href={e.source.url} target="_blank" rel="noreferrer">
-            {e.source.name}
+            {tr(e.source.name)}
           </a>
         </p>
       )}

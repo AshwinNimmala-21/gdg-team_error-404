@@ -8,10 +8,11 @@ import { normalizeContact, sha256Hex } from "@/lib/community";
 import type { CheckError, CheckRequest, CheckResult, Overrides, SampleId } from "@/lib/types";
 import type { MapsConfig } from "@/lib/server/maps-config";
 import { CameraIcon } from "./Icons";
-import { useLang } from "./Lang";
+import { useLang, useTr } from "./Lang";
 import { Report } from "./Report";
 
-// Titles and notes live in lib/i18n.ts (samples), keyed by id. Sample texts themselves stay in English.
+// Titles and notes live in lib/i18n.ts (samples), keyed by id. In Spanish mode the text samples load from
+// public/samples/es/ (fictional Spanish versions); the lease photo stays English.
 const SAMPLES: { id: SampleId; file: string }[] = [
   { id: "blacksburg-sublet", file: "/samples/blacksburg-sublet.txt" },
   { id: "lease-photo", file: "/samples/lease-page.jpg" },
@@ -24,6 +25,7 @@ type Status = { kind: "idle" } | { kind: "loading" } | { kind: "error"; message:
 
 export function Checker({ maps }: { maps: MapsConfig | null }) {
   const { t, lang } = useLang();
+  const tr = useTr(); // server and image errors arrive in English; shown through the Spanish templates
   const [text, setText] = useState("");
   const [zip, setZip] = useState("");
   const [image, setImage] = useState<PreparedImage | null>(null);
@@ -64,14 +66,14 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
       if (!res.ok || !json || "error" in json) {
         const message = json && "error" in json ? json.error.message : "Something went wrong. Try again in a moment.";
         setStatus({ kind: "error", message });
-        setAnnounce(message);
+        setAnnounce(tr(message));
         return null;
       }
       return json;
     } catch {
       const message = "You seem to be offline, or our server didn't answer. Check your connection and try again.";
       setStatus({ kind: "error", message });
-      setAnnounce(message);
+      setAnnounce(tr(message));
       return null;
     }
   }
@@ -162,7 +164,9 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
     setZip("");
     setImageError(null);
     if (s.file.endsWith(".txt")) {
-      const t = await (await fetch(s.file)).text();
+      // In Spanish mode the text samples are Spanish listings (public/samples/es/). The lease photo stays English.
+      const file = lang === "es" ? s.file.replace("/samples/", "/samples/es/") : s.file;
+      const t = await (await fetch(file)).text();
       setText(t);
       setImage(null);
       await check({ text: t, image: null, sampleId: id, zip: "" });
@@ -252,7 +256,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
             )}
             {imageError && (
               <p role="alert" className="mt-2 text-[14px] font-semibold text-stop">
-                {imageError}
+                {tr(imageError)}
               </p>
             )}
           </div>
@@ -313,7 +317,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
         {status.kind === "error" && (
           <div role="alert" className="rounded-xs border-2 border-stop bg-sheet p-5">
             <p className="text-lg font-bold text-stop">{t.errorH}</p>
-            <p className="mt-1">{status.message}</p>
+            <p className="mt-1">{tr(status.message)}</p>
             <button type="button" onClick={() => check()} className="mt-4 min-h-11 rounded-xs bg-pen px-4 font-semibold text-white hover:bg-pen-dark">
               {t.tryAgain}
             </button>

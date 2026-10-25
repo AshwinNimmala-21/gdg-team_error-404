@@ -117,7 +117,10 @@ function Marked({ source, quotes, g }: { source: string; quotes: string[]; g: GR
       <p className="mt-1 text-[13px] text-ink-soft">
         {g.passages(ranges.length)}
       </p>
-      <p className="mt-2 font-mono text-[13.5px] leading-relaxed break-words whitespace-pre-wrap text-ink">{parts}</p>
+      {/* The user's own text (or Gemma's transcript of their photo): always shown in the original language. */}
+      <p data-quote className="mt-2 font-mono text-[13.5px] leading-relaxed break-words whitespace-pre-wrap text-ink">
+        {parts}
+      </p>
     </>
   );
 }
@@ -157,7 +160,11 @@ export function GemmaRead({ result: r, sourceText, imageUrl }: { result: CheckRe
                 {f.value}
                 {!f.where && <span className="ml-2 text-[13px] font-normal text-ink-soft">{g.notUsed}</span>}
               </dd>
-              {f.quote && <dd className="mt-0.5 font-mono text-[13px] leading-snug break-words text-ink-soft">“{short(f.quote)}”</dd>}
+              {f.quote && (
+                <dd data-quote className="mt-0.5 font-mono text-[13px] leading-snug break-words text-ink-soft">
+                  “{short(f.quote)}”
+                </dd>
+              )}
             </div>
           ))}
         </dl>

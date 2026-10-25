@@ -7,12 +7,13 @@ export interface MapView {
   zoom: number;
   /** What the view shows, for the caption and the map's accessible label. */
   label: string;
+  labelEs: string;
 }
 
 export const MAP_VIEWS: Record<string, MapView> = {
   // Midpoint of the VT Drillfield (37.22751, -80.42189, per vt.edu/about/buildings/drillfield) and downtown
   // Blacksburg (about 37.2297, -80.4137). Zoom 14 keeps campus and downtown both in view.
-  "24060": { lat: 37.2286, lng: -80.4178, zoom: 14, label: "downtown Blacksburg and the Virginia Tech campus" },
+  "24060": { lat: 37.2286, lng: -80.4178, zoom: 14, label: "downtown Blacksburg and the Virginia Tech campus", labelEs: "el centro de Blacksburg y el campus de Virginia Tech" },
 };
 
 export const mapViewFor = (zip: string): MapView | null => MAP_VIEWS[zip] ?? null;

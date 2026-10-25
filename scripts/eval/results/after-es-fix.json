@@ -1,0 +1,838 @@
+[
+ {
+  "id": "s01",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "mail you the key",
+   "can't show"
+  ],
+  "mode": "live",
+  "ms": 14611,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": true,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s02",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "first deposit gets"
+  ],
+  "mode": "live",
+  "ms": 12849,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": true,
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s03",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "mail you the key"
+  ],
+  "mode": "live",
+  "ms": 13683,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": true,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s05",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "abroad",
+   "mission trip",
+   "mail the key"
+  ],
+  "mode": "live",
+  "ms": 12545,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s06",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "cash app"
+  ],
+  "mode": "live",
+  "ms": 12652,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s07",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "gift card",
+   "overseas",
+   "deployed",
+   "fedex"
+  ],
+  "mode": "live",
+  "ms": 13700,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s08",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "wire",
+   "western union",
+   "out of the country",
+   "whatsapp"
+  ],
+  "mode": "live",
+  "ms": 12861,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "landlordAway",
+   "pressure",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s10",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "ssn"
+  ],
+  "mode": "live",
+  "ms": 11463,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "some",
+  "flags": [
+   "sensitiveInfoEarly"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s11",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "venmo",
+   "overnight the key"
+  ],
+  "mode": "live",
+  "ms": 12494,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s12",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle"
+  ],
+  "mode": "live",
+  "ms": 16023,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s13",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "overseas",
+   "fedex"
+  ],
+  "mode": "live",
+  "ms": 13851,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s15",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "urgent"
+  ],
+  "mode": "live",
+  "ms": 13393,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s16",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "apple pay"
+  ],
+  "mode": "live",
+  "ms": 13311,
+  "price": "rough",
+  "priceWord": "rough",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s17",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "money order",
+   "telegram"
+  ],
+  "mode": "live",
+  "ms": 12307,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s19",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "social security"
+  ],
+  "mode": "live",
+  "ms": 12014,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "sensitiveInfoEarly"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s20",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "zelle",
+   "abroad",
+   "can't show"
+  ],
+  "mode": "live",
+  "ms": 12041,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s22",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": false,
+  "keywords": [
+   "western union",
+   "overseas",
+   "ship keys",
+   "gmail"
+  ],
+  "mode": "live",
+  "ms": 12229,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway",
+   "offPlatformContact"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l01",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11505,
+  "price": "rough",
+  "priceWord": "rough",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l02",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11432,
+  "price": "typical",
+  "priceWord": "typical",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l03",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11162,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l04",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12105,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": false,
+  "subletLine": true,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l06",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12255,
+  "price": "typical",
+  "priceWord": "typical",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l07",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11897,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l08",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11037,
+  "price": "typical",
+  "priceWord": "typical",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l09",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11900,
+  "price": "rough",
+  "priceWord": "rough",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l11",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12035,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "some",
+  "flags": [
+   "pressure"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l12",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [
+   "venmo"
+  ],
+  "mode": "live",
+  "ms": 11955,
+  "price": "rough",
+  "priceWord": "rough",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "some",
+  "flags": [
+   "riskyPayment"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l14",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11812,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l15",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11376,
+  "price": "typical",
+  "priceWord": "typical",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l16",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11673,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l18",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11165,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l19",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11702,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "x01",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 15907,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "landlord_entry",
+   "waiver_of_rights",
+   "security_deposit"
+  ],
+  "expect": [
+   "security_deposit",
+   "landlord_entry",
+   "waiver_of_rights"
+  ]
+ },
+ {
+  "id": "x02",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16007,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "landlord_entry",
+   "attorney_fees"
+  ],
+  "expect": [
+   "landlord_entry",
+   "attorney_fees"
+  ]
+ },
+ {
+  "id": "x03",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16025,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "security_deposit",
+   "late_fee"
+  ],
+  "expect": [
+   "security_deposit",
+   "late_fee"
+  ]
+ },
+ {
+  "id": "x04",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16488,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "late_fee",
+   "repairs_on_tenant"
+  ],
+  "expect": [
+   "late_fee",
+   "repairs_on_tenant"
+  ]
+ },
+ {
+  "id": "x05",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 18322,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [],
+  "expect": []
+ },
+ {
+  "id": "x06",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 16201,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "security_deposit",
+   "landlord_entry"
+  ],
+  "expect": [
+   "security_deposit",
+   "landlord_entry"
+  ]
+ },
+ {
+  "id": "x07",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 37691,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [],
+  "expect": []
+ },
+ {
+  "id": "x08",
+  "kind": "lease",
+  "label": "lease",
+  "holdout": false,
+  "keywords": [],
+  "mode": "live",
+  "ms": 13885,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "not_run",
+  "flags": [],
+  "conflicts": [
+   "repairs_on_tenant",
+   "security_deposit"
+  ],
+  "expect": [
+   "security_deposit",
+   "repairs_on_tenant"
+  ]
+ }
+]

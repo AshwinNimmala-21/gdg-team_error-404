@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ExtractionError, extractWithGemma, modelId } from "@/lib/ai/gemma";
-import { keywordExtract, SAMPLE_EXTRACTIONS } from "@/lib/ai/mock";
+import { keywordExtract } from "@/lib/ai/mock";
+import { sampleExtraction } from "@/lib/ai/mock-es";
 import { ExtractionSchema, type Extraction } from "@/lib/ai/schema";
 import { resolveBenchmarks } from "@/lib/data/benchmarks";
 import { resolveFacts, runRules } from "@/lib/rules/check";
@@ -49,10 +50,10 @@ export class CheckFailure extends Error {
 export const isMockMode = () => process.env.MOCK_AI === "1" || !process.env.GEMINI_API_KEY?.trim();
 
 /** True only when the request is still the built-in sample: every quote in its saved answer is in the text. */
-export function isUnchangedSample(id: SampleId, text: string, hasImage: boolean): boolean {
+export function isUnchangedSample(id: SampleId, text: string, hasImage: boolean, lang?: "en" | "es"): boolean {
   if (id === "lease-photo") return hasImage && !text.trim();
   if (hasImage) return false;
-  const saved = SAMPLE_EXTRACTIONS[id];
+  const saved = sampleExtraction(id, lang);
   const quotes = [...Object.values(saved.listing), ...Object.values(saved.signals), saved.aiInstructions]
     .map((f) => f.quote)
     .filter((q): q is string => Boolean(q));
@@ -106,7 +107,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
   } else if (mock) {
     mode = "mock";
     if (req.sampleId) {
-      extraction = SAMPLE_EXTRACTIONS[req.sampleId];
+      extraction = sampleExtraction(req.sampleId, req.lang);
       imageRead = req.sampleId === "lease-photo";
     } else {
       extraction = keywordExtract(text);
@@ -121,8 +122,8 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
       mode = "live";
     } catch (err) {
       // Retries are spent. A built-in sample gets its saved answer, labelled in the UI; user input never does.
-      if (!req.sampleId || !isUnchangedSample(req.sampleId, text, Boolean(req.image))) throw modelFailure(err);
-      extraction = SAMPLE_EXTRACTIONS[req.sampleId];
+      if (!req.sampleId || !isUnchangedSample(req.sampleId, text, Boolean(req.image), req.lang)) throw modelFailure(err);
+      extraction = sampleExtraction(req.sampleId, req.lang);
       imageRead = req.sampleId === "lease-photo";
       mode = "saved";
     }

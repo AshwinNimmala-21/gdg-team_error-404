@@ -56,7 +56,12 @@ The audit found a production-only crash: run a text sample, then the lease-photo
 - **Browser check:** `scripts/a11y.mjs` fails on any uncaught page error during the text → photo → text sequence.
 
 ## Spanish mode
-`node scripts/a11y.mjs http://localhost:3000 --lang=es` switches to Español first, then runs the same 8 scans: **0 violations**, 0 uncaught page errors (Oct 25, about 12:50 AM, dev server). The toggle is two real buttons in a labelled group with `aria-pressed`, each with its own `lang`, and the page's `<html lang>` switches to `es` so screen readers change voice.
+- **The toggle doesn't reset.** A manual test reported that the page "went back to English" after running a sample in Spanish. We reproduced it on the live site with `scripts/e2e-es.mjs`: after every sample the ES button still had `aria-pressed="true"` and `<html lang="es">`. The English came from untranslated rule text (price explanation, evidence, help links) and from English sample listings. Both are fixed: every rule sentence goes through hand-written Spanish templates (`lib/client/rules-es.ts`), and the text samples load Spanish listings.
+- **`node scripts/e2e-es.mjs <url>`** switches to Español, runs all 5 samples plus a pasted Spanish listing, and fails if the toggle isn't still pressed, `<html lang>` isn't `es`, or any English sentence is visible outside quotes (marked `data-quote`), the user's own text and an allowlist of proper nouns and citations. Result: **6/6 pass** on the production build and on the dev server (Oct 25, about 2:30 AM).
+- **axe in Spanish** (`node scripts/a11y.mjs <url> --lang=es`): **0 violations** in 8 scans, 0 uncaught page errors.
+- Quotes are labelled "Texto original:" in Spanish mode and stay in the original language, so screen readers read them with the page voice; a per-quote `lang` attribute isn't set yet, because we can't reliably tell the language of a quote.
+- The toggle is two real buttons in a labelled group with `aria-pressed`, each with its own `lang`.
+- The Spanish has not yet been reviewed by a native speaker.
 
 ## Known issue: Google Maps error after the key is rejected
 When Google rejects the Maps key (our key only allows `localhost:3000` and the Cloud Run URL, so this can only happen elsewhere; seen on `localhost:3100`), running a lease photo and then the Blacksburg sample logs an uncaught `IntersectionObserver` error from inside Google's map script. The page keeps working (no error screen). It hasn't appeared on the dev server (allowed referrer) or in any e2e run. Two fix attempts didn't remove it; options are in PLAN.md.

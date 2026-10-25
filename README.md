@@ -60,7 +60,14 @@ Also included:
 
 **Student rentals are priced per bedroom.** When a listing says "$650 per bedroom" or "$575 per person", Gemma reports that (with the quote) along with the whole unit's bedroom count, and our code compares the rent with the whole unit's HUD and Census benchmarks divided by the number of bedrooms. That's an approximation, so it's only used to catch prices **far below** that share. Otherwise the report says "Rough comparison only: per-bedroom rents near campus often run above an even split of area averages. Compare 2–3 nearby listings and ask what's included." It never calls a student rental "above usual range". Sublets, summer and short-term rentals get one more line: "Summer sublets often list below market; price alone isn't a red flag here."
 
-**En español.** An EN/ES switch sits at the top of the page. In Spanish mode, Gemma writes each lease clause's plain-language explanation in Spanish (quotes stay in the original language, so they can still be verified), the "questions to ask" come from hand-translated templates, and the main labels, verdicts, scam-flag labels and headlines are translated. The page's `lang` attribute switches too, so screen readers change voice. Still in English: the longer price explanation, the legal reason under each clause, and the evidence drawers; the report says so in Spanish. Spanish mode passes the same axe audit (0 violations). The Spanish was written by us with Claude Code and has not been reviewed by a native-speaking tenant advocate yet.
+**En español.** An EN/ES switch sits at the top of the page, and Spanish mode is Spanish end to end:
+- **Gemma** writes each lease clause's plain-language explanation in Spanish.
+- **Everything our rules say** is translated through hand-written Spanish templates in [`lib/client/rules-es.ts`](lib/client/rules-es.ts) ("usted" style, like consumidor.ftc.gov): the price explanation, the "rough comparison" and sublet lines, the legal reason under each clause and the 26 legal summaries (statute citations kept exactly as written), scam-flag explanations, evidence labels, help links, notes, errors and loading states. No machine translation, and the verdict logic is identical in both languages.
+- **Quotes stay in the original language**, so they can still be verified against what you shared, and are labelled "Texto original:".
+- **The text samples load fictional Spanish listings.** The lease photo stays English: an English lease explained in Spanish is the realistic case.
+- The page's `lang` attribute switches to `es`, so screen readers change voice.
+- **Checks:** `node scripts/e2e-es.mjs` runs every sample plus a pasted listing in Spanish and fails if the toggle resets or any English is visible outside quotes and proper nouns (6/6 pass). axe shows 0 violations in Spanish. A unit test confirms the Spanish samples give the same verdicts as the English ones.
+- The Spanish was written by us with Claude Code and has **not yet been reviewed by a native speaker**.
 
 ## Evaluation
 
@@ -237,4 +244,4 @@ Next.js 16 (App Router), TypeScript, Tailwind CSS 4, `@google/genai`, Zod, Vites
 
 ## License
 
-[Apache 2.0](LICENSE). Gemma 4 weights are under [Apache 2.0](https://ai.google.dev/gemma/apache_2). The sample listings and lease are fictional. Clearlease is not legal advice.
+[Apache 2.0](LICENSE). Gemma 4 is open weights under [Apache 2.0](https://ai.google.dev/gemma/apache_2). Download the weights from [Hugging Face](https://huggingface.co/google/gemma-4-26B-A4B-it), [Kaggle](https://www.kaggle.com/models/google/gemma-4) or [Ollama](https://ollama.com/library/gemma4) (`gemma4:26b`). The sample listings and lease are fictional. Clearlease is not legal advice.

@@ -1,0 +1,187 @@
+[
+ {
+  "id": "s04",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": true,
+  "keywords": [
+   "zelle"
+  ],
+  "mode": "live",
+  "ms": 12837,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "some",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s09",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": true,
+  "keywords": [
+   "bitcoin",
+   "usdt",
+   "no credit check"
+  ],
+  "mode": "live",
+  "ms": 13561,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s14",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": true,
+  "keywords": [
+   "paypal"
+  ],
+  "error": "gave up after 3 tries"
+ },
+ {
+  "id": "s18",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": true,
+  "keywords": [
+   "missionar"
+  ],
+  "mode": "live",
+  "ms": 12700,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": true,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "priceFarBelow",
+   "riskyPayment",
+   "payBeforeViewing",
+   "noInPersonViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "s21",
+  "kind": "listing",
+  "label": "scam",
+  "holdout": true,
+  "keywords": [
+   "venmo",
+   "abroad"
+  ],
+  "mode": "live",
+  "ms": 12278,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "likely",
+  "flags": [
+   "riskyPayment",
+   "payBeforeViewing",
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l05",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": true,
+  "keywords": [],
+  "mode": "live",
+  "ms": 12244,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l10",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": true,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11774,
+  "price": "below",
+  "priceWord": "below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "some",
+  "flags": [
+   "landlordAway"
+  ],
+  "conflicts": []
+ },
+ {
+  "id": "l13",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": true,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11389,
+  "price": "unknown",
+  "priceWord": "unknown",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l17",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": true,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11843,
+  "price": "typical",
+  "priceWord": "typical",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ },
+ {
+  "id": "l20",
+  "kind": "listing",
+  "label": "legit",
+  "holdout": true,
+  "keywords": [],
+  "mode": "live",
+  "ms": 11330,
+  "price": "below",
+  "priceWord": "far-below",
+  "suspicious": false,
+  "subletLine": false,
+  "scam": "none_found",
+  "flags": [],
+  "conflicts": []
+ }
+]

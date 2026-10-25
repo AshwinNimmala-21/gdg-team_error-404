@@ -97,6 +97,7 @@ const EN = {
   savedFigures: "Saved figures: HUD FY2027 FMR, Census ACS 2020–2024 (live lookup unavailable)",
   rulesEnglish: "",
   freeHelp: "Free help",
+  original: "",
   // Facts bar
   weRead: "We read:",
   rent: "Rent",
@@ -214,8 +215,9 @@ const ES: Dict = {
   rulesOnly: "Actualizado con sus cambios (sin nueva llamada a la IA)",
   savedFigures: "Cifras guardadas: HUD FMR año fiscal 2027, Censo ACS 2020–2024 (consulta en vivo no disponible)",
   freeHelp: "Ayuda gratuita",
-  rulesEnglish:
-    "Algunos detalles todavía aparecen en inglés: la explicación del precio, los motivos legales de cada cláusula, la evidencia y las citas (las citas siempre se muestran en el idioma original).",
+  original: "Texto original:",
+  // Everything rule-generated is now translated (lib/client/rules-es.ts), so the "parts are in English" notice is gone.
+  rulesEnglish: "",
   weRead: "Leímos:",
   rent: "Renta",
   size: "Tamaño",
