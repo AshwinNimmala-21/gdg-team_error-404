@@ -1,6 +1,22 @@
-import type { Evidence } from "@/lib/types";
-import { Caret } from "./Icons";
+import type { CheckResult, Evidence } from "@/lib/types";
+import { Caret, ToneIcon } from "./Icons";
 import { useLang, useTr } from "./Lang";
+
+/** "This text contained instructions aimed at AI tools. We ignored them." Shown on the report and on "what we can check". */
+export function AiBanner({ ai, className = "" }: { ai: CheckResult["aiInstructions"]; className?: string }) {
+  const { t } = useLang();
+  if (!ai.detected) return null;
+  return (
+    <div role="note" className={`flex gap-3 rounded-xs border-l-4 border-stop bg-stop-tint/60 py-3 pr-3 pl-3.5 text-[15px] ${className}`}>
+      <ToneIcon tone="stop" className="mt-0.5 shrink-0 text-stop" />
+      <div className="min-w-0">
+        <p className="font-bold text-stop">{t.aiH}</p>
+        {ai.quote && <Quote text={ai.quote} />}
+        <p className="mt-1 text-ink-soft">{t.aiP}</p>
+      </div>
+    </div>
+  );
+}
 
 export function Quote({ text, from }: { text: string; from?: "text" | "image" }) {
   const { t } = useLang();

@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 import type { CheckResult } from "@/lib/types";
-import { Quote } from "./Evidence";
+import { AiBanner, Quote } from "./Evidence";
 import { ToneIcon } from "./Icons";
 import { useLang, useTr } from "./Lang";
 
@@ -17,7 +17,8 @@ export const QuestionHelp = forwardRef<HTMLHeadingElement, { result: CheckResult
 ) {
   const { t } = useLang();
   const tr = useTr();
-  const flags = r.scam.flags.filter((f) => f.evidence[0]?.counted);
+  // Hidden AI instructions get the banner, not a row in the warning-sign list.
+  const flags = r.scam.flags.filter((f) => f.evidence[0]?.counted && f.id !== "aiInstructions");
 
   return (
     <article aria-labelledby="question-title" className="rounded-xs border border-rule bg-sheet">
@@ -25,6 +26,7 @@ export const QuestionHelp = forwardRef<HTMLHeadingElement, { result: CheckResult
         <h2 id="question-title" ref={headingRef} tabIndex={-1} className="text-[22px] font-extrabold tracking-tight focus:outline-none sm:text-[26px]">
           {t.qH}
         </h2>
+        <AiBanner ai={r.aiInstructions} className="mt-4" />
         <p className="mt-3 max-w-[64ch] text-[16px] leading-relaxed">{t.qWhat}</p>
         <p className="mt-2 max-w-[64ch] text-[16px] leading-relaxed text-ink-soft">{t.qPaste}</p>
         <button

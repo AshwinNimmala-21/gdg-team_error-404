@@ -21,8 +21,10 @@ export const modelId = () => process.env.GEMMA_MODEL?.trim() || (providerFromEnv
 // keeps a request with retries under Cloud Run's --timeout 120 (docs/DEPLOY.md).
 export const ATTEMPT_MS = { text: 30_000, image: 55_000 };
 const DEADLINE_MS = 110_000;
-// Transient failures (5xx, network, timeout) are retried up to twice with jittered backoff.
-const MAX_RETRIES = 2;
+// Transient failures (5xx, network, timeout) are retried up to four times with jittered backoff (0.8, 1.6, 3.2, 6.4 s).
+// Measured Oct 29: the hosted API's 500s often come back to back in about 1 s each, so two retries could be spent in
+// 3 seconds with 100 s of the deadline left. The deadline still caps the total.
+const MAX_RETRIES = 4;
 const BACKOFF_MS = 800;
 // One wait-and-retry on a 429 (per-minute quota), then "busy". Doesn't count against MAX_RETRIES.
 const BUSY_WAIT_MS = 4_000;
@@ -109,10 +111,14 @@ export async function generateWithRetries(generate: Generate, opts: RetryOptions
   let level: Level = opts.startLevel ?? 0;
   let retries = 0;
   let busyRetried = false;
+  // Once the model has answered with something unusable, a later failure means "couldn't read", not "couldn't reach".
+  let sawInvalid = false;
+  const failed = (message: string) =>
+    sawInvalid ? new ExtractionError("invalid_output", "The model's answer wasn't usable.") : new ExtractionError("model_failed", message);
 
   for (;;) {
     const remaining = deadline - Date.now();
-    if (remaining <= 1_000) throw new ExtractionError("model_failed", "Gemma took too long to answer.");
+    if (remaining <= 1_000) throw failed("Gemma took too long to answer.");
     const signal = AbortSignal.timeout(Math.min(opts.attemptMs, remaining));
     let transient: string;
     try {
@@ -141,10 +147,13 @@ export async function generateWithRetries(generate: Generate, opts: RetryOptions
           level = (level + 1) as Level; // step down: drop schema / thinking config
           continue;
         }
-        if (err.status < 500) throw new ExtractionError("model_failed", `Gemma request failed (${err.status}).`);
+        if (err.status < 500) throw failed(`Gemma request failed (${err.status}).`);
         transient = `Gemma request failed (${err.status}).`;
       } else if (err instanceof ExtractionError) {
-        if (err.code === "invalid_output") log(`level=${level} invalid_output retry=${retries}`);
+        if (err.code === "invalid_output") {
+          log(`level=${level} invalid_output retry=${retries}`);
+          sawInvalid = true;
+        }
         if (err.code === "invalid_output" && level < 2) {
           level = (level + 1) as Level;
           continue;
@@ -155,7 +164,7 @@ export async function generateWithRetries(generate: Generate, opts: RetryOptions
         transient = "Couldn't reach Gemma.";
       }
     }
-    if (retries >= MAX_RETRIES) throw new ExtractionError("model_failed", transient);
+    if (retries >= MAX_RETRIES) throw failed(transient);
     retries++;
     await sleep(BACKOFF_MS * 2 ** (retries - 1) * (0.75 + Math.random() * 0.5));
   }

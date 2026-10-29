@@ -63,13 +63,14 @@ export function isUnchangedSample(id: SampleId, text: string, hasImage: boolean,
   return quotes.length > 0 && quotes.every((q) => findQuote(q, corpus) === "text");
 }
 
-function modelFailure(err: unknown): CheckFailure {
+export function modelFailure(err: unknown, input: { hasText: boolean }): CheckFailure {
   if (err instanceof ExtractionError) {
     if (err.code === "model_busy") return new CheckFailure("model_busy", "Gemma is busy right now. Wait a few seconds and try again.", 503);
+    // The model answered, but not with anything we can check: say that, not "couldn't reach".
     if (err.code === "invalid_output")
       return new CheckFailure(
         "invalid_output",
-        "We couldn't read this reliably, so we're not showing a guess. Try pasting the text instead of a photo, or try again.",
+        input.hasText ? "We couldn't read this text. Try pasting the listing itself." : "We couldn't read this photo. Try a clearer photo, or paste the text instead.",
         502,
       );
   }
@@ -124,7 +125,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
       mode = "live";
     } catch (err) {
       // Retries are spent. A built-in sample gets its saved answer, labelled in the UI; user input never does.
-      if (!req.sampleId || !isUnchangedSample(req.sampleId, text, Boolean(req.image), req.lang)) throw modelFailure(err);
+      if (!req.sampleId || !isUnchangedSample(req.sampleId, text, Boolean(req.image), req.lang)) throw modelFailure(err, { hasText: Boolean(text.trim()) });
       extraction = sampleExtraction(req.sampleId, req.lang);
       imageRead = req.sampleId === "lease-photo";
       mode = "saved";

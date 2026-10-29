@@ -31,10 +31,28 @@ describe("generateWithRetries", () => {
     expect(s.levels).toEqual([0, 0]);
   });
 
-  it("retries network errors at most twice", async () => {
-    const s = scripted(["network", "network", "network", "ok"]);
+  it("retries network errors at most four times", async () => {
+    const s = scripted(["network", "network", "network", "network", "network", "ok"]);
     await expect(run(s.generate)).rejects.toMatchObject({ code: "model_failed", message: "Couldn't reach Gemma." });
-    expect(s.levels).toHaveLength(3);
+    expect(s.levels).toHaveLength(5);
+  });
+
+  // Regression (Oct 29): injection inputs on the deployed site got 500, 500, timeout from the hosted API and the
+  // old budget of two retries ended in "couldn't reach the AI model" with most of the deadline left.
+  it("survives a run of 500s and a timeout before the model answers", async () => {
+    const s = scripted([500, 500, "hang", 500, "ok"]);
+    await expect(run(s.generate, 20)).resolves.toHaveProperty("extraction");
+    expect(s.levels).toEqual([0, 0, 0, 0, 0]);
+  });
+
+  it("after an unusable answer, a later failure is reported as invalid_output, not model_failed", async () => {
+    const s = scripted(["bad-json", "bad-json", 400]);
+    await expect(run(s.generate)).rejects.toMatchObject({ code: "invalid_output" });
+    expect(s.levels).toEqual([0, 1, 2]);
+    const spent = scripted(["bad-json", 500, 500, 500, 500, 500]);
+    await expect(run(spent.generate)).rejects.toMatchObject({ code: "invalid_output" });
+    const busy = scripted(["bad-json", 429, 429]);
+    await expect(run(busy.generate)).rejects.toMatchObject({ code: "model_busy" });
   });
 
   it("retries an attempt that hits its own timeout", async () => {
