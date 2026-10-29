@@ -1,0 +1,114 @@
+<!doctype html>
+<!-- Source of docs/architecture.png. Render with: node scripts/render-architecture.mjs (1600×715 CSS px at 2×). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How Clearlease works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --ink: #161c26;
+    --soft: #4d5663;
+    --rule: #dfe3e8;
+    --grey: #8b96a3;
+    --blue: #1f48c7;
+    --purple: #7a5bc9;
+    --green: #1e6a45;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1600px; height: 715px; background: #fff; }
+  body { font-family: Inter, system-ui, sans-serif; color: var(--ink); padding: 36px 64px 0; -webkit-font-smoothing: antialiased; }
+  h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+  .sub { margin-top: 12px; font-size: 16.5px; color: var(--soft); }
+  .sub b { color: var(--ink); font-weight: 700; }
+  code { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 700; font-size: 12.5px; color: var(--ink); background: #f1f3f5; padding: 1px 4px; border-radius: 2px; }
+
+  .steps { margin-top: 32px; display: grid; grid-template-columns: repeat(6, 214px); column-gap: 37.6px; position: relative; }
+  .zone { border-top: 2.5px solid var(--grey); padding-top: 12px; font-size: 13.5px; color: var(--soft); }
+  .zone.blue { border-color: var(--blue); color: var(--blue); }
+  .zone.purple { border-color: var(--purple); color: var(--purple); }
+  .zone.span2 { grid-column: span 2; }
+  .step { position: relative; padding-top: 14px; }
+  .step + .step::before { content: "→"; position: absolute; left: -30px; top: 11px; color: var(--grey); font-size: 22px; line-height: 1; }
+  .num { width: 21px; height: 21px; border-radius: 50%; border: 1.5px solid var(--ink); display: grid; place-items: center; font-size: 11.5px; font-weight: 700; }
+  .num.ai { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .num.guard { background: var(--green); border-color: var(--green); color: #fff; }
+  .step h2 { margin-top: 11px; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .step p { margin-top: 6px; font-size: 14px; line-height: 20.4px; letter-spacing: -0.012em; color: var(--soft); }
+
+  .notes { margin-top: 24px; border-top: 1px solid var(--rule); padding-top: 20px; display: grid; grid-template-columns: repeat(4, 338px); column-gap: 40px; }
+  .notes h3 { font-size: 15px; font-weight: 700; margin-bottom: 9px; }
+  .notes li { list-style: none; font-size: 14px; line-height: 19.5px; letter-spacing: -0.012em; color: var(--soft); padding: 5.5px 0; border-bottom: 1px solid var(--rule); }
+  .notes li:last-child { border-bottom: 0; }
+
+  .legend { position: absolute; left: 64px; top: 672px; display: flex; gap: 28px; font-size: 13.5px; color: var(--soft); align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+  <h1>How Clearlease works</h1>
+  <p class="sub"><b>Gemma 4 reads. Our code verifies every quote and decides every verdict.</b> Clearlease never stores your text or photos.</p>
+
+  <div class="steps">
+    <div class="zone">Your browser</div>
+    <div class="zone blue">Google Cloud Run</div>
+    <div class="zone purple">Gemini API</div>
+    <div class="zone blue span2">Google Cloud Run</div>
+    <div class="zone">Your browser</div>
+
+    <div class="step"><div class="num">1</div><h2>Paste or snap</h2><p>A listing, a landlord's message or a lease photo. Phone numbers, emails and long ID numbers are removed and photos shrunk on your device.</p></div>
+    <div class="step"><div class="num">2</div><h2>API</h2><p><code>POST /api/check</code> with rate limiting and size and type checks.</p></div>
+    <div class="step"><div class="num ai">3</div><h2>Gemma 4 reads</h2><p><code>gemma-4-26b-a4b-it</code> turns text and images into JSON facts, each with its exact quote. Input is wrapped as untrusted data.</p></div>
+    <div class="step"><div class="num guard">4</div><h2>Verify</h2><p>Schema check, then every quote is matched against the input. Anything not found is dropped.</p></div>
+    <div class="step"><div class="num guard">5</div><h2>Rules decide</h2><p>TypeScript sets every verdict: price, 9 FTC scam signs and state lease law. The model never does.</p></div>
+    <div class="step"><div class="num">6</div><h2>Report</h2><p>Three verdicts, quoted evidence, what Gemma read, questions to ask and help links, in English or Spanish.</p></div>
+  </div>
+
+  <div class="notes">
+    <section>
+      <h3>Data the rules use</h3>
+      <ul>
+        <li>HUD Fair Market Rents (live, saved FY2027 fallback)</li>
+        <li>Census ACS median rent by ZIP</li>
+        <li>VA, DC and MD lease rules with statute links</li>
+        <li>FTC rental-scam warning signs</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Google Cloud, us-east4</h3>
+      <ul>
+        <li>Cloud Run, scales to zero</li>
+        <li>Secret Manager holds the API keys</li>
+        <li>Firestore keeps anonymous scam-flag counts (one-way fingerprints, only when someone flags)</li>
+        <li>Cloud Build and Artifact Registry for deploys</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Privacy and reliability</h3>
+      <ul>
+        <li>No accounts. Clearlease never stores or logs your text or photos</li>
+        <li>Checks are processed by Google's Gemini API</li>
+        <li>Photo location data stripped before upload</li>
+        <li>If Gemma doesn't answer, typed text gets a labelled keyword check and samples show a labelled saved result</li>
+        <li>Area map (Google Maps) is optional and decorative</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Open weights</h3>
+      <ul>
+        <li>Gemma 4 is Apache 2.0</li>
+        <li>Self-host with Ollama: <code>GEMMA_PROVIDER=ollama</code></li>
+        <li>Same prompt, quote checks and rules, so documents can stay on your own machine</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="legend">
+    <span><i class="dot" style="background: var(--purple)"></i>AI model</span>
+    <span><i class="dot" style="background: var(--green)"></i>Guardrails in our code</span>
+    <span><i class="dot" style="border: 1.5px solid var(--ink)"></i>Other steps</span>
+  </div>
+</body>
+</html>

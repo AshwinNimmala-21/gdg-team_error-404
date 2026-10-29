@@ -58,8 +58,8 @@ The five samples: a Blacksburg sublet that wants Zelle before a viewing, a lease
 
 - **Gemma reads text and photos.** One Gemma 4 call per check (retried only on transient errors) turns a listing, a chat screenshot or a lease photo into strict JSON: rent, bedrooms, ZIP, payment methods, seven scam signals and lease clauses, each with a verbatim quote. It understands paraphrase and negation ("we never take wire transfers" is not a red flag). Details: [`docs/model.md`](docs/model.md).
 - **Every quote is verified.** A quote must appear in your text, or in Gemma's own transcript of your photo. Unmatched quotes are dropped and shown as "not counted", and extracted numbers must appear inside their quote.
-- **Rules decide.** Prices, thresholds and legal comparisons live in [`lib/rules/`](lib/rules), covered by 126 unit tests. The model never scores anything.
-- **Prompt-injection defense.** Your text is wrapped as delimited data, the system prompt is pinned, and output must pass a Zod schema or you get a safe error. A second, rule-based detector catches phrases like "ignore previous instructions". The injection sample shows the attack being ignored and counted as a red flag.
+- **Rules decide.** Prices, thresholds and legal comparisons live in [`lib/rules/`](lib/rules), covered by unit tests (160 in the suite). The model never scores anything.
+- **Prompt-injection defense.** Your text is wrapped as delimited data, the system prompt is pinned, and output must pass a Zod schema or you get a safe error. A second, rule-based detector catches phrases like "ignore previous instructions" and fake role or chat-template markup (`"role":"system"`, `<|im_start|>`, `<start_of_turn>`, `[INST]`, `<<SYS>>`), and the banner shows the whole injected line. The injection sample shows the attack being ignored and counted as a red flag.
 
 **Why the AI is necessary.** Listings and leases arrive as messy text, screenshots and phone photos, with paraphrased payment requests, misspellings, Spanish and disclaimers. Keyword rules can't read photos and misread negation: on our hard set, a keyword scan raised false alarms on 6 of 9 legitimate listings. Gemma 4 reads all of it into one quoted shape that code can check. If the model still fails after its retries, typed text gets a clearly labelled keyword-only check instead: the same rules run on keyword matches, the scam verdict is capped at "Some red flags" unless 3 or more keyword signals match, and a clean result is a neutral "None found by keywords", never the green "No red flags found". Photos still need the model.
 
@@ -90,7 +90,7 @@ More detail: [`docs/responsible-ai.md`](docs/responsible-ai.md).
 - **Grounded:** a flag counts only if its quote is found in what you gave us. The model never decides a price, score or legal question.
 - **Redaction:** before sending, the browser removes email addresses, phone numbers, SSN-format numbers and long ID or account numbers (10+ digits), per [`lib/client/redact.ts`](lib/client/redact.ts). It does not remove names, addresses or anything inside a photo, so the page asks you to cover those in photos.
 - **Who processes it:** checks are processed by Google's Gemini API. On Google's free tier, Google may use submitted text to improve its products. Don't paste personal information.
-- **Nothing stored:** your text and photos are never stored or logged. Firestore is written to only when someone flags a listing, and it keeps one-way fingerprints and counts. The page says that the free Gemini API tier may use inputs to improve Google's products.
+- **Nothing stored:** your text and photos are never stored or logged. Firestore is written to only when someone flags a listing, and it keeps one-way fingerprints and counts.
 - **Cheap isn't a crime:** low rent alone never makes Clearlease say "scam". Shared rooms, income-restricted units and sublets are often cheap, and those renters shouldn't be scared off.
 - **Abuse and cost guards:** a per-client rate limit (10 checks per minute by default, 30 on the deployed site), a 12,000-character text limit, an 8 MB image cap checked on the server too, and an image-type allowlist.
 - **Not legal advice:** every report says so and links to free help for the renter's state.
@@ -110,10 +110,10 @@ Requires Node 20+. Without keys it runs in demo mode on the five samples; for li
 
 ```bash
 git clone https://github.com/AshwinNimmala-21/gdg-team_error-404.git && cd gdg-team_error-404
-npm install && cp .env.example .env && npm run dev     # http://localhost:3000
+npm ci && cp .env.example .env && npm run dev     # http://localhost:3000
 ```
 
-Checks: `npm test` (126 unit tests), `npm run lint`, `npm run build`, and `node scripts/e2e.mjs http://localhost:3000` for the five samples. Optional keys and the one-command deploy: [`docs/setup.md`](docs/setup.md). Cloud Run runbook: [`docs/DEPLOY.md`](docs/DEPLOY.md).
+Checks: `npm test` (160 unit tests), `npm run lint`, `npm run build`, and `node scripts/e2e.mjs http://localhost:3000` for the five samples and two typed injection inputs. Optional keys and the one-command deploy: [`docs/setup.md`](docs/setup.md). Cloud Run runbook: [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ## APIs and data
 
@@ -138,6 +138,7 @@ lib/rules/           price, scam, lease, questions, quote verification (+ tests)
 lib/data/            HUD/Census data and lookups, ZIP areas, rule sheets, help links
 scripts/eval/        labelled eval sets, runner, frozen keyword baseline
 docs/                setup, deploy, model, evaluation, validation, accessibility, research
+docs/diagram/        source of docs/architecture.png (node scripts/render-architecture.mjs)
 docs/process/        hackathon working notes (see docs/process/README.md)
 ```
 

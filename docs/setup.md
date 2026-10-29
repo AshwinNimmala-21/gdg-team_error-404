@@ -24,7 +24,7 @@ Only **one key is required**: `GEMINI_API_KEY` (free from [aistudio.google.com/a
 Checked on Oct 25: a production build with only `GEMINI_API_KEY` set (the other four blanked) passed all 5 samples live (`node scripts/e2e.mjs`), showed saved figures, no counter and no map.
 
 ```bash
-npm test            # 126 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map)
+npm test            # 160 unit tests (rules, grounding, redaction, injection, schema, pricing, leases, map, keyword fallback)
 npm run lint
 npm run build && npm start              # production server (standalone, like Cloud Run)
 node scripts/e2e.mjs http://localhost:3000            # API check of the 5 samples
