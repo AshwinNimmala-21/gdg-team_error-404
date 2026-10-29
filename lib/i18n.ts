@@ -33,6 +33,8 @@ const EN = {
   privacy1: "No account and no logs of your text. Your photo is resized on your device (which also strips location data) and dropped after the check.",
   privacy2:
     "Before sending, we remove phone numbers, emails and long ID or account numbers from your text. To read it, we send the text and photo to Google's Gemma 4 model through the free Gemini API, where Google may review inputs to improve its products. Cover names, signatures and account numbers in photos first.",
+  privacyGoogle:
+    "Checks are processed by Google's Gemini API. On Google's free tier, Google may use submitted text to improve its products. Don't paste personal information.",
   privacy3:
     "If you flag a listing as a scam, we store only a one-way fingerprint of its street address or contact and a count, so others can see how many people flagged it. Never the text itself.",
   samplesH: "Try a fictional sample",
@@ -173,6 +175,8 @@ const ES: Dict = {
   privacy1: "Sin cuenta y sin registros de su texto. Su foto se reduce en su dispositivo (lo que también borra la ubicación) y se descarta después de la revisión.",
   privacy2:
     "Antes de enviar, quitamos de su texto números de teléfono, correos y números largos de identificación o de cuenta. Para leerlo, enviamos el texto y la foto al modelo Gemma 4 de Google mediante la API gratuita de Gemini, donde Google puede revisar los datos para mejorar sus productos. Tape nombres, firmas y números de cuenta en las fotos.",
+  privacyGoogle:
+    "Las revisiones las procesa la API de Gemini de Google. En el nivel gratuito, Google puede usar el texto enviado para mejorar sus productos. No pegue información personal.",
   privacy3:
     "Si marca un anuncio como estafa, solo guardamos una huella irreversible de su dirección o contacto y un conteo, para que otros vean cuántas personas lo marcaron. Nunca el texto.",
   samplesH: "Pruebe un ejemplo ficticio",

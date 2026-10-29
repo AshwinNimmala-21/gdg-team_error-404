@@ -303,6 +303,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
             <div className="space-y-2 pb-2 text-ink-soft" id={ids.privacy}>
               <p>{t.privacy1}</p>
               <p>{t.privacy2}</p>
+              <p>{t.privacyGoogle}</p>
               <p>{t.privacy3}</p>
             </div>
           </details>
