@@ -33,6 +33,8 @@ const EN = {
   privacy1: "No account and no logs of your text. Your photo is resized on your device (which also strips location data) and dropped after the check.",
   privacy2:
     "Before sending, we remove phone numbers, emails and long ID or account numbers from your text. To read it, we send the text and photo to Google's Gemma 4 model through the free Gemini API, where Google may review inputs to improve its products. Cover names, signatures and account numbers in photos first.",
+  privacyGoogle:
+    "Checks are processed by Google's Gemini API. On Google's free tier, Google may use submitted text to improve its products. Don't paste personal information.",
   privacy3:
     "If you flag a listing as a scam, we store only a one-way fingerprint of its street address or contact and a count, so others can see how many people flagged it. Never the text itself.",
   samplesH: "Try a fictional sample",
@@ -76,7 +78,10 @@ const EN = {
   scamH: "Scam risk",
   leaseH: "Lease clauses",
   savedH: "Showing a saved result: the AI model didn't respond.",
-  savedP: "This is the pre-recorded answer for this sample, in Gemma's format. Checks of your own listings always use the live model.",
+  savedP: "This is the pre-recorded answer for this sample, in Gemma's format. Checks of your own listings always try the live model first.",
+  kwH: "AI reading is unavailable right now, so this is a quick keyword check.",
+  kwP: "It can miss paraphrased or hidden warning signs. Try again in a minute for the full check.",
+  kwMode: "Quick keyword check (no AI reading)",
   aiH: "This text contained instructions aimed at AI tools. We ignored them.",
   aiP: "Real landlords don't hide notes for scam checkers. We count it as a red flag.",
   addLease: "Add a photo of the lease",
@@ -170,6 +175,8 @@ const ES: Dict = {
   privacy1: "Sin cuenta y sin registros de su texto. Su foto se reduce en su dispositivo (lo que también borra la ubicación) y se descarta después de la revisión.",
   privacy2:
     "Antes de enviar, quitamos de su texto números de teléfono, correos y números largos de identificación o de cuenta. Para leerlo, enviamos el texto y la foto al modelo Gemma 4 de Google mediante la API gratuita de Gemini, donde Google puede revisar los datos para mejorar sus productos. Tape nombres, firmas y números de cuenta en las fotos.",
+  privacyGoogle:
+    "Las revisiones las procesa la API de Gemini de Google. En el nivel gratuito, Google puede usar el texto enviado para mejorar sus productos. No pegue información personal.",
   privacy3:
     "Si marca un anuncio como estafa, solo guardamos una huella irreversible de su dirección o contacto y un conteo, para que otros vean cuántas personas lo marcaron. Nunca el texto.",
   samplesH: "Pruebe un ejemplo ficticio",
@@ -212,7 +219,10 @@ const ES: Dict = {
   scamH: "Riesgo de estafa",
   leaseH: "Cláusulas del contrato",
   savedH: "Mostrando un resultado guardado: el modelo de IA no respondió.",
-  savedP: "Esta es la respuesta pregrabada para este ejemplo, en el formato de Gemma. Las revisiones de sus propios anuncios siempre usan el modelo en vivo.",
+  savedP: "Esta es la respuesta pregrabada para este ejemplo, en el formato de Gemma. Las revisiones de sus propios anuncios siempre intentan primero el modelo en vivo.",
+  kwH: "La lectura con IA no está disponible en este momento, así que esta es una revisión rápida por palabras clave.",
+  kwP: "Puede pasar por alto señales de alerta escritas de otra forma u ocultas. Intente de nuevo en un minuto para la revisión completa.",
+  kwMode: "Revisión rápida por palabras clave (sin lectura con IA)",
   aiH: "Este texto contenía instrucciones dirigidas a herramientas de IA. Las ignoramos.",
   aiP: "Los arrendadores reales no esconden notas para los verificadores de estafas. Lo contamos como señal de alerta.",
   addLease: "Agregar una foto del contrato",

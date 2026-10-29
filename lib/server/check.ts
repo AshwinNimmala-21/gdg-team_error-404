@@ -35,6 +35,7 @@ export const CheckRequestSchema = z.object({
   sampleId: z.enum(SAMPLE_IDS).optional(),
   contactHashes: z.array(z.string().regex(HASH_RE)).max(5).optional(),
   lang: z.enum(["en", "es"]).optional(),
+  fallback: z.literal("keywords").optional(),
 });
 
 export class CheckFailure extends Error {
@@ -63,13 +64,14 @@ export function isUnchangedSample(id: SampleId, text: string, hasImage: boolean,
   return quotes.length > 0 && quotes.every((q) => findQuote(q, corpus) === "text");
 }
 
-function modelFailure(err: unknown): CheckFailure {
+export function modelFailure(err: unknown, input: { hasText: boolean }): CheckFailure {
   if (err instanceof ExtractionError) {
     if (err.code === "model_busy") return new CheckFailure("model_busy", "Gemma is busy right now. Wait a few seconds and try again.", 503);
+    // The model answered, but not with anything we can check: say that, not "couldn't reach".
     if (err.code === "invalid_output")
       return new CheckFailure(
         "invalid_output",
-        "We couldn't read this reliably, so we're not showing a guess. Try pasting the text instead of a photo, or try again.",
+        input.hasText ? "We couldn't read this text. Try pasting the listing itself." : "We couldn't read this photo. Try a clearer photo, or paste the text instead.",
         502,
       );
   }
@@ -98,14 +100,16 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
   let usage: CheckResult["meta"]["usage"] = null;
   let imageRead = false;
   const mock = isMockMode();
-  const model = mock ? "demo mode (no model call)" : modelId();
+  let model = mock ? "demo mode (no model call)" : modelId();
+  let fallback: CheckResult["meta"]["fallback"];
 
   if (req.extraction !== undefined) {
-    // Rescore: the user edited rent / bedrooms / ZIP. No model call.
+    // Rescore: the user edited rent / bedrooms / ZIP. No model call. A keyword-fallback result stays one.
     const x = ExtractionSchema.safeParse(req.extraction);
     if (!x.success) throw new CheckFailure("bad_input", "Couldn't update the check. Run it again.", 400);
     extraction = x.data;
     mode = "rules-only";
+    fallback = req.fallback;
   } else if (mock) {
     mode = "mock";
     if (req.sampleId) {
@@ -124,10 +128,22 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
       mode = "live";
     } catch (err) {
       // Retries are spent. A built-in sample gets its saved answer, labelled in the UI; user input never does.
-      if (!req.sampleId || !isUnchangedSample(req.sampleId, text, Boolean(req.image), req.lang)) throw modelFailure(err);
-      extraction = sampleExtraction(req.sampleId, req.lang);
-      imageRead = req.sampleId === "lease-photo";
-      mode = "saved";
+      if (req.sampleId && isUnchangedSample(req.sampleId, text, Boolean(req.image), req.lang)) {
+        extraction = sampleExtraction(req.sampleId, req.lang);
+        imageRead = req.sampleId === "lease-photo";
+        mode = "saved";
+      } else if (text.trim()) {
+        // Typed text still gets a check: the keyword extractor and the same rules, labelled as a keyword check (never as
+        // Gemma's reading), with the scam verdict capped to what keywords can support. Keywords can't read a photo.
+        console.error(`check: keyword fallback after ${err instanceof ExtractionError ? err.code : "unknown error"}`);
+        extraction = keywordExtract(text);
+        mode = "rules-only";
+        fallback = "keywords";
+        model = "keyword check (no model call)";
+        if (req.image) notes.push("The quick keyword check can't read photos, so only your text was checked.");
+      } else {
+        throw modelFailure(err, { hasText: false });
+      }
     }
   }
 
@@ -138,7 +154,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
   const address = mode !== "rules-only" && findQuote(addr.quote, corpus) && findQuote(addr.value, corpus) ? addr.value : null;
   const keys = await communityKeys(address, facts.zip, req.contactHashes ?? []);
   const [benchmarks, counts] = await Promise.all([resolveBenchmarks(facts.zip, facts.bedrooms), readCounts(keys)]);
-  const result = runRules({ extraction, text, facts, benchmarks, lang: req.lang });
+  const result = runRules({ extraction, text, facts, benchmarks, lang: req.lang, keywordOnly: fallback === "keywords" });
   const dataLive = Boolean(benchmarks.fmr?.live || benchmarks.census?.live);
 
   return {
@@ -154,6 +170,7 @@ export async function runCheck(body: unknown): Promise<CheckResult> {
     meta: {
       model,
       mode,
+      ...(fallback ? { fallback } : {}),
       dataLive,
       latencyMs: Date.now() - started,
       usage,

@@ -196,6 +196,8 @@ const S: Record<string, string> = {
   "We couldn't confirm the number of bedrooms, so we left it out.": "No pudimos confirmar el número de recámaras, así que no lo usamos.",
   "We couldn't confirm the ZIP code, so we left it out.": "No pudimos confirmar el código postal, así que no lo usamos.",
   "Demo mode can't read photos.": "El modo de demostración no puede leer fotos.",
+  "The quick keyword check can't read photos, so only your text was checked.":
+    "La revisión rápida por palabras clave no puede leer fotos, así que solo se revisó su texto.",
   "Paste the text, or run Clearlease with a Gemini API key.": "Pegue el texto, o use Clearlease con una clave de la API de Gemini.",
   // ---------- errors from the server ----------
   "That upload is too large.": "Ese archivo es demasiado grande.",
@@ -208,8 +210,10 @@ const S: Record<string, string> = {
   "Run it again.": "Hágala de nuevo.",
   "Gemma is busy right now.": "Gemma está ocupada en este momento.",
   "Wait a few seconds and try again.": "Espere unos segundos e intente de nuevo.",
-  "We couldn't read this reliably, so we're not showing a guess.": "No pudimos leer esto con seguridad, así que no mostramos una suposición.",
-  "Try pasting the text instead of a photo, or try again.": "Pruebe pegando el texto en lugar de una foto, o intente de nuevo.",
+  "We couldn't read this text.": "No pudimos leer este texto.",
+  "Try pasting the listing itself.": "Pruebe pegando el anuncio mismo.",
+  "We couldn't read this photo.": "No pudimos leer esta foto.",
+  "Try a clearer photo, or paste the text instead.": "Pruebe con una foto más clara, o pegue el texto.",
   "We couldn't reach the AI model.": "No pudimos comunicarnos con el modelo de IA.",
   "Try again, or try one of the samples.": "Intente de nuevo, o pruebe uno de los ejemplos.",
   "Something went wrong on our side.": "Algo salió mal de nuestro lado.",

@@ -125,8 +125,8 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
       setStatus({ kind: "done" });
       setAnnounce(
         r.inputType === "question"
-          ? t.announceQuestion
-          : `${r.meta.mode === "saved" ? t.announceSaved : ""}${t.announceReady(priceVerdict(r.price, lang).word, scamVerdict(r.scam, lang).word, leaseVerdict(r.lease, lang).word)}`,
+          ? `${r.meta.fallback === "keywords" ? `${t.kwH} ` : ""}${t.announceQuestion}`
+          : `${r.meta.mode === "saved" ? t.announceSaved : ""}${r.meta.fallback === "keywords" ? `${t.kwH} ` : ""}${t.announceReady(priceVerdict(r.price, lang).word, scamVerdict(r.scam, lang).word, leaseVerdict(r.lease, lang).word)}`,
       );
     }
   }
@@ -134,7 +134,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
   async function rescore(overrides: Overrides) {
     if (!result) return;
     setRescoring(true);
-    const r = await send({ text: lastText, extraction: result.extraction, overrides, contactHashes: lastHashes, lang });
+    const r = await send({ text: lastText, extraction: result.extraction, overrides, contactHashes: lastHashes, lang, fallback: result.meta.fallback });
     setRescoring(false);
     if (r) {
       setResult(r);
@@ -303,6 +303,7 @@ export function Checker({ maps }: { maps: MapsConfig | null }) {
             <div className="space-y-2 pb-2 text-ink-soft" id={ids.privacy}>
               <p>{t.privacy1}</p>
               <p>{t.privacy2}</p>
+              <p>{t.privacyGoogle}</p>
               <p>{t.privacy3}</p>
             </div>
           </details>

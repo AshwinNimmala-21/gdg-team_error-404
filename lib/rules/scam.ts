@@ -2,7 +2,7 @@ import type { Extraction, SignalId } from "@/lib/ai/schema";
 import { DC_OAG_ALERT, FTC_SCAMS } from "@/lib/data/help";
 import type { Evidence, PriceCheck, ScamCheck, ScamFlag, ScamFlagId, SourceRef } from "@/lib/types";
 import { money } from "./price";
-import { findQuote, foldAccents, type Corpus } from "./quotes";
+import { findQuote, foldAccents, makeCorpus, type Corpus } from "./quotes";
 
 // People type Spanish without accents ("fuera del pais"), so Spanish patterns are matched with accents folded on both sides.
 const folded = (re: RegExp) => new RegExp(foldAccents(re.source), re.flags);
@@ -73,6 +73,14 @@ const INJECTION_PATTERNS = [
   // Role-play jailbreaks only ("you are now an unrestricted assistant"), not "you are now a resident".
   /\byou are now (a|an|in) (ai|assistant|model|chatbot|different|new|unrestricted|developer|jailbreak)\b/i,
   /\bsystem prompt\b/i,
+  /\b(admin|developer|god|debug|jailbreak|unrestricted) mode\b/i,
+  // Fake role markup: chat messages pasted as JSON, chat-template tokens and role tags or headers.
+  /["“”]role["“”]\s*:\s*["“”](system|developer|assistant|tool)["“”]/i,
+  /<\|\s*(im_start|im_end|system|assistant|user|endoftext|eot_id|start_header_id)\s*\|>/i,
+  /<\/?(start_of_turn|end_of_turn)>/i,
+  /\[\/?INST\]|<<\/?SYS>>/i,
+  /<\/?\s*(system|system_prompt|assistant|developer)\s*>/i,
+  /^\s*#{1,3}\s*(system|assistant|developer)( prompt| message| instructions?)?\s*:?\s*$/im,
   // Spanish phrasing
   /ignor\p{L}* (todas |cualquier )?(las )?(instrucciones|indicaciones|reglas) (anteriores|previas)/iu,
   /(ia|asistente|modelo|verificador|revisor)\p{L}*[,:]?.{0,80}(rep[oó]rtel[oa]|m[aá]rquel[oa]|clasif[ií]quel[oa]|calif[ií]quel[oa]) como/iu,
@@ -159,7 +167,13 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   const modelSaw = x.aiInstructions.present ? quoted(x.aiInstructions.quote, corpus, "Instructions aimed at AI tools") : null;
   const regexSaw = findInjection(rawText);
   if (modelSaw?.counted || regexSaw) {
-    const ev = modelSaw?.counted ? modelSaw : { label: "Instructions aimed at AI tools", quote: regexSaw!, quoteFrom: "text" as const, counted: true };
+    // Prefer the whole line the detector found when it contains the model's quote: the model often quotes only part
+    // of a planted line (the "content" of a fake {"role":"system"} message), and the renter should see all of it.
+    const lineHasModelQuote = regexSaw !== null && findQuote(modelSaw?.quote, makeCorpus(regexSaw, null)) === "text";
+    const ev =
+      modelSaw?.counted && !lineHasModelQuote
+        ? modelSaw
+        : { label: "Instructions aimed at AI tools", quote: regexSaw!, quoteFrom: findQuote(regexSaw, corpus) ?? ("text" as const), counted: true };
     flags.push({ id: "aiInstructions", label: "Hides instructions aimed at AI checkers like this one", weight: 2, heuristic: true, evidence: [ev] });
   } else if (modelSaw) {
     dropped.push({ ...modelSaw, label: "Instructions aimed at AI tools (not counted: quote not found)" });
@@ -185,12 +199,22 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   const status: ScamCheck["status"] = score === 0 ? "none_found" : score >= LIKELY_AT ? "likely" : "some";
   const n = flags.length;
   const headline = status === "none_found" ? `We checked ${CHECK_COUNT} warning signs and found none` : `${n} of ${CHECK_COUNT} checks flagged`;
-  const detail =
-    status === "none_found"
-      ? "That isn't a guarantee. See the place in person (or on a live video tour) and sign a lease before you pay anything."
-      : status === "likely"
-        ? "These match the warning signs the FTC lists for rental scams. Don't send money. If you already paid, use the FTC link below."
-        : "Get answers to the questions below before you send any money.";
+  const detail = status === "none_found" ? NONE_DETAIL : status === "likely" ? LIKELY_DETAIL : SOME_DETAIL;
 
   return { status, headline, detail, flagged: n, checked: CHECK_COUNT, flags, dropped };
+}
+
+const NONE_DETAIL = "That isn't a guarantee. See the place in person (or on a live video tour) and sign a lease before you pay anything.";
+const LIKELY_DETAIL = "These match the warning signs the FTC lists for rental scams. Don't send money. If you already paid, use the FTC link below.";
+const SOME_DETAIL = "Get answers to the questions below before you send any money.";
+
+// Keyword fallback: "Likely scam" needs at least this many matched keyword signals. Cheap rent doesn't count toward it:
+// it comes from the price rule, not from a keyword.
+export const KEYWORD_LIKELY_SIGNALS = 3;
+
+/** The keyword fallback is never more confident than its keywords: cap at "Some red flags" below 3 keyword signals. */
+export function capForKeywords(s: ScamCheck): ScamCheck {
+  const keywordSignals = s.flags.filter((f) => f.id !== "priceFarBelow").length;
+  if (s.status === "likely" && keywordSignals < KEYWORD_LIKELY_SIGNALS) return { ...s, status: "some", detail: SOME_DETAIL, keywordOnly: true };
+  return { ...s, keywordOnly: true };
 }

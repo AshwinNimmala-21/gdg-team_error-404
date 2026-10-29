@@ -24,6 +24,8 @@ export interface CheckRequest {
   contactHashes?: string[];
   /** Language for Gemma's clause explanations and the question templates. Default "en". */
   lang?: "en" | "es";
+  /** Sent back on a rescore of a keyword-fallback result, so the edit keeps its label and its capped verdict. */
+  fallback?: "keywords";
 }
 
 export interface SourceRef {
@@ -84,6 +86,8 @@ export interface ScamFlag {
 export interface ScamCheck {
   /** "not_run": no listing or landlord message to check (e.g. a lease alone) and nothing flagged. */
   status: "not_run" | "none_found" | "some" | "likely";
+  /** True when the keyword fallback read the input: "none found" is then a neutral result, not a green one. */
+  keywordOnly?: boolean;
   headline: string;
   detail: string;
   flagged: number;
@@ -151,6 +155,8 @@ export interface CheckResult {
     model: string;
     /** "saved": the live call failed on a built-in sample, so its recorded answer is shown (labelled in the UI). */
     mode: "live" | "mock" | "rules-only" | "saved";
+    /** "keywords": the live model failed on typed text, so the keyword extractor read it (labelled; scam verdict capped). */
+    fallback?: "keywords";
     dataLive: boolean;
     latencyMs: number;
     usage: { promptTokens: number; outputTokens: number } | null;
