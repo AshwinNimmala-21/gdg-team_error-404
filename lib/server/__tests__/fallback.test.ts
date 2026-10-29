@@ -57,14 +57,16 @@ describe("saved result when the live model fails", () => {
     expect(r.lease.status).toBe("fix");
   });
 
-  it("never serves a saved answer for user input", async () => {
-    await expect(runCheck({ text: "1BR in Arlington 22201, $1,900/month. Tours on Saturday." })).rejects.toMatchObject({
-      code: "model_failed",
-    });
+  it("never serves a saved answer for user input (it gets the labelled keyword check)", async () => {
+    const r = await runCheck({ text: "1BR in Arlington 22201, $1,900/month. Tours on Saturday." });
+    expect(r.meta.mode).toBe("rules-only");
+    expect(r.meta.fallback).toBe("keywords");
   });
 
   it("never serves a saved answer for an edited sample", async () => {
     const edited = sample("fine-arlington.txt").replace("$2,350/month", "$1,200/month");
-    await expect(runCheck({ text: edited, sampleId: "fine-arlington" })).rejects.toMatchObject({ code: "model_failed" });
+    const r = await runCheck({ text: edited, sampleId: "fine-arlington" });
+    expect(r.meta.mode).not.toBe("saved");
+    expect(r.meta.fallback).toBe("keywords");
   });
 });

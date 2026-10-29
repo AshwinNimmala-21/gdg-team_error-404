@@ -2,6 +2,21 @@ import type { CheckResult, Evidence } from "@/lib/types";
 import { Caret, ToneIcon } from "./Icons";
 import { useLang, useTr } from "./Lang";
 
+/** The live model failed and the keyword fallback read the text. Shown on the report and on "what we can check". */
+export function KeywordBanner({ meta, className = "" }: { meta: CheckResult["meta"]; className?: string }) {
+  const { t } = useLang();
+  if (meta.fallback !== "keywords") return null;
+  return (
+    <div role="note" data-fallback="keywords" className={`flex gap-3 rounded-xs border-l-4 border-warn bg-warn-tint/60 py-3 pr-3 pl-3.5 text-[15px] ${className}`}>
+      <ToneIcon tone="warn" className="mt-0.5 shrink-0 text-warn" />
+      <div className="min-w-0">
+        <p className="font-bold">{t.kwH}</p>
+        <p className="mt-1 text-ink-soft">{t.kwP}</p>
+      </div>
+    </div>
+  );
+}
+
 /** "This text contained instructions aimed at AI tools. We ignored them." Shown on the report and on "what we can check". */
 export function AiBanner({ ai, className = "" }: { ai: CheckResult["aiInstructions"]; className?: string }) {
   const { t } = useLang();

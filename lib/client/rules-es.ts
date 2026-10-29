@@ -196,6 +196,8 @@ const S: Record<string, string> = {
   "We couldn't confirm the number of bedrooms, so we left it out.": "No pudimos confirmar el número de recámaras, así que no lo usamos.",
   "We couldn't confirm the ZIP code, so we left it out.": "No pudimos confirmar el código postal, así que no lo usamos.",
   "Demo mode can't read photos.": "El modo de demostración no puede leer fotos.",
+  "The quick keyword check can't read photos, so only your text was checked.":
+    "La revisión rápida por palabras clave no puede leer fotos, así que solo se revisó su texto.",
   "Paste the text, or run Clearlease with a Gemini API key.": "Pegue el texto, o use Clearlease con una clave de la API de Gemini.",
   // ---------- errors from the server ----------
   "That upload is too large.": "Ese archivo es demasiado grande.",

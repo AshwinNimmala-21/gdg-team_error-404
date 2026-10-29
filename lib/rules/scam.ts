@@ -199,12 +199,22 @@ export function computeScam(x: Extraction, corpus: Corpus, price: PriceCheck, ra
   const status: ScamCheck["status"] = score === 0 ? "none_found" : score >= LIKELY_AT ? "likely" : "some";
   const n = flags.length;
   const headline = status === "none_found" ? `We checked ${CHECK_COUNT} warning signs and found none` : `${n} of ${CHECK_COUNT} checks flagged`;
-  const detail =
-    status === "none_found"
-      ? "That isn't a guarantee. See the place in person (or on a live video tour) and sign a lease before you pay anything."
-      : status === "likely"
-        ? "These match the warning signs the FTC lists for rental scams. Don't send money. If you already paid, use the FTC link below."
-        : "Get answers to the questions below before you send any money.";
+  const detail = status === "none_found" ? NONE_DETAIL : status === "likely" ? LIKELY_DETAIL : SOME_DETAIL;
 
   return { status, headline, detail, flagged: n, checked: CHECK_COUNT, flags, dropped };
+}
+
+const NONE_DETAIL = "That isn't a guarantee. See the place in person (or on a live video tour) and sign a lease before you pay anything.";
+const LIKELY_DETAIL = "These match the warning signs the FTC lists for rental scams. Don't send money. If you already paid, use the FTC link below.";
+const SOME_DETAIL = "Get answers to the questions below before you send any money.";
+
+// Keyword fallback: "Likely scam" needs at least this many matched keyword signals. Cheap rent doesn't count toward it:
+// it comes from the price rule, not from a keyword.
+export const KEYWORD_LIKELY_SIGNALS = 3;
+
+/** The keyword fallback is never more confident than its keywords: cap at "Some red flags" below 3 keyword signals. */
+export function capForKeywords(s: ScamCheck): ScamCheck {
+  const keywordSignals = s.flags.filter((f) => f.id !== "priceFarBelow").length;
+  if (s.status === "likely" && keywordSignals < KEYWORD_LIKELY_SIGNALS) return { ...s, status: "some", detail: SOME_DETAIL, keywordOnly: true };
+  return { ...s, keywordOnly: true };
 }

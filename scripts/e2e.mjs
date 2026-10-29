@@ -54,6 +54,7 @@ for (const c of typed) {
   const problems = [];
   if (!res.ok) problems.push(`HTTP ${res.status} ${j?.error?.code}: ${j?.error?.message}`);
   else {
+    if (j.meta.fallback === "keywords") problems.push("keyword fallback: the live model didn't respond (see scripts/e2e-fallback.mjs)");
     if (j.inputType !== c.inputType) problems.push(`inputType ${j.inputType}`);
     if (j.aiInstructions.quote !== c.aiQuote) problems.push(`banner quote ${JSON.stringify(j.aiInstructions.quote)}`);
     const ids = j.scam.flags.map((f) => f.id);

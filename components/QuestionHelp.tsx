@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 import type { CheckResult } from "@/lib/types";
-import { AiBanner, Quote } from "./Evidence";
+import { AiBanner, KeywordBanner, Quote } from "./Evidence";
 import { ToneIcon } from "./Icons";
 import { useLang, useTr } from "./Lang";
 
@@ -26,6 +26,7 @@ export const QuestionHelp = forwardRef<HTMLHeadingElement, { result: CheckResult
         <h2 id="question-title" ref={headingRef} tabIndex={-1} className="text-[22px] font-extrabold tracking-tight focus:outline-none sm:text-[26px]">
           {t.qH}
         </h2>
+        <KeywordBanner meta={r.meta} className="mt-4" />
         <AiBanner ai={r.aiInstructions} className="mt-4" />
         <p className="mt-3 max-w-[64ch] text-[16px] leading-relaxed">{t.qWhat}</p>
         <p className="mt-2 max-w-[64ch] text-[16px] leading-relaxed text-ink-soft">{t.qPaste}</p>

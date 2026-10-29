@@ -113,6 +113,14 @@ Note for Yoshwan: your stashed tag restyle touches `components/Report.tsx` and `
   - Injection text with nothing else to check gets "what we can check", which now shows the banner.
 - Tests: `lib/rules/__tests__/injection-live.test.ts` uses the real live extractions. `scripts/e2e.mjs` has 2 typed cases.
 - **Redeploy `dev`** to get this on the live URL.
+- **Keyword fallback (approved by Yoshwan, Oct 29).** When the live model still fails after retries, typed text goes through the keyword extractor and the same rules.
+  - It's labelled as a quick keyword check, in EN and ES, and is never attributed to Gemma: `meta.mode = "rules-only"`, `meta.fallback = "keywords"`, and no "What Gemma read" section.
+  - The scam verdict is capped at "Some red flags" unless 3 or more keyword signals match. Cheap rent doesn't count toward the 3.
+  - A clean keyword result shows the neutral "None found by keywords", never green.
+  - An unchanged built-in sample still gets its saved answer. A photo alone still gets the honest error.
+  - Tests: `lib/server/__tests__/keyword-fallback.test.ts`, plus `scripts/e2e-fallback.mjs`, which needs no key: the model points at a closed port.
+  - To check: README line 64 ("without that reading there is nothing to check") should mention the labelled keyword fallback. That's Ashwin's call.
+  - Running the gate back to back sends more than 10 checks a minute, so start the server with `RATE_LIMIT_PER_MIN=200` for local e2e runs.
 
 ## Status
 - [x] Phase 0: safety rails, validation questions (`docs/validation.md`; **answers still needed**)

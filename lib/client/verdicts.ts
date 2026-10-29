@@ -11,14 +11,14 @@ const W = {
   en: {
     typical: "Typical", above: "Above usual range", rough: "Rough comparison", suspicious: "Suspiciously cheap",
     farBelow: "Below usual range: verify before paying", below: "Below usual range", unknown: "Not enough info",
-    notRun: "Not run", likely: "Likely scam", some: "Some red flags", none: "No red flags found",
+    notRun: "Not run", likely: "Likely scam", some: "Some red flags", none: "No red flags found", noneKeywords: "None found by keywords",
     fix: "Fix before signing", ask: (n: number) => `Ask about ${n} clause${n === 1 ? "" : "s"}`, standard: "Looks standard", noLease: "No lease yet",
     noClauses: "No clauses found", checkWording: "Check the wording",
   },
   es: {
     typical: "Precio normal", above: "Por encima de lo usual", rough: "Comparación aproximada", suspicious: "Sospechosamente barato",
     farBelow: "Por debajo de lo usual: verifique antes de pagar", below: "Por debajo de lo usual", unknown: "Faltan datos",
-    notRun: "No se revisó", likely: "Probable estafa", some: "Algunas señales de alerta", none: "Sin señales de alerta",
+    notRun: "No se revisó", likely: "Probable estafa", some: "Algunas señales de alerta", none: "Sin señales de alerta", noneKeywords: "Ninguna por palabras clave",
     fix: "Corregir antes de firmar", ask: (n: number) => `Pregunte sobre ${n} cláusula${n === 1 ? "" : "s"}`, standard: "Parece estándar", noLease: "Sin contrato todavía",
     noClauses: "No se encontraron cláusulas", checkWording: "Revise el texto",
   },
@@ -47,6 +47,8 @@ export function scamVerdict(s: ScamCheck, lang: Lang = "en"): Verdict {
   if (s.status === "not_run") return { word: w.notRun, tone: "nil" };
   if (s.status === "likely") return { word: w.likely, tone: "stop" };
   if (s.status === "some") return { word: w.some, tone: "warn" };
+  // A keyword check that matched nothing can still miss reworded signs: neutral, never green.
+  if (s.keywordOnly) return { word: w.noneKeywords, tone: "nil" };
   return { word: w.none, tone: "ok" };
 }
 

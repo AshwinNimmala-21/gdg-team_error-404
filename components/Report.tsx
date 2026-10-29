@@ -5,7 +5,7 @@ import { leaseVerdict, priceVerdict, scamVerdict, type Tone, type Verdict } from
 import type { MapsConfig } from "@/lib/server/maps-config";
 import type { CheckResult, ClauseFinding, Overrides } from "@/lib/types";
 import { Community } from "./Community";
-import { AiBanner, EvidenceDrawer, Quote } from "./Evidence";
+import { AiBanner, EvidenceDrawer, KeywordBanner, Quote } from "./Evidence";
 import { FactsBar } from "./FactsBar";
 import { GemmaRead } from "./GemmaRead";
 import { useLang, useTr } from "./Lang";
@@ -115,6 +115,7 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
           </div>
         )}
 
+        <KeywordBanner meta={r.meta} className="mt-5" />
         <AiBanner ai={r.aiInstructions} className="mt-5" />
         {r.meta.notes.length > 0 && (
           <ul className="mt-3 list-disc pl-5 text-[14px] text-ink-soft">
@@ -179,7 +180,8 @@ export const Report = forwardRef<HTMLHeadingElement, Props>(function Report({ re
         <LeaseGroups findings={r.lease.findings} />
       </Section>
 
-      <GemmaRead result={r} sourceText={sourceText} imageUrl={imageUrl} />
+      {/* The keyword fallback isn't Gemma's reading, so it never gets the "What Gemma read" section. */}
+      {r.meta.fallback !== "keywords" && <GemmaRead result={r} sourceText={sourceText} imageUrl={imageUrl} />}
 
       <section aria-labelledby="questions" className="border-t-2 border-ink px-4 pt-6 pb-7 sm:px-8">
         <h3 id="questions" className="text-[20px] font-bold tracking-[-0.01em]">
@@ -300,7 +302,8 @@ function ModeLine({ r }: { r: CheckResult }) {
       {r.meta.mode === "mock" && (
         <span className="rounded-xs bg-warn-tint px-2 py-0.5 text-warn">{t.demoMode}</span>
       )}
-      {r.meta.mode === "rules-only" && <span>{t.rulesOnly}</span>}
+      {r.meta.fallback === "keywords" && <span className="rounded-xs bg-warn-tint px-2 py-0.5 text-warn">{t.kwMode}</span>}
+      {r.meta.mode === "rules-only" && r.meta.fallback !== "keywords" && <span>{t.rulesOnly}</span>}
       {!r.meta.dataLive && <span>{t.savedFigures}</span>}
     </div>
   );
